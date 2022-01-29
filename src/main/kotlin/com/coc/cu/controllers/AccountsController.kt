@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 
-@CrossOrigin(origins = ["*"])
+@CrossOrigin(origins =  ["http://localhost:3000","https://coccu.sentigroup.com"])
 @RequestMapping("/api/v1/accounts")
 @RestController
 class AccountsController(var accountService: AccountService) {

@@ -6,7 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 
-@CrossOrigin(origins = ["*"])
+@CrossOrigin(origins =  ["http://localhost:3000","https://coccu.sentigroup.com"])
 @RequestMapping("/api/v1/auth")
 @RestController
 class AuthController {
