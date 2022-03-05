@@ -1,6 +1,5 @@
 package com.coc.cu
 
-import antlr.StringUtils
 import com.coc.cu.domain.AccountType
 import com.coc.cu.domain.TransactionType
 import com.coc.cu.entities.Member
@@ -9,16 +8,27 @@ import com.coc.cu.entities.Transaction
 import com.coc.cu.repositories.AccountTransactionsRepository
 import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.repositories.MembersRepository
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.logging.log4j.util.Strings
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.core.io.ClassPathResource
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 @SpringBootApplication
@@ -30,12 +40,21 @@ class CuApplication {
         accountTransactionsRepository: AccountTransactionsRepository,
         memberAccountRepository: MemberAccountRepository
     ) = CommandLineRunner {
-        registerMembers(membersRepository,memberAccountRepository)
+        registerMembers(membersRepository, memberAccountRepository)
         recordTransactions(accountTransactionsRepository, membersRepository, memberAccountRepository)
     }
 
 
-    fun registerMembers(repository: MembersRepository,memberAccountRepository: MemberAccountRepository) {
+    @Bean
+    fun objectMapper(): ObjectMapper {
+        var om = jacksonObjectMapper()
+        om.findAndRegisterModules()
+
+        return om
+    }
+
+
+    fun registerMembers(repository: MembersRepository, memberAccountRepository: MemberAccountRepository) {
         val bufferedReader = BufferedReader((InputStreamReader(ClassPathResource("/fixtures/Members.csv").inputStream)))
         val csvParser = CSVParser(bufferedReader, CSVFormat.DEFAULT.withFirstRecordAsHeader())
 
@@ -81,6 +100,7 @@ class CuApplication {
             transaction.amount = record[4]
                 .replace("GHS", "")
                 .replace(",", "").toFloat()
+            transaction.createdDate = LocalDate.parse(record[5], DateTimeFormatter.ISO_DATE)
             var t = TransactionType.values().filter { t -> t.name == record[3].replace(" ", "_") }
             if (t.isNotEmpty()) {
                 transaction.type = t.first()
@@ -111,7 +131,6 @@ class CuApplication {
                 }
 
 
-
             }
 
             repository.save(transaction)
@@ -121,6 +140,8 @@ class CuApplication {
 }
 
 fun main(args: Array<String>) {
+
+
     runApplication<CuApplication>(*args)
 
 

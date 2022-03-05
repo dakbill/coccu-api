@@ -1,7 +1,7 @@
 package com.coc.cu.config
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpMethod
@@ -12,13 +12,32 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.provisioning.InMemoryUserDetailsManager
+import org.springframework.web.cors.CorsUtils
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
 @EnableWebSecurity
 class WebSecurityConfig {
 
+    @Value("\${cors.originPatterns:default}")
+    private val corsOriginPatterns: String = ""
+
     @Bean
-    public fun userDetailsService(): UserDetailsService {
+    fun addCorsConfig(): WebMvcConfigurer {
+        return object : WebMvcConfigurer {
+            override fun addCorsMappings(registry: CorsRegistry) {
+                val allowedOrigins = corsOriginPatterns.split(",").toTypedArray()
+                registry.addMapping("/**")
+                    .allowedMethods("*")
+                    .allowedOriginPatterns(*allowedOrigins)
+                    .allowCredentials(true)
+            }
+        }
+    }
+
+    @Bean
+    fun userDetailsService(): UserDetailsService {
         val users: User.UserBuilder = User.withDefaultPasswordEncoder()
         val manager = InMemoryUserDetailsManager()
         manager.createUser(users.username("user").password("password").roles("USER").build())
@@ -31,6 +50,7 @@ class WebSecurityConfig {
     class ApiWebSecurityConfigurationAdapter : WebSecurityConfigurerAdapter() {
         override fun configure(http: HttpSecurity) {
             http.authorizeRequests()
+                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .antMatchers(HttpMethod.GET,"/h2-console/**").permitAll()
                 .antMatchers(HttpMethod.POST,"/h2-console/**").permitAll()
                 .antMatchers(

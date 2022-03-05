@@ -17,7 +17,15 @@ interface AccountTransactionsRepository: CrudRepository<Transaction, Long> {
 interface MembersRepository : CrudRepository<Member, Long> {
 
     @Query(
-        value = "SELECT member.* FROM member WHERE (CAST(id AS CHAR) LIKE '%' || ?1 || '%' ) OR (LOWER(name) LIKE '%' || ?1 || '%' )",
+        value = "" +
+                "SELECT " +
+                    "DISTINCT member.* " +
+                "FROM " +
+                    "member LEFT JOIN MEMBER_ACCOUNT ON(MEMBER_ACCOUNT.member_id=member.id) " +
+                "WHERE " +
+                    "(( LOWER(?1) <> UPPER(?1) ) AND MEMBER_ACCOUNT.member_id LIKE '%' || ?1 || '%') OR " +
+                    "(CAST(member.id AS CHAR) LIKE '%' || ?1 || '%' ) OR " +
+                    "(LOWER(member.name) LIKE '%' || ?1 || '%' )" ,
         nativeQuery = true
     )
     fun findByQuery(query: String?): List<Member>
@@ -26,5 +34,5 @@ interface MembersRepository : CrudRepository<Member, Long> {
 
 @Repository
 interface MemberAccountRepository : CrudRepository<MemberAccount, String> {
-    fun findByUserId(id: Long?): List<MemberAccount>?
+    fun findByMemberId(id: Long?): List<MemberAccount>?
 }

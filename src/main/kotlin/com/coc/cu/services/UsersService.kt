@@ -1,8 +1,7 @@
 package com.coc.cu.services
 
 import com.coc.cu.domain.AccountResponseDto
-import com.coc.cu.domain.UserResponseDto
-import com.coc.cu.entities.Member
+import com.coc.cu.domain.MemberResponseDto
 import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.repositories.MembersRepository
 import com.fasterxml.jackson.core.type.TypeReference
@@ -13,9 +12,9 @@ import org.springframework.stereotype.Service
 @Service
 class UsersService(var repository: MembersRepository, var memberAccountRepository: MemberAccountRepository) {
 
-    fun single(id: Long): UserResponseDto? {
+    fun single(id: Long): MemberResponseDto? {
         val objectMapper = ObjectMapper()
-        val typeRef = object : TypeReference<UserResponseDto>() {}
+        val typeRef = object : TypeReference<MemberResponseDto>() {}
 
         var res = repository.findById(id)
         if (res.isPresent) {
@@ -28,9 +27,9 @@ class UsersService(var repository: MembersRepository, var memberAccountRepositor
         return null
     }
 
-    fun list(query: String): List<UserResponseDto>? {
+    fun list(query: String): List<MemberResponseDto>? {
         val objectMapper = ObjectMapper()
-        val typeRef = object : TypeReference<List<UserResponseDto>>() {}
+        val typeRef = object : TypeReference<List<MemberResponseDto>>() {}
         val accountsTypeRef = object : TypeReference<List<AccountResponseDto>>() {}
 
         val members = repository.findByQuery(query.lowercase())
@@ -38,7 +37,7 @@ class UsersService(var repository: MembersRepository, var memberAccountRepositor
 
         val users = objectMapper.convertValue(members, typeRef)
         for (user in users) {
-            user.accounts = objectMapper.convertValue(memberAccountRepository.findByUserId(user.id), accountsTypeRef)
+            user.accounts = objectMapper.convertValue(memberAccountRepository.findByMemberId(user.id), accountsTypeRef)
         }
 
         return users
