@@ -1,5 +1,6 @@
 package com.coc.cu.domain
 
+import com.fasterxml.jackson.annotation.JsonFilter
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
@@ -16,6 +17,7 @@ class AccountResponseDto {
     var transactions: List<TransactionResponseDto>? = null
 
 }
+
 
 class TransactionResponseDto {
     var id: Long? = null
@@ -34,6 +36,7 @@ class TransactionResponseDto {
     @JsonFormat(pattern="yyyy-MM-dd")
     var updatedDate: LocalDate? = null
 }
+
 
 class MemberResponseDto {
     var id: Long? = null

@@ -1,6 +1,5 @@
 package com.coc.cu.services
 
-import com.coc.cu.domain.AccountResponseDto
 import com.coc.cu.domain.TransactionResponseDto
 import com.coc.cu.repositories.AccountTransactionsRepository
 import com.fasterxml.jackson.core.type.TypeReference
@@ -8,12 +7,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.stereotype.Service
 
 @Service
-class TransactionsService(repository: AccountTransactionsRepository) {
-    var repository: AccountTransactionsRepository = repository
-
+class TransactionsService(var repository: AccountTransactionsRepository, var objectMapper: ObjectMapper) {
 
     fun single(id: Long): TransactionResponseDto? {
-        val objectMapper = ObjectMapper()
         val typeRef = object : TypeReference<TransactionResponseDto>() {}
 
 
@@ -28,10 +24,11 @@ class TransactionsService(repository: AccountTransactionsRepository) {
         return null
     }
 
-    fun list(): List<TransactionResponseDto>? {
-        val objectMapper = ObjectMapper()
+    fun list(memberId: Long): List<TransactionResponseDto>? {
         val typeRef = object : TypeReference<List<TransactionResponseDto>>() {}
+        var transactions = repository.findAllByMemberId(memberId)
 
-        return objectMapper.convertValue(repository.findAll(), typeRef)
+
+        return objectMapper.convertValue(transactions, typeRef)
     }
 }

@@ -18,8 +18,8 @@ class TransactionsController(val transactionsService: TransactionsService) {
     }
 
     @GetMapping
-    fun list(): ApiResponse<List<TransactionResponseDto>> {
-        return ApiResponse(transactionsService.list(), HttpStatus.OK)
+    fun list(@RequestParam memberId: Long): ApiResponse<List<TransactionResponseDto>> {
+        return ApiResponse(transactionsService.list(memberId), HttpStatus.OK)
     }
 
     @GetMapping("/{id}")

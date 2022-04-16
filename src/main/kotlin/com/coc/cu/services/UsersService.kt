@@ -2,6 +2,7 @@ package com.coc.cu.services
 
 import com.coc.cu.domain.AccountResponseDto
 import com.coc.cu.domain.MemberResponseDto
+import com.coc.cu.entities.Account
 import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.repositories.MembersRepository
 import com.fasterxml.jackson.core.type.TypeReference
@@ -19,9 +20,20 @@ class UsersService(var repository: MembersRepository, var memberAccountRepositor
         var res = repository.findById(id)
         if (res.isPresent) {
             var userEntity = res.get()
+            val accounts = memberAccountRepository.findByMemberId(userEntity.id)
+
+            for (account in accounts!!) {
+                account.member = null
+            }
+
+            userEntity.accounts = accounts
+
+
+
 
             return objectMapper.convertValue(userEntity, typeRef)
         }
+
 
 
         return null

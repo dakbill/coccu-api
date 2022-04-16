@@ -2,32 +2,28 @@ package com.coc.cu
 
 import com.coc.cu.domain.AccountType
 import com.coc.cu.domain.TransactionType
+import com.coc.cu.entities.Account
 import com.coc.cu.entities.Member
-import com.coc.cu.entities.MemberAccount
 import com.coc.cu.entities.Transaction
 import com.coc.cu.repositories.AccountTransactionsRepository
 import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.repositories.MembersRepository
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
+import com.fasterxml.jackson.databind.ser.FilterProvider
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.logging.log4j.util.Strings
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.core.io.ClassPathResource
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 
@@ -55,7 +51,7 @@ class CuApplication {
 
 
     fun registerMembers(repository: MembersRepository, memberAccountRepository: MemberAccountRepository) {
-        val bufferedReader = BufferedReader((InputStreamReader(ClassPathResource("/fixtures/Members.csv").inputStream)))
+        val bufferedReader = BufferedReader((InputStreamReader(ClassPathResource("/fixtures/Transactions_Members.csv").inputStream)))
         val csvParser = CSVParser(bufferedReader, CSVFormat.DEFAULT.withFirstRecordAsHeader())
 
 
@@ -68,10 +64,11 @@ class CuApplication {
             var accountNumber = user.id.toString()
             var accountOptional = memberAccountRepository.findById(accountNumber)
             if (accountOptional.isEmpty) {
-                var account = MemberAccount(user, AccountType.SAVINGS, accountNumber)
-                account = memberAccountRepository.save(account)
+                var account = Account(user, AccountType.SAVINGS, accountNumber)
                 memberAccountRepository.save(account)
             }
+
+
         }
     }
 
@@ -81,7 +78,7 @@ class CuApplication {
         memberAccountRepository: MemberAccountRepository
     ) {
         val bufferedReader =
-            BufferedReader((InputStreamReader(ClassPathResource("/fixtures/Transactions.csv").inputStream)))
+            BufferedReader((InputStreamReader(ClassPathResource("/fixtures/Transactions_Transactions.csv").inputStream)))
         val csvParser = CSVParser(
             bufferedReader,
             CSVFormat.EXCEL.withFirstRecordAsHeader()
@@ -97,9 +94,12 @@ class CuApplication {
 
             var transaction = Transaction()
 
-            transaction.amount = record[4]
-                .replace("GHS", "")
-                .replace(",", "").toFloat()
+            if (record[4].isNotEmpty()) {
+                transaction.amount = record[4]
+                    .replace("GHS", "")
+                    .replace(",", "").toFloat()
+            }
+
             transaction.createdDate = LocalDate.parse(record[5], DateTimeFormatter.ISO_DATE)
             var t = TransactionType.values().filter { t -> t.name == record[3].replace(" ", "_") }
             if (t.isNotEmpty()) {
@@ -113,14 +113,14 @@ class CuApplication {
                         accountType = AccountType.LOAN
                     }
 
-                    var account: MemberAccount? = null
+                    var account: Account? = null
                     var accountOptional = memberAccountRepository.findById(accountNumber)
                     if (accountOptional.isPresent) {
                         account = accountOptional.get()
                     } else if (record[1].isNotEmpty()) {
                         var memberOptional = membersRepository.findById(record[1].toLong())
                         if (memberOptional.isPresent) {
-                            account = MemberAccount(memberOptional.get(), accountType, accountNumber)
+                            account = Account(memberOptional.get(), accountType, accountNumber)
                             account = memberAccountRepository.save(account)
                             memberAccountRepository.save(account)
                         }

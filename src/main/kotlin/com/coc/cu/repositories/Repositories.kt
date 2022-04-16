@@ -1,8 +1,7 @@
 package com.coc.cu.repositories
 
-import com.coc.cu.domain.AccountResponseDto
 import com.coc.cu.entities.Member
-import com.coc.cu.entities.MemberAccount
+import com.coc.cu.entities.Account
 import com.coc.cu.entities.Transaction
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
@@ -11,6 +10,12 @@ import org.springframework.stereotype.Repository
 @Repository
 interface AccountTransactionsRepository: CrudRepository<Transaction, Long> {
     fun findByAccountId(accountId: String?): List<Transaction>
+
+    @Query(
+        value = "SELECT * FROM TRANSACTION WHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1)",
+        nativeQuery = true
+    )
+    fun findAllByMemberId(memberId: Long): List<Transaction>
 }
 
 @Repository
@@ -19,13 +24,16 @@ interface MembersRepository : CrudRepository<Member, Long> {
     @Query(
         value = "" +
                 "SELECT " +
-                    "DISTINCT member.* " +
+                    "DISTINCT MEMBER.* " +
                 "FROM " +
-                    "member LEFT JOIN MEMBER_ACCOUNT ON(MEMBER_ACCOUNT.member_id=member.id) " +
+                    "MEMBER LEFT JOIN ACCOUNT ON(ACCOUNT.member_id=MEMBER.id) " +
                 "WHERE " +
-                    "(( LOWER(?1) <> UPPER(?1) ) AND MEMBER_ACCOUNT.member_id LIKE '%' || ?1 || '%') OR " +
-                    "(CAST(member.id AS CHAR) LIKE '%' || ?1 || '%' ) OR " +
-                    "(LOWER(member.name) LIKE '%' || ?1 || '%' )" ,
+                    "( LENGTH(MEMBER.name) > 0 ) AND"+
+                    "( " +
+                    "   (( LOWER(?1) <> UPPER(?1) ) AND ACCOUNT.member_id LIKE '%' || ?1 || '%') OR " +
+                    "   (CAST(MEMBER.id AS CHAR) LIKE '%' || ?1 || '%' ) OR " +
+                    "   (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )" +
+                    " )",
         nativeQuery = true
     )
     fun findByQuery(query: String?): List<Member>
@@ -33,6 +41,6 @@ interface MembersRepository : CrudRepository<Member, Long> {
 
 
 @Repository
-interface MemberAccountRepository : CrudRepository<MemberAccount, String> {
-    fun findByMemberId(id: Long?): List<MemberAccount>?
+interface MemberAccountRepository : CrudRepository<Account, String> {
+    fun findByMemberId(id: Long?): List<Account>?
 }

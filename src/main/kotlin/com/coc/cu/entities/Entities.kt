@@ -3,30 +3,28 @@ package com.coc.cu.entities
 
 import com.coc.cu.domain.AccountType
 import com.coc.cu.domain.TransactionType
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
+import com.fasterxml.jackson.annotation.JsonBackReference
+import com.fasterxml.jackson.annotation.JsonFilter
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import java.time.LocalDate
-import java.util.*
 import javax.persistence.*
 
-@Entity
-class Member(
-    var name: String? = null,
-    @OneToMany var accounts: List<MemberAccount>? = arrayListOf(),
-    @Id @GeneratedValue(strategy = GenerationType.AUTO) var id: Long? = -1
-)
-
 
 @Entity
-data class MemberAccount(
-    @ManyToOne var member: Member,
+data class Account(
+    @ManyToOne var member: Member?,
     @Enumerated(value = EnumType.STRING) var type: AccountType?,
     @Id var id: String? = null,
     @OneToMany var transactions: List<Transaction>? = arrayListOf()
 )
+
+@Entity
+class Member(
+    var name: String? = null,
+    @OneToMany var accounts: List<Account>? = arrayListOf(),
+    @Id @GeneratedValue(strategy = GenerationType.AUTO) var id: Long? = -1
+)
+
 
 @Entity
 data class Transaction(
@@ -35,10 +33,10 @@ data class Transaction(
 
     var createdDate: LocalDate? = null,
 
-
     var updatedDate: LocalDate? = null,
 
-    @JsonIgnore @ManyToOne var account: MemberAccount? = null,
+    @ManyToOne var account: Account? = null,
+
     @Id @GeneratedValue(strategy = GenerationType.AUTO) var id: Long? = -1
 )
 

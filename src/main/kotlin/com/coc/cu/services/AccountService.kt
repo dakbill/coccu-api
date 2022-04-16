@@ -1,7 +1,6 @@
 package com.coc.cu.services
 
 import com.coc.cu.domain.AccountResponseDto
-import com.coc.cu.domain.TransactionResponseDto
 import com.coc.cu.repositories.AccountTransactionsRepository
 import com.coc.cu.repositories.MemberAccountRepository
 import com.fasterxml.jackson.core.type.TypeReference
@@ -19,7 +18,6 @@ class AccountService(
     fun single(id: String): AccountResponseDto? {
 
         val typeRef = object : TypeReference<AccountResponseDto>() {}
-        val transactionRef = object : TypeReference<TransactionResponseDto>() {}
 
         var res = repository.findById(id)
         if (res.isPresent) {
