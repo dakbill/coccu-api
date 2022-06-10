@@ -1,11 +1,13 @@
 package com.coc.cu.repositories
 
+import com.coc.cu.domain.TransactionSumsDto
 import com.coc.cu.entities.Member
 import com.coc.cu.entities.Account
 import com.coc.cu.entities.Transaction
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
+import java.util.*
 
 @Repository
 interface AccountTransactionsRepository: CrudRepository<Transaction, Long> {
@@ -43,4 +45,12 @@ interface MembersRepository : CrudRepository<Member, Long> {
 @Repository
 interface MemberAccountRepository : CrudRepository<Account, String> {
     fun findByMemberId(id: Long?): List<Account>?
+
+
+    @Query(
+        value = "SELECT SUM(AMOUNT) AS AMOUNT, TYPE FROM TRANSACTION WHERE CREATED_DATE BETWEEN ?1 AND ?2 GROUP BY TYPE",
+        nativeQuery = true
+    )
+    fun getDashboardStatistics(startDate: Date, endDate: Date): List<TransactionSumsDto>
 }
+
