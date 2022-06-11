@@ -6,6 +6,7 @@ enum class AccountType {
 }
 
 enum class TransactionType {
+    CARD,
     SAVINGS,
     SAVINGS_CHEQUE,
     WITHDRAWAL,

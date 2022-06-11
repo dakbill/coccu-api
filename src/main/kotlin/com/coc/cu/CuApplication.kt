@@ -101,9 +101,10 @@ class CuApplication {
             }
 
             transaction.createdDate = LocalDate.parse(record[5], DateTimeFormatter.ISO_DATE)
-            var t = TransactionType.values().filter { t -> t.name == record[3].replace(" ", "_") }
+            var t = TransactionType.values().filter { t -> t.name == record[3].trim().replace(" ", "_") }
             if (t.isNotEmpty()) {
                 transaction.type = t.first()
+
 
                 if (Strings.isNotEmpty(record[1])) {
                     var accountNumber = record[1].toLong().toString()

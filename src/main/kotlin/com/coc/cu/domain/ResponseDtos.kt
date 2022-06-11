@@ -59,7 +59,7 @@ class ClosingBooksResponseDto {
     var totalWithdrawals: Double = 0.0
     var totalAdminExpensesCheque: Double = 0.0
     var totalAdminExpenses: Double = 0.0
-    var totalChequeLoans: Double = 0.0
+    var totalLoansCheque: Double = 0.0
     var totalLoans: Double = 0.0
     var totalLoanRepaymentsCheque: Double = 0.0
     var totalLoanRepayments: Double = 0.0
