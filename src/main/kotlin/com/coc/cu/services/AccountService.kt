@@ -128,6 +128,7 @@ class AccountService(
             }
         }
 
+        response.cashBalance = response.totalIn - response.totalOut
         return response
     }
 }
