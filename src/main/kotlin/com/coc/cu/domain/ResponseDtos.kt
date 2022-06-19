@@ -1,13 +1,11 @@
 package com.coc.cu.domain
 
-import com.fasterxml.jackson.annotation.JsonFilter
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import lombok.Data
-import org.springframework.beans.factory.annotation.Value
 import java.time.LocalDate
 
 
@@ -45,6 +43,18 @@ class MemberResponseDto {
     var name: String? = null
     var phone: String? = null
     var accounts: List<AccountResponseDto>? = null
+
+
+    var image: String? = null
+    var email: String? = null
+    var address: String? = null
+    var city: String? = null
+    var firstOfKinName: String? = null
+    var firstOfKinPhone: String? = null
+    var firstOfKinEmail: String? = null
+    var secondOfKinName: String? = null
+    var secondOfKinPhone: String? = null
+    var secondOfKinEmail: String? = null
 }
 
 

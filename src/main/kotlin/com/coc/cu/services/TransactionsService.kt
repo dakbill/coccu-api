@@ -1,13 +1,17 @@
 package com.coc.cu.services
 
-import com.coc.cu.domain.TransactionResponseDto
+import com.coc.cu.domain.*
+import com.coc.cu.entities.Account
+import com.coc.cu.entities.Transaction
 import com.coc.cu.repositories.AccountTransactionsRepository
+import com.coc.cu.repositories.MemberAccountRepository
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
-class TransactionsService(var repository: AccountTransactionsRepository, var objectMapper: ObjectMapper) {
+class TransactionsService(var repository: AccountTransactionsRepository,var accountRepository: MemberAccountRepository, var objectMapper: ObjectMapper) {
 
     fun single(id: Long): TransactionResponseDto? {
         val typeRef = object : TypeReference<TransactionResponseDto>() {}
@@ -30,5 +34,20 @@ class TransactionsService(var repository: AccountTransactionsRepository, var obj
 
 
         return objectMapper.convertValue(transactions, typeRef)
+    }
+
+    fun create(model: RawTransactionRequestDto): TransactionResponseDto? {
+        val transactionTypeRef = object : TypeReference<Transaction>() {}
+        var transaction = objectMapper.convertValue(model,transactionTypeRef)
+
+        transaction.createdDate = LocalDate.now()
+        transaction.account = accountRepository.findById(model.accountId!!).get()
+        transaction = repository.save(transaction)
+
+
+
+
+        val typeRef = object : TypeReference<TransactionResponseDto>() {}
+        return objectMapper.convertValue(repository.findById(transaction.id!!).get(), typeRef)
     }
 }
