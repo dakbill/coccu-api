@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.Period
+import java.time.ZoneId
 import java.util.*
 import java.util.stream.Collectors
 import kotlin.math.roundToInt
@@ -67,7 +68,21 @@ class AccountService(
         }
 
 
-        val step = Period.ofWeeks(1)
+        val zoneId = ZoneId.of("GMT")
+        val diff = endDate.atStartOfDay(zoneId).toEpochSecond()-startDate.atStartOfDay(zoneId).toEpochSecond()
+
+
+        val step = if (diff < (24 * 60 * 60)) {
+            Period.ofDays(1 / 24)
+        } else if (diff < (24 * 60 * 60 * 16)) {
+            Period.ofDays(1)
+        } else if (diff < (24 * 60 * 60 * 30 * 3)) {
+            Period.ofWeeks(1)
+        } else if (diff < (24 * 60 * 60 * 30 * 24)) {
+            Period.ofMonths(1)
+        } else {
+            Period.ofYears(1)
+        }
 
         val dates: List<LocalDate> = startDate.datesUntil(endDate, step)
             .collect(Collectors.toList())
