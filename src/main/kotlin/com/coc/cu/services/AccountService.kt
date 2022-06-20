@@ -96,7 +96,7 @@ class AccountService(
                             arrayOf(
                                 TransactionType.SAVINGS.name,
                                 TransactionType.SAVINGS_CHEQUE.name
-                            ), it.minus(step), it
+                            ), it, it.plus(step)
                         )
                     },
                     TransactionType.WITHDRAWAL.name to dates.map {
@@ -104,7 +104,7 @@ class AccountService(
                             arrayOf(
                                 TransactionType.WITHDRAWAL.name,
                                 TransactionType.WITHDRAWAL_CHEQUE.name
-                            ), it.minus(step), it
+                            ), it, it.plus(step)
                         )
                     },
                     TransactionType.LOAN_REPAYMENT.name to dates.map {
@@ -112,7 +112,7 @@ class AccountService(
                             arrayOf(
                                 TransactionType.LOAN_REPAYMENT.name,
                                 TransactionType.LOAN_REPAYMENT_CHEQUE.name
-                            ), it.minus(step), it
+                            ), it, it.plus(step)
                         )
                     },
                     TransactionType.INTEREST_ON_LOAN.name to dates.map {
@@ -120,7 +120,7 @@ class AccountService(
                             arrayOf(
                                 TransactionType.INTEREST_ON_LOAN.name,
                                 TransactionType.INTEREST_ON_LOAN_CHEQUE.name
-                            ), it.minus(step), it
+                            ), it, it.plus(step)
                         )
                     },
                     TransactionType.LOAN.name to dates.map {
@@ -128,7 +128,7 @@ class AccountService(
                             arrayOf(
                                 TransactionType.LOAN.name,
                                 TransactionType.LOAN_CHEQUE.name
-                            ), it.minus(step), it
+                            ), it, it.plus(step)
                         )
                     },
                 )
