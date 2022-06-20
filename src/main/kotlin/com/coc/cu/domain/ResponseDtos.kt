@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import lombok.Data
 import java.time.LocalDate
+import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 
 class AccountResponseDto {
@@ -91,6 +92,7 @@ class DashboardResponseDto {
     var withdrawals: Double = 0.0
     var loans: Double = 0.0
     var loanRepayments: Double = 0.0
+    var chart: Map<String,Any>? = null
 }
 
 @Data

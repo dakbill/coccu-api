@@ -2,14 +2,18 @@ package com.coc.cu.services
 
 import com.coc.cu.domain.*
 import com.coc.cu.entities.Account
-import com.coc.cu.entities.Member
 import com.coc.cu.repositories.AccountTransactionsRepository
 import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.repositories.MembersRepository
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.stereotype.Service
+import java.time.LocalDate
+import java.time.Period
 import java.util.*
+import java.util.stream.Collectors
+import kotlin.math.roundToInt
+
 
 @Service
 class AccountService(
@@ -43,9 +47,9 @@ class AccountService(
         return objectMapper.convertValue(repository.findAll(), typeRef)
     }
 
-    fun getDashboardMetrics(startDate: Date, endDate: Date): DashboardResponseDto {
+    fun getDashboardMetrics(startDate: LocalDate, endDate: LocalDate): DashboardResponseDto {
         val response = DashboardResponseDto()
-        val transactionSumsDto = repository.getDashboardStatistics(startDate,endDate)
+        val transactionSumsDto = repository.getDashboardStatistics(startDate, endDate)
         for (record in transactionSumsDto) {
             if (record.type == null) {
                 continue
@@ -62,12 +66,66 @@ class AccountService(
             }
         }
 
+
+        val step = Period.ofWeeks(1)
+
+        val dates: List<LocalDate> = startDate.datesUntil(endDate, step)
+            .collect(Collectors.toList())
+
+        response.chart =
+            mapOf(
+                "x" to dates.map { String.format("%s-%s-%s", it.year, it.monthValue, it.dayOfMonth) },
+                "series" to mapOf(
+                    TransactionType.SAVINGS.name to dates.map {
+                        repository.sumAmounts(
+                            arrayOf(
+                                TransactionType.SAVINGS.name,
+                                TransactionType.SAVINGS_CHEQUE.name
+                            ), it, it.plus(step)
+                        )
+                    },
+                    TransactionType.WITHDRAWAL.name to dates.map {
+                        repository.sumAmounts(
+                            arrayOf(
+                                TransactionType.WITHDRAWAL.name,
+                                TransactionType.WITHDRAWAL_CHEQUE.name
+                            ), it, it.plus(step)
+                        )
+                    },
+                    TransactionType.LOAN_REPAYMENT.name to dates.map {
+                        repository.sumAmounts(
+                            arrayOf(
+                                TransactionType.LOAN_REPAYMENT.name,
+                                TransactionType.LOAN_REPAYMENT_CHEQUE.name
+                            ), it, it.plus(step)
+                        )
+                    },
+                    TransactionType.INTEREST_ON_LOAN.name to dates.map {
+                        repository.sumAmounts(
+                            arrayOf(
+                                TransactionType.INTEREST_ON_LOAN.name,
+                                TransactionType.INTEREST_ON_LOAN_CHEQUE.name
+                            ), it, it.plus(step)
+                        )
+                    },
+                    TransactionType.LOAN.name to dates.map {
+                        repository.sumAmounts(
+                            arrayOf(
+                                TransactionType.LOAN.name,
+                                TransactionType.LOAN_CHEQUE.name
+                            ), it, it.plus(step)
+                        )
+                    },
+                )
+            )
+
         return response
     }
 
-    fun getClosingBooksMetrics(dayInFocus: Date): ClosingBooksResponseDto {
+    fun getClosingBooksMetrics(dayInFocus: LocalDate): ClosingBooksResponseDto {
         val response = ClosingBooksResponseDto()
-        val endOfDay = Date(dayInFocus.time + (24 * 60 * 60 * 1000))
+        val endOfDay = dayInFocus.atStartOfDay().plusSeconds((24 * 60 * 60)).toLocalDate()
+//        val endOfDay = Date(dayInFocus.time + (24 * 60 * 60 * 1000))
 
         val transactionSumsDto = repository.getDashboardStatistics(dayInFocus, endOfDay)
         for (record in transactionSumsDto) {
@@ -136,7 +194,7 @@ class AccountService(
 
     fun create(model: AccountRequestDto): AccountResponseDto? {
         val accountTypeRef = object : TypeReference<Account>() {}
-        var account = objectMapper.convertValue(model,accountTypeRef)
+        var account = objectMapper.convertValue(model, accountTypeRef)
         account.id = UUID.randomUUID().toString()
 
         account.member = membersRepository.findById(model.memberId!!).get()

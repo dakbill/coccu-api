@@ -1,12 +1,14 @@
 package com.coc.cu.repositories
 
 import com.coc.cu.domain.TransactionSumsDto
+import com.coc.cu.domain.TransactionType
 import com.coc.cu.entities.Member
 import com.coc.cu.entities.Account
 import com.coc.cu.entities.Transaction
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
+import java.time.LocalDate
 import java.util.*
 
 @Repository
@@ -51,6 +53,12 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
         value = "SELECT SUM(AMOUNT) AS AMOUNT, TYPE FROM TRANSACTION WHERE CREATED_DATE BETWEEN ?1 AND ?2 GROUP BY TYPE",
         nativeQuery = true
     )
-    fun getDashboardStatistics(startDate: Date, endDate: Date): List<TransactionSumsDto>
+    fun getDashboardStatistics(startDate: LocalDate, endDate: LocalDate): List<TransactionSumsDto>
+
+    @Query(
+        value = "SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE TYPE IN (?1) AND CREATED_DATE BETWEEN ?2 AND ?3",
+        nativeQuery = true
+    )
+    fun sumAmounts(transactionTypes: Array<String>, startDate: LocalDate, endDate: LocalDate): Double
 }
 
