@@ -1,6 +1,9 @@
 package com.coc.cu.controllers
 
+import com.coc.cu.domain.AccountRequestDto
 import com.coc.cu.domain.AccountResponseDto
+import com.coc.cu.domain.MemberResponseDto
+import com.coc.cu.domain.UserRequestDto
 import com.coc.cu.domain.models.ApiResponse
 import com.coc.cu.services.AccountService
 import org.springframework.http.HttpStatus
@@ -12,9 +15,10 @@ import org.springframework.web.bind.annotation.*
 @RestController
 class AccountsController(var accountService: AccountService) {
 
+
     @PostMapping
-    fun create(): ApiResponse<Array<String>> {
-        return ApiResponse(arrayOf("1"), HttpStatus.OK)
+    fun create(@RequestBody model: AccountRequestDto): ApiResponse<AccountResponseDto> {
+        return ApiResponse(accountService.create(model), HttpStatus.OK)
     }
 
     @GetMapping

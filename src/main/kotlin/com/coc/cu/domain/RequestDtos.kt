@@ -6,8 +6,6 @@ import java.util.*
 class AccountRequestDto {
     var memberId: Long? = null
     var type: String? = null
-
-    var number: String? = null
 }
 
 

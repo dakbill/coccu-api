@@ -1,11 +1,11 @@
 package com.coc.cu.services
 
-import com.coc.cu.domain.AccountResponseDto
-import com.coc.cu.domain.ClosingBooksResponseDto
-import com.coc.cu.domain.DashboardResponseDto
-import com.coc.cu.domain.TransactionType
+import com.coc.cu.domain.*
+import com.coc.cu.entities.Account
+import com.coc.cu.entities.Member
 import com.coc.cu.repositories.AccountTransactionsRepository
 import com.coc.cu.repositories.MemberAccountRepository
+import com.coc.cu.repositories.MembersRepository
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.stereotype.Service
@@ -14,6 +14,7 @@ import java.util.*
 @Service
 class AccountService(
     var repository: MemberAccountRepository,
+    var membersRepository: MembersRepository,
     var transactionsRepository: AccountTransactionsRepository,
     var objectMapper: ObjectMapper
 ) {
@@ -130,5 +131,19 @@ class AccountService(
 
         response.cashBalance = response.totalIn - response.totalOut
         return response
+    }
+
+
+    fun create(model: AccountRequestDto): AccountResponseDto? {
+        val accountTypeRef = object : TypeReference<Account>() {}
+        var account = objectMapper.convertValue(model,accountTypeRef)
+        account.id = UUID.randomUUID().toString()
+
+        account.member = membersRepository.findById(model.memberId!!).get()
+        account = repository.save(account)
+
+
+        val typeRef = object : TypeReference<AccountResponseDto>() {}
+        return objectMapper.convertValue(account, typeRef)
     }
 }
