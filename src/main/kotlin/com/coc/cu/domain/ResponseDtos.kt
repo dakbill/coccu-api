@@ -13,6 +13,7 @@ import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 class AccountResponseDto {
     var id: String? = null
     var number: String? = null
+    var balance: Double = 0.0
     var type: AccountType? = null
     var member: MemberResponseDto? = null
     var transactions: List<TransactionResponseDto>? = null

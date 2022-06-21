@@ -6,6 +6,7 @@ import com.coc.cu.domain.MemberResponseDto
 import com.coc.cu.domain.UserRequestDto
 import com.coc.cu.entities.Account
 import com.coc.cu.entities.Member
+import com.coc.cu.repositories.AccountTransactionsRepository
 import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.repositories.MembersRepository
 import com.fasterxml.jackson.core.type.TypeReference
@@ -16,7 +17,7 @@ import java.util.*
 
 
 @Service
-class UsersService(var repository: MembersRepository, var memberAccountRepository: MemberAccountRepository, val objectMapper: ObjectMapper) {
+class UsersService(var repository: MembersRepository, var memberAccountRepository: MemberAccountRepository, var transactionsRepository: AccountTransactionsRepository, val objectMapper: ObjectMapper) {
 
     fun single(id: Long): MemberResponseDto? {
         val objectMapper = ObjectMapper()
@@ -25,15 +26,24 @@ class UsersService(var repository: MembersRepository, var memberAccountRepositor
         var res = repository.findById(id)
         if (res.isPresent) {
             var userEntity = res.get()
-            val accounts = memberAccountRepository.findByMemberId(userEntity.id)
+
+            val accountTypeRef = object : TypeReference<List<AccountResponseDto>>() {}
+            val accounts = objectMapper.convertValue(memberAccountRepository.findByMemberId(userEntity.id), accountTypeRef)
 
             for (account in accounts!!) {
                 account.member = null
+                if (account.type == AccountType.SAVINGS) {
+                    account.balance = transactionsRepository.findBySavingsBalance(account.id)
+                } else {
+                    account.balance = transactionsRepository.findByLoanBalance(account.id)
+                }
+
             }
 
-            userEntity.accounts = accounts
+            val member = objectMapper.convertValue(userEntity, typeRef)
+            member.accounts = accounts
 
-            return objectMapper.convertValue(userEntity, typeRef)
+            return member
         }
 
         return null
