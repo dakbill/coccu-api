@@ -80,17 +80,21 @@ class CuApplication {
     }
 
     @Bean
+    fun passwordEncoder(): PasswordEncoder? {
+        return BCryptPasswordEncoder()
+    }
+
+    @Bean
     fun userDetailsService(): UserDetailsService {
         val passwordEncoder = passwordEncoder()
         val users: User.UserBuilder = User.builder()
         val manager = InMemoryUserDetailsManager()
         manager.createUser(users.username("taichobill@gmail.com").password(passwordEncoder!!.encode("password")).roles("USER", "ADMIN").build())
+        manager.createUser(users.username("eben.ashley@gmail.com").password(passwordEncoder!!.encode("password")).roles("USER", "ADMIN").build())
+        manager.createUser(users.username("philipopokuam@gmail.com").password(passwordEncoder!!.encode("password")).roles("USER", "ADMIN").build())
+        manager.createUser(users.username("nanaagyemanprempeh90@gmail.com").password(passwordEncoder!!.encode("password")).roles("USER", "ADMIN").build())
+        manager.createUser(users.username("bernardakuffo@hotmail.com").password(passwordEncoder!!.encode("password")).roles("USER", "ADMIN").build())
         return manager
-    }
-
-    @Bean
-    fun passwordEncoder(): PasswordEncoder? {
-        return BCryptPasswordEncoder()
     }
 
 

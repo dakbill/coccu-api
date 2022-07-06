@@ -140,20 +140,17 @@ class UsersService(
                     UsernamePasswordAuthenticationToken(res.email, "password")
                 )
 
-//                SecurityContextHolder.getContext().authentication = authentication
-
-                response.bearerToken = jwtUtils.generateJwtToken(authentication)
-
                 val userDetails = authentication.principal as UserDetails
-
-                response.authorities = userDetails.authorities.stream()
-                    .map { item -> item.authority }
-                    .collect(Collectors.toList())
-
 
                 val member = MemberResponseDto()
                 member.email = res.email
+
+
                 response.member = member
+                response.bearerToken = jwtUtils.generateJwtToken(authentication)
+                response.authorities = userDetails.authorities.stream()
+                    .map { item -> item.authority }
+                    .collect(Collectors.toList())
             }
 
 

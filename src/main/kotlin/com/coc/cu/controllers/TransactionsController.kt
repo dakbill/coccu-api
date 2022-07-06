@@ -9,6 +9,7 @@ import com.coc.cu.services.TransactionsService
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 
@@ -17,17 +18,20 @@ import org.springframework.web.bind.annotation.*
 @RestController
 class TransactionsController(val transactionsService: TransactionsService, var objectMapper: ObjectMapper) {
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     fun create(@RequestBody model: RawTransactionRequestDto): ApiResponse<TransactionResponseDto> {
 
         return ApiResponse(transactionsService.create(model), HttpStatus.OK)
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     fun list(@RequestParam memberId: Long): ApiResponse<List<TransactionResponseDto>> {
         return ApiResponse(transactionsService.list(memberId), HttpStatus.OK)
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     fun detail(@PathVariable id: Long): ApiResponse<TransactionResponseDto> {
         return ApiResponse(transactionsService.single(id), "Success", HttpStatus.OK)

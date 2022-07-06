@@ -19,13 +19,14 @@ import java.util.*
 @RestController
 class ReportsController(var accountService: AccountService) {
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/closing-books")
     fun getClosingBooks(@DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam dayInFocus: LocalDate): ApiResponse<ClosingBooksResponseDto> {
         return ApiResponse(accountService.getClosingBooksMetrics(dayInFocus), HttpStatus.OK)
     }
 
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/dashboard-metrics")
     fun getDashboardMetrics(
         @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam startDate: LocalDate,

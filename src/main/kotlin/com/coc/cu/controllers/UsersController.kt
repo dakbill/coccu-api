@@ -7,30 +7,34 @@ import com.coc.cu.domain.models.ApiResponse
 import com.coc.cu.services.UsersService
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 
 @RequestMapping("/api/v1/users")
 @RestController
-class UsersController(val usersService: UsersService, var objectMapper: ObjectMapper) {
+class UsersController(val usersService: UsersService) {
 
-
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     fun create(@RequestBody model: UserRequestDto): ApiResponse<MemberResponseDto> {
         return ApiResponse(usersService.create(model), HttpStatus.OK)
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     fun list(@RequestParam(name = "q", defaultValue = "") query: String): ApiResponse<List<MemberResponseDto>> {
         return ApiResponse(usersService.list(query), HttpStatus.OK)
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     fun detail(@PathVariable id: Long): ApiResponse<MemberResponseDto> {
 
         return ApiResponse(usersService.single(id), "Success", HttpStatus.OK)
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
     fun update(@PathVariable id: Long, @ModelAttribute model: UserRequestDto): ApiResponse<MemberResponseDto> {
 
