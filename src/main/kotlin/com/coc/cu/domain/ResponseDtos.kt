@@ -1,6 +1,7 @@
 package com.coc.cu.domain
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
@@ -59,8 +60,17 @@ class MemberResponseDto {
     var secondOfKinEmail: String? = null
 }
 
+class AuthResponseDto {
+    var member: MemberResponseDto? = null
+    var bearerToken: String? = null
+    var authorities: List<String>? = null
+}
 
-
+data class GoogleTokenInfoResponseDto(
+    var email: String,
+    @JsonProperty("verified_email") var isVerified: Boolean,
+    @JsonProperty("user_id") var userId: String
+)
 
 class ClosingBooksResponseDto {
     var openingBalance: Double = 0.0

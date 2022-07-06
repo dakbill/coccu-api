@@ -1,5 +1,6 @@
 package com.coc.cu.domain
 
+import org.springframework.web.multipart.MultipartFile
 import java.util.*
 
 
@@ -25,8 +26,14 @@ class RawTransactionRequestDto {
 }
 
 
+class ExchangeTokenRequestDto{
+    val authProvider: AuthProvider? = null
+    val token: String? = null
+}
+
 class UserRequestDto {
     var image: String? = null
+    var imageFile: MultipartFile? = null
     var name: String? = null
     var phone: String? = null
     var email: String? = null

@@ -1,5 +1,10 @@
 package com.coc.cu
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider
+import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.client.builder.AwsClientBuilder
+import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.coc.cu.domain.AccountType
 import com.coc.cu.domain.TransactionType
 import com.coc.cu.entities.Account
@@ -8,19 +13,26 @@ import com.coc.cu.entities.Transaction
 import com.coc.cu.repositories.AccountTransactionsRepository
 import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.repositories.MembersRepository
+import com.coc.cu.utils.JwtUtils
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.ser.FilterProvider
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.logging.log4j.util.Strings
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.core.io.ClassPathResource
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
+import org.springframework.security.core.userdetails.User
+import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.provisioning.InMemoryUserDetailsManager
+import org.springframework.web.client.RestTemplate
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.time.LocalDate
@@ -29,6 +41,19 @@ import java.time.format.DateTimeFormatter
 
 @SpringBootApplication
 class CuApplication {
+
+    @Value("\${cloud.aws.credentials.accessKey}")
+    private val accessKey: String? = null
+
+    @Value("\${cloud.aws.credentials.secretKey}")
+    private val secretKey: String? = null
+
+    @Value("\${cloud.aws.endpoint}")
+    private val endpointUrl: String? = null
+
+    @Value("\${cloud.aws.region}")
+    private val region: String? = null
+
 
     @Bean
     fun init(
@@ -49,9 +74,54 @@ class CuApplication {
         return om
     }
 
+    @Bean
+    fun restTemplate(): RestTemplate {
+        return RestTemplate()
+    }
+
+    @Bean
+    fun userDetailsService(): UserDetailsService {
+        val passwordEncoder = passwordEncoder()
+        val users: User.UserBuilder = User.builder()
+        val manager = InMemoryUserDetailsManager()
+        manager.createUser(users.username("taichobill@gmail.com").password(passwordEncoder!!.encode("password")).roles("USER", "ADMIN").build())
+        return manager
+    }
+
+    @Bean
+    fun passwordEncoder(): PasswordEncoder? {
+        return BCryptPasswordEncoder()
+    }
+
+
+    @Bean
+    fun jwtUtils(): JwtUtils {
+        return JwtUtils()
+    }
+
+    @Bean
+    fun getClient(): AmazonS3? {
+
+        val credentials = BasicAWSCredentials(accessKey, secretKey)
+        return AmazonS3ClientBuilder
+            .standard()
+            .withCredentials(AWSStaticCredentialsProvider(credentials))
+            .withEndpointConfiguration(AwsClientBuilder.EndpointConfiguration(endpointUrl, region))
+            .build()
+    }
+
+    @Bean
+    @Throws(Exception::class)
+    fun authenticationManager(
+        authenticationConfiguration: AuthenticationConfiguration
+    ): AuthenticationManager? {
+        return authenticationConfiguration.authenticationManager
+    }
+
 
     fun registerMembers(repository: MembersRepository, memberAccountRepository: MemberAccountRepository) {
-        val bufferedReader = BufferedReader((InputStreamReader(ClassPathResource("/fixtures/Transactions_Members.csv").inputStream)))
+        val bufferedReader =
+            BufferedReader((InputStreamReader(ClassPathResource("/fixtures/Transactions_Members.csv").inputStream)))
         val csvParser = CSVParser(bufferedReader, CSVFormat.DEFAULT.withFirstRecordAsHeader())
 
 
@@ -139,6 +209,8 @@ class CuApplication {
     }
 
 }
+
+
 
 fun main(args: Array<String>) {
 

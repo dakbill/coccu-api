@@ -5,6 +5,11 @@ enum class AccountType {
     LOAN,
 }
 
+enum class AuthProvider{
+    FACEBOOK,
+    GOOGLE
+}
+
 enum class TransactionType {
     CARD,
     SAVINGS,

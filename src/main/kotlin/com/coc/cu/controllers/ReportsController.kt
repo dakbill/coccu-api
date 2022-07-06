@@ -6,6 +6,7 @@ import com.coc.cu.domain.models.ApiResponse
 import com.coc.cu.services.AccountService
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -18,7 +19,7 @@ import java.util.*
 @RestController
 class ReportsController(var accountService: AccountService) {
 
-
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/closing-books")
     fun getClosingBooks(@DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam dayInFocus: LocalDate): ApiResponse<ClosingBooksResponseDto> {
         return ApiResponse(accountService.getClosingBooksMetrics(dayInFocus), HttpStatus.OK)
