@@ -57,9 +57,6 @@ class WebSecurityConfiguration(val jwtUtils: JwtUtils, val userDetailsService: U
             .httpBasic().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
-            .and()
-            .exceptionHandling()
-
 
             .and()
             .addFilterBefore(
