@@ -72,6 +72,12 @@ interface MembersRepository : CrudRepository<Member, Long> {
 interface MemberAccountRepository : CrudRepository<Account, String> {
     fun findByMemberId(id: Long?): List<Account>?
 
+    @Query(
+        value = "SELECT COUNT(account.id) FROM account WHERE type IN (?2) AND member_id=?1",
+        nativeQuery = true
+    )
+    fun countByMemberIdAndType(id: Long?, transactionTypes: Array<String>): Long
+
 
     @Query(
         value = "SELECT SUM(AMOUNT) AS AMOUNT, TYPE FROM TRANSACTION WHERE CREATED_DATE BETWEEN ?1 AND ?2 GROUP BY TYPE",

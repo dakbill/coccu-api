@@ -8,7 +8,6 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import lombok.Data
 import java.time.LocalDate
-import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 
 class AccountResponseDto {

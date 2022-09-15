@@ -231,7 +231,13 @@ class AccountService(
     fun create(model: AccountRequestDto): AccountResponseDto? {
         val accountTypeRef = object : TypeReference<Account>() {}
         var account = objectMapper.convertValue(model, accountTypeRef)
-        account.id = UUID.randomUUID().toString()
+        var loanAccountsCount = repository.countByMemberIdAndType(
+            model.memberId,
+            arrayOf(AccountType.LOAN.name)
+        )
+        account.id = String.format(
+            "LOAN-%s-%s", model.memberId, loanAccountsCount + 1
+        )
 
         account.member = membersRepository.findById(model.memberId!!).get()
         account = repository.save(account)
