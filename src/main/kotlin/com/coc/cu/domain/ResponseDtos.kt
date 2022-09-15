@@ -58,6 +58,10 @@ class MemberResponseDto {
     var secondOfKinName: String? = null
     var secondOfKinPhone: String? = null
     var secondOfKinEmail: String? = null
+
+    var totalSavings: Double = 0.0
+    var totalWithdrawals: Double = 0.0
+    var totalBalance: Double = 0.0
 }
 
 class AuthResponseDto {

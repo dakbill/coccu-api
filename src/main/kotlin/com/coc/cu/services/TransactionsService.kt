@@ -50,4 +50,12 @@ class TransactionsService(var repository: AccountTransactionsRepository,var acco
         val typeRef = object : TypeReference<TransactionResponseDto>() {}
         return objectMapper.convertValue(repository.findById(transaction.id!!).get(), typeRef)
     }
+
+    fun getTotalSavings(memberId: Long): Double {
+        return repository.getTotalSavings(memberId)
+    }
+
+    fun getTotalWithdrawals(memberId: Long): Double {
+        return repository.getTotalWithdrawals(memberId)
+    }
 }

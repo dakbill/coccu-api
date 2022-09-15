@@ -32,6 +32,18 @@ interface AccountTransactionsRepository: CrudRepository<Transaction, Long> {
         nativeQuery = true
     )
     fun findByLoanBalance(id: String?): Double
+
+    @Query(
+        value = "SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE account_id = (SELECT id FROM ACCOUNT WHERE member_id=?1 AND TYPE='SAVINGS') AND TYPE IN ('OPENING_BALANCE','SAVINGS','SAVINGS_CHEQUE')",
+        nativeQuery = true
+    )
+    fun getTotalSavings(memberId: Long): Double
+
+    @Query(
+        value = "SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1 AND TYPE='SAVINGS') AND TYPE IN ('WITHDRAWAL','WITHDRAWAL_CHEQUE')",
+        nativeQuery = true
+    )
+    fun getTotalWithdrawals(memberId: Long): Double
 }
 
 @Repository

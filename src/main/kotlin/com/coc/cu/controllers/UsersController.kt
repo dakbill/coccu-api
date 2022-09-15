@@ -4,6 +4,7 @@ package com.coc.cu.controllers
 import com.coc.cu.domain.MemberResponseDto
 import com.coc.cu.domain.UserRequestDto
 import com.coc.cu.domain.models.ApiResponse
+import com.coc.cu.services.TransactionsService
 import com.coc.cu.services.UsersService
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.http.HttpStatus
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 
 @RequestMapping("/api/v1/users")
 @RestController
-class UsersController(val usersService: UsersService) {
+class UsersController(val usersService: UsersService,val transactionsService: TransactionsService) {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping
@@ -31,7 +32,11 @@ class UsersController(val usersService: UsersService) {
     @GetMapping("/{id}")
     fun detail(@PathVariable id: Long): ApiResponse<MemberResponseDto> {
 
-        return ApiResponse(usersService.single(id), "Success", HttpStatus.OK)
+        var memberResponseDto = usersService.single(id)
+        memberResponseDto!!.totalSavings = transactionsService.getTotalSavings(id)
+        memberResponseDto!!.totalWithdrawals = transactionsService.getTotalWithdrawals(id)
+        memberResponseDto!!.totalBalance = memberResponseDto.totalSavings - memberResponseDto.totalWithdrawals;
+        return ApiResponse(memberResponseDto, "Success", HttpStatus.OK)
     }
 
     @PreAuthorize("isAuthenticated()")
