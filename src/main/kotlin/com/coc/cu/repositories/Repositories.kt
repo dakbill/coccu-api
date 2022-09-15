@@ -16,7 +16,7 @@ interface AccountTransactionsRepository: CrudRepository<Transaction, Long> {
     fun findByAccountId(accountId: String?): List<Transaction>
 
     @Query(
-        value = "SELECT * FROM TRANSACTION WHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1)",
+        value = "SELECT * FROM TRANSACTION WHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1) ORDER BY created_date DESC",
         nativeQuery = true
     )
     fun findAllByMemberId(memberId: Long): List<Transaction>
