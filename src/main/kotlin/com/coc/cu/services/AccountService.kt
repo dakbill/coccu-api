@@ -200,7 +200,7 @@ class AccountService(
             }
         }
 
-        response.cashBalance = response.totalIn - response.totalOut
+        response.cashBalance = (response.totalIn + response.totalInCheque) - response.totalOut
         return response
     }
 
