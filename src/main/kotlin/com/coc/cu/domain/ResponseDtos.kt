@@ -95,6 +95,7 @@ class ClosingBooksResponseDto {
     var totalIn: Double = 0.0
     var totalOut: Double = 0.0
     var cashBalance: Double = 0.0
+    var moneyToBank: Double = 0.0
 
 
 
