@@ -161,4 +161,23 @@ class UsersService(
         return response
     }
 
+    fun login(model: LoginRequestDto): AuthResponseDto? {
+        val authentication = authenticationManager.authenticate(
+            UsernamePasswordAuthenticationToken(model.username, model.password)
+        )
+
+        val userDetails = authentication.principal as UserDetails
+
+
+
+        val response = AuthResponseDto()
+        response.member = MemberResponseDto()
+        response.bearerToken = jwtUtils.generateJwtToken(authentication)
+        response.authorities = userDetails.authorities.stream()
+            .map { item -> item.authority }
+            .collect(Collectors.toList())
+
+        return response
+    }
+
 }

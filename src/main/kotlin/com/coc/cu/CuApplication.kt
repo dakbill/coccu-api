@@ -91,8 +91,7 @@ class CuApplication {
         val manager = InMemoryUserDetailsManager()
         manager.createUser(users.username("taichobill@gmail.com").password(passwordEncoder!!.encode("password")).roles("USER", "ADMIN").build())
         manager.createUser(users.username("eben.ashley@gmail.com").password(passwordEncoder!!.encode("password")).roles("USER", "ADMIN").build())
-        manager.createUser(users.username("philipopokuam@gmail.com").password(passwordEncoder!!.encode("password")).roles("USER", "ADMIN").build())
-        manager.createUser(users.username("nanaagyemanprempeh90@gmail.com").password(passwordEncoder!!.encode("password")).roles("USER", "ADMIN").build())
+        manager.createUser(users.username("admin").password(passwordEncoder!!.encode("admin")).roles("USER", "ADMIN").build())
         manager.createUser(users.username("bernardakuffo@hotmail.com").password(passwordEncoder!!.encode("password")).roles("USER", "ADMIN").build())
         return manager
     }
@@ -133,6 +132,7 @@ class CuApplication {
             var user = Member()
             user.name = record[1]
             user.id = record[0].toLong()
+            user.phone = record[2]
             user = repository.save(user)
 
             var accountNumber = user.id.toString()

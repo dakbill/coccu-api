@@ -26,6 +26,11 @@ class RawTransactionRequestDto {
 }
 
 
+class LoginRequestDto{
+    val username: String? = null
+    val password: String? = null
+}
+
 class ExchangeTokenRequestDto{
     val authProvider: AuthProvider? = null
     val token: String? = null
