@@ -13,7 +13,6 @@ import java.time.Period
 import java.time.ZoneId
 import java.util.*
 import java.util.stream.Collectors
-import kotlin.math.roundToInt
 
 
 @Service
@@ -140,7 +139,6 @@ class AccountService(
     fun getClosingBooksMetrics(dayInFocus: LocalDate): ClosingBooksResponseDto {
         val response = ClosingBooksResponseDto()
         val endOfDay = dayInFocus.atStartOfDay().plusSeconds((24 * 60 * 60)).toLocalDate()
-//        val endOfDay = Date(dayInFocus.time + (24 * 60 * 60 * 1000))
 
         val transactionSumsDto = repository.getDashboardStatistics(dayInFocus, endOfDay)
         for (record in transactionSumsDto) {
@@ -166,14 +164,14 @@ class AccountService(
             } else if (record.type.equals(TransactionType.WITHDRAWAL_CHEQUE.name)) {
                 response.totalWithdrawalsCheque += record.amount
                 response.totalOutCheque += record.amount
-            } else if (arrayOf(TransactionType.INCENTIVE_TO_PERSONEL.name, TransactionType.STATIONERY.name).contains(
+            } else if (arrayOf(TransactionType.INCENTIVE_TO_PERSONNEL.name, TransactionType.STATIONERY.name, TransactionType.TRANSPORT.name).contains(
                     record.type
                 )
             ) {
                 response.totalAdminExpenses += record.amount
                 response.totalOut += record.amount
             } else if (arrayOf(
-                    TransactionType.INCENTIVE_TO_PERSONEL_CHEQUE.name,
+                    TransactionType.INCENTIVE_TO_PERSONNEL_CHEQUE.name,
                     TransactionType.STATIONERY_CHEQUE.name
                 ).contains(record.type)
             ) {
