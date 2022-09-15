@@ -47,6 +47,28 @@ class AccountService(
         return objectMapper.convertValue(repository.findAll(), typeRef)
     }
 
+    fun getDebtors(): List<AccountResponseDto>? {
+        val accounts = repository.getDebtors()
+        val typeRef = object : TypeReference<List<AccountResponseDto>>() {}
+        val response = objectMapper.convertValue(accounts, typeRef)
+
+        for (record in response) {
+            record.balance = repository.sumAmounts(
+                record.id!!, arrayOf(
+                    TransactionType.LOAN.name,
+                    TransactionType.LOAN_CHEQUE.name
+                )
+            ) - repository.sumAmounts(
+                record.id!!, arrayOf(
+                    TransactionType.LOAN_REPAYMENT.name,
+                    TransactionType.LOAN_REPAYMENT_CHEQUE.name
+                )
+            )
+        }
+
+        return response
+    }
+
     fun getDashboardMetrics(startDate: LocalDate, endDate: LocalDate): DashboardResponseDto {
         val response = DashboardResponseDto()
         val transactionSumsDto = repository.getDashboardStatistics(startDate, endDate)

@@ -84,5 +84,22 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
         nativeQuery = true
     )
     fun sumAmounts(transactionTypes: Array<String>, startDate: LocalDate, endDate: LocalDate): Double
+
+    @Query(
+        value = "SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE TYPE IN (?2) AND ACCOUNT_ID=?1 ",
+        nativeQuery = true
+    )
+    fun sumAmounts(accountId: String, transactionTypes: Array<String>): Double
+
+    @Query(
+        value = "SELECT account.* FROM account WHERE account.type='LOAN' " +
+                "AND (" +
+                "   (SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE TYPE IN ('LOAN','LOAN_CHEQUE') AND ACCOUNT_ID=account.id) " +
+                "   - " +
+                "   (SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE') AND ACCOUNT_ID=account.id) " +
+                ") > 0",
+        nativeQuery = true
+    )
+    fun getDebtors(): List<Account>?
 }
 

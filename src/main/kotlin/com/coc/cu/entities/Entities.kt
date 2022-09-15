@@ -14,6 +14,8 @@ data class Account(
     @ManyToOne var member: Member?,
     @Enumerated(value = EnumType.STRING) var type: AccountType?,
     @Id var id: String? = null,
+    var createdDate: LocalDate? = null,
+    var updatedDate: LocalDate? = null,
     @OneToMany var transactions: List<Transaction>? = arrayListOf()
 )
 

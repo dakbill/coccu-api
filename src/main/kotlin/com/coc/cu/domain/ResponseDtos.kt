@@ -19,6 +19,16 @@ class AccountResponseDto {
     var member: MemberResponseDto? = null
     var transactions: List<TransactionResponseDto>? = null
 
+    @JsonDeserialize(using = LocalDateDeserializer::class)
+    @JsonSerialize(using = LocalDateSerializer::class)
+    @JsonFormat(pattern="yyyy-MM-dd")
+    var createdDate: LocalDate? = null
+
+    @JsonDeserialize(using = LocalDateDeserializer::class)
+    @JsonSerialize(using = LocalDateSerializer::class)
+    @JsonFormat(pattern="yyyy-MM-dd")
+    var updatedDate: LocalDate? = null
+
 }
 
 

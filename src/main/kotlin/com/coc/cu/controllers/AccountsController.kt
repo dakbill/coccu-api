@@ -36,4 +36,11 @@ class AccountsController(var accountService: AccountService) {
     }
 
 
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/debtors")
+    fun getDebtors(): ApiResponse<List<AccountResponseDto>> {
+        return ApiResponse(accountService.getDebtors(), HttpStatus.OK)
+    }
+
+
 }
