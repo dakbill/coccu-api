@@ -22,13 +22,21 @@ interface AccountTransactionsRepository: CrudRepository<Transaction, Long> {
     fun findAllByMemberId(memberId: Long): List<Transaction>
 
     @Query(
-        value = "SELECT ( (SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE account_id = ?1 AND TYPE IN ('OPENING_BALANCE','SAVINGS','SAVINGS_CHEQUE')) - SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE account_id = ?1 AND TYPE IN ('WITHDRAWAL','WITHDRAWAL_CHEQUE') )",
+        value = "SELECT ( " +
+                "(SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE account_id = ?1 AND TYPE IN ('OPENING_BALANCE','SAVINGS','SAVINGS_CHEQUE')) " +
+                " - " +
+                "(SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE account_id = ?1 AND TYPE IN ('WITHDRAWAL','WITHDRAWAL_CHEQUE')) " +
+                ")",
         nativeQuery = true
     )
     fun findBySavingsBalance(id: String?): Double
 
     @Query(
-        value = "SELECT ( (SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE account_id = ?1 AND TYPE IN ('OPENING_LOAN_BALANCE','LOAN','LOAN_CHEQUE')) - SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE account_id = ?1 AND TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE') ) ",
+        value = "SELECT ( " +
+                "(SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE account_id = ?1 AND TYPE IN ('OPENING_LOAN_BALANCE','LOAN','LOAN_CHEQUE')) " +
+                " - " +
+                "(SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE account_id = ?1 AND TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE')) " +
+                ") ",
         nativeQuery = true
     )
     fun findByLoanBalance(id: String?): Double
@@ -52,13 +60,13 @@ interface MembersRepository : CrudRepository<Member, Long> {
     @Query(
         value = "" +
                 "SELECT " +
-                    "DISTINCT MEMBER.* " +
+                    "DISTINCT member.* " +
                 "FROM " +
-                    "MEMBER LEFT JOIN ACCOUNT ON(ACCOUNT.member_id=MEMBER.id) " +
+                    "member LEFT JOIN account ON(account.member_id=member.id) " +
                 "WHERE " +
                     "( LENGTH(MEMBER.name) > 0 ) AND"+
                     "( " +
-                    "   (( LOWER(?1) <> UPPER(?1) ) AND ACCOUNT.member_id LIKE '%' || ?1 || '%') OR " +
+                    "   (( LOWER(?1) <> UPPER(?1) ) AND CAST(account.member_id AS CHAR) LIKE '%' || ?1 || '%') OR " +
                     "   (CAST(MEMBER.id AS CHAR) LIKE '%' || ?1 || '%' ) OR " +
                     "   (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )" +
                     " )",

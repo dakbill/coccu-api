@@ -162,9 +162,13 @@ class CuApplication {
                 )
         )
 
+        val transactionsCount =  repository.count()
 
-        for (record in csvParser.records) {
+        for ((counter, record) in csvParser.records.withIndex()) {
 
+            if ((counter + 1) <= transactionsCount) {
+                continue
+            }
 
             var transaction = Transaction()
 
