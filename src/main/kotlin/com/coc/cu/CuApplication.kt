@@ -196,6 +196,7 @@ class CuApplication {
                     var accountOptional = memberAccountRepository.findById(accountNumber)
                     var createdDate =
                         LocalDate.parse(record[5].trim(), DateTimeFormatter.ISO_DATE)
+
                     if (accountOptional.isPresent) {
                         account = accountOptional.get()
                         if ((account.createdDate == null || account.createdDate!!.isAfter(createdDate)) && record[5].isNotEmpty()) {
@@ -203,28 +204,12 @@ class CuApplication {
                             account = memberAccountRepository.save(account)
                         }
 
-                        val member = account.member
-                        if (member != null) {
-                            if ((member.createdDate == null || member.createdDate!!.isAfter(createdDate)) && record[5].isNotEmpty()) {
-                                member.createdDate = createdDate
-                                membersRepository.save(member)
-                            }
-                        }
-
 
                     } else if (record[1].isNotEmpty()) {
                         var memberOptional = membersRepository.findById(record[1].toLong())
                         if (memberOptional.isPresent) {
-                            val member = memberOptional.get()
                             account = Account(memberOptional.get(), accountType, accountNumber)
-                            if (record[5].isNotEmpty()) {
-                                account.createdDate = createdDate
-                            }
-
-                            if ((member.createdDate == null || member.createdDate!!.isAfter(createdDate)) && record[5].isNotEmpty()) {
-                                member.createdDate = createdDate
-                                membersRepository.save(member)
-                            }
+                            account.createdDate = createdDate
 
                             account = memberAccountRepository.save(account)
                             memberAccountRepository.save(account)
@@ -233,6 +218,14 @@ class CuApplication {
                     }
 
                     transaction.account = account
+
+                    val member = account!!.member
+                    if (member != null) {
+                        if ((member.createdDate == null || member.createdDate!!.isAfter(transaction.createdDate))) {
+                            member.createdDate = transaction.createdDate
+                            membersRepository.save(member)
+                        }
+                    }
                 }
 
 
