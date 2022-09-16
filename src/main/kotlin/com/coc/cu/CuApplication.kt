@@ -207,9 +207,15 @@ class CuApplication {
                     } else if (record[1].isNotEmpty()) {
                         var memberOptional = membersRepository.findById(record[1].toLong())
                         if (memberOptional.isPresent) {
+                            val member = memberOptional.get()
                             account = Account(memberOptional.get(), accountType, accountNumber)
                             if (record[5].isNotEmpty()) {
                                 account.createdDate = createdDate
+                            }
+
+                            if ((member.createdDate == null || member.createdDate!!.isAfter(createdDate)) && record[5].isNotEmpty()) {
+                                member.createdDate = createdDate
+                                membersRepository.save(member)
                             }
 
                             account = memberAccountRepository.save(account)

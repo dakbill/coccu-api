@@ -71,6 +71,16 @@ class MemberResponseDto {
     var totalSavings: Double = 0.0
     var totalWithdrawals: Double = 0.0
     var totalBalance: Double = 0.0
+
+    @JsonDeserialize(using = LocalDateDeserializer::class)
+    @JsonSerialize(using = LocalDateSerializer::class)
+    @JsonFormat(pattern="yyyy-MM-dd")
+    var createdDate: LocalDate? = null
+
+    @JsonDeserialize(using = LocalDateDeserializer::class)
+    @JsonSerialize(using = LocalDateSerializer::class)
+    @JsonFormat(pattern="yyyy-MM-dd")
+    var updatedDate: LocalDate? = null
 }
 
 class AuthResponseDto {

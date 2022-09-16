@@ -34,6 +34,8 @@ class Member(
     var secondOfKinName: String? = null,
     var secondOfKinPhone: String? = null,
     var secondOfKinEmail: String? = null,
+    var createdDate: LocalDate? = null,
+    var updatedDate: LocalDate? = null,
     @OneToMany var accounts: List<Account>? = arrayListOf(),
     @Id @GeneratedValue(strategy = GenerationType.AUTO) var id: Long? = -1
 )
