@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Service
 class TransactionsService(var repository: AccountTransactionsRepository,var accountRepository: MemberAccountRepository, var objectMapper: ObjectMapper) {
@@ -40,7 +41,7 @@ class TransactionsService(var repository: AccountTransactionsRepository,var acco
         val transactionTypeRef = object : TypeReference<Transaction>() {}
         var transaction = objectMapper.convertValue(model,transactionTypeRef)
 
-        transaction.createdDate = LocalDate.now()
+        transaction.createdDate = LocalDateTime.now()
         transaction.account = accountRepository.findById(model.accountId!!).get()
         transaction = repository.save(transaction)
 

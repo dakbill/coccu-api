@@ -4,7 +4,7 @@ package com.coc.cu.entities
 import com.coc.cu.domain.AccountType
 import com.coc.cu.domain.TransactionType
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.persistence.*
 
 
@@ -14,8 +14,8 @@ data class Account(
     @ManyToOne var member: Member?,
     @Enumerated(value = EnumType.STRING) var type: AccountType?,
     @Id var id: String? = null,
-    var createdDate: LocalDate? = null,
-    var updatedDate: LocalDate? = null,
+    var createdDate: LocalDateTime? = null,
+    var updatedDate: LocalDateTime? = null,
     @OneToMany var transactions: List<Transaction>? = arrayListOf()
 )
 
@@ -34,8 +34,8 @@ class Member(
     var secondOfKinName: String? = null,
     var secondOfKinPhone: String? = null,
     var secondOfKinEmail: String? = null,
-    var createdDate: LocalDate? = null,
-    var updatedDate: LocalDate? = null,
+    var createdDate: LocalDateTime? = null,
+    var updatedDate: LocalDateTime? = null,
     @OneToMany var accounts: List<Account>? = arrayListOf(),
     @Id @GeneratedValue(strategy = GenerationType.AUTO) var id: Long? = -1
 )
@@ -47,9 +47,9 @@ data class Transaction(
     @Enumerated(value = EnumType.STRING) var type: TransactionType? = null,
     var amount: Float? = null,
 
-    var createdDate: LocalDate? = null,
+    var createdDate: LocalDateTime? = null,
 
-    var updatedDate: LocalDate? = null,
+    var updatedDate: LocalDateTime? = null,
 
     @ManyToOne var account: Account? = null,
 

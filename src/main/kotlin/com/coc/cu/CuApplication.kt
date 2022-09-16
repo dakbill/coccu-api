@@ -36,6 +36,7 @@ import org.springframework.web.client.RestTemplate
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 
@@ -178,7 +179,8 @@ class CuApplication {
                     .replace(",", "").toFloat()
             }
 
-            transaction.createdDate = LocalDate.parse(record[5], DateTimeFormatter.ISO_DATE)
+            transaction.createdDate =
+                LocalDateTime.parse(String.format("%s 00:00", record[5]), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
             var t = TransactionType.values().filter { t -> t.name == record[3].trim().replace(" ", "_") }
             if (t.isNotEmpty()) {
                 transaction.type = t.first()
@@ -195,7 +197,7 @@ class CuApplication {
                     var account: Account? = null
                     var accountOptional = memberAccountRepository.findById(accountNumber)
                     var createdDate =
-                        LocalDate.parse(record[5].trim(), DateTimeFormatter.ISO_DATE)
+                        LocalDateTime.parse(String.format("%s 00:00", record[5].trim()), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
 
                     if (accountOptional.isPresent) {
                         account = accountOptional.get()
@@ -212,18 +214,20 @@ class CuApplication {
                             account.createdDate = createdDate
 
                             account = memberAccountRepository.save(account)
-                            memberAccountRepository.save(account)
                         }
 
                     }
 
                     transaction.account = account
 
-                    val member = account!!.member
-                    if (member != null) {
-                        if ((member.createdDate == null || member.createdDate!!.isAfter(transaction.createdDate))) {
-                            member.createdDate = transaction.createdDate
-                            membersRepository.save(member)
+
+                    if (account!!.member != null) {
+                        val member = account.member
+                        if (member != null) {
+                            if (member.createdDate == null || member.createdDate!!.isAfter(transaction.createdDate)) {
+                                member.createdDate = transaction.createdDate
+                                membersRepository.save(member)
+                            }
                         }
                     }
                 }

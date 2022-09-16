@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import lombok.Data
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 
 class AccountResponseDto {
@@ -18,15 +18,15 @@ class AccountResponseDto {
     var member: MemberResponseDto? = null
     var transactions: List<TransactionResponseDto>? = null
 
-    @JsonDeserialize(using = LocalDateDeserializer::class)
-    @JsonSerialize(using = LocalDateSerializer::class)
-    @JsonFormat(pattern="yyyy-MM-dd")
-    var createdDate: LocalDate? = null
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+    var createdDate: LocalDateTime? = null
 
-    @JsonDeserialize(using = LocalDateDeserializer::class)
-    @JsonSerialize(using = LocalDateSerializer::class)
-    @JsonFormat(pattern="yyyy-MM-dd")
-    var updatedDate: LocalDate? = null
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+    var updatedDate: LocalDateTime? = null
 
 }
 
@@ -38,15 +38,15 @@ class TransactionResponseDto {
     var amount: Float? = null
 
 
-    @JsonDeserialize(using = LocalDateDeserializer::class)
-    @JsonSerialize(using = LocalDateSerializer::class)
-    @JsonFormat(pattern="yyyy-MM-dd")
-    var createdDate: LocalDate? = null
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+    var createdDate: LocalDateTime? = null
 
-    @JsonDeserialize(using = LocalDateDeserializer::class)
-    @JsonSerialize(using = LocalDateSerializer::class)
-    @JsonFormat(pattern="yyyy-MM-dd")
-    var updatedDate: LocalDate? = null
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+    var updatedDate: LocalDateTime? = null
 }
 
 
@@ -72,15 +72,15 @@ class MemberResponseDto {
     var totalWithdrawals: Double = 0.0
     var totalBalance: Double = 0.0
 
-    @JsonDeserialize(using = LocalDateDeserializer::class)
-    @JsonSerialize(using = LocalDateSerializer::class)
-    @JsonFormat(pattern="yyyy-MM-dd")
-    var createdDate: LocalDate? = null
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+    var createdDate: LocalDateTime? = null
 
-    @JsonDeserialize(using = LocalDateDeserializer::class)
-    @JsonSerialize(using = LocalDateSerializer::class)
-    @JsonFormat(pattern="yyyy-MM-dd")
-    var updatedDate: LocalDate? = null
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+    var updatedDate: LocalDateTime? = null
 }
 
 class AuthResponseDto {
