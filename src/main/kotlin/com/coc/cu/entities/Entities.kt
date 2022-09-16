@@ -47,6 +47,8 @@ data class Transaction(
     @Enumerated(value = EnumType.STRING) var type: TransactionType? = null,
     var amount: Float? = null,
 
+    var comment: String? = null,
+
     var createdDate: LocalDateTime? = null,
 
     var updatedDate: LocalDateTime? = null,

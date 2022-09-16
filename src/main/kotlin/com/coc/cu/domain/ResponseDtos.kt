@@ -36,7 +36,7 @@ class TransactionResponseDto {
     var account: AccountResponseDto? = null
     var type: TransactionType? = null
     var amount: Float? = null
-
+    var comment: String? = null
 
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)

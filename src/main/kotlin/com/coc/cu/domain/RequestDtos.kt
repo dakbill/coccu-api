@@ -14,6 +14,7 @@ class AccountRequestDto {
 class TransactionRequestDto(accountId: Long, amount: Float, type: TransactionType) {
     var accountId: String? = null
     var type: String? = null
+    var comment: String? = null
     var amount: Float? = null
     var date: Date? = null
 }
@@ -21,6 +22,7 @@ class TransactionRequestDto(accountId: Long, amount: Float, type: TransactionTyp
 class RawTransactionRequestDto {
     var accountId: String? = null
     var type: String? = null
+    var comment: String? = null
     var amount: Float? = null
     var date: Date? = null
 }

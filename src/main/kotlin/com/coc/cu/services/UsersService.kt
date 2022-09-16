@@ -171,6 +171,7 @@ class UsersService(
 
         val response = AuthResponseDto()
         response.member = MemberResponseDto()
+        response.member
         response.bearerToken = jwtUtils.generateJwtToken(authentication)
         response.authorities = userDetails.authorities.stream()
             .map { item -> item.authority }
