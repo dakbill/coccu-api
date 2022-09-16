@@ -30,7 +30,6 @@ class UsersService(
 ) {
 
     fun single(id: Long): MemberResponseDto? {
-        val objectMapper = ObjectMapper()
         val typeRef = object : TypeReference<MemberResponseDto>() {}
 
         var res = repository.findById(id)
@@ -61,7 +60,6 @@ class UsersService(
     }
 
     fun list(query: String): List<MemberResponseDto>? {
-        val objectMapper = ObjectMapper()
         val typeRef = object : TypeReference<List<MemberResponseDto>>() {}
         val accountsTypeRef = object : TypeReference<List<AccountResponseDto>>() {}
 
@@ -70,7 +68,8 @@ class UsersService(
 
         val users = objectMapper.convertValue(members, typeRef)
         for (user in users) {
-            user.accounts = objectMapper.convertValue(memberAccountRepository.findByMemberId(user.id), accountsTypeRef)
+            val accounts = memberAccountRepository.findByMemberId(user.id)
+            user.accounts = objectMapper.convertValue(accounts, accountsTypeRef)
         }
 
         return users

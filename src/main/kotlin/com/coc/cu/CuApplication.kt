@@ -194,12 +194,24 @@ class CuApplication {
 
                     var account: Account? = null
                     var accountOptional = memberAccountRepository.findById(accountNumber)
+                    var createdDate =
+                        LocalDate.parse(record[5].trim(), DateTimeFormatter.ISO_DATE)
                     if (accountOptional.isPresent) {
                         account = accountOptional.get()
+                        if ((account.createdDate == null || account.createdDate!!.isAfter(createdDate)) && record[5].isNotEmpty()) {
+                            account.createdDate = createdDate
+                            account = memberAccountRepository.save(account)
+                        }
+
+
                     } else if (record[1].isNotEmpty()) {
                         var memberOptional = membersRepository.findById(record[1].toLong())
                         if (memberOptional.isPresent) {
                             account = Account(memberOptional.get(), accountType, accountNumber)
+                            if (record[5].isNotEmpty()) {
+                                account.createdDate = createdDate
+                            }
+
                             account = memberAccountRepository.save(account)
                             memberAccountRepository.save(account)
                         }
