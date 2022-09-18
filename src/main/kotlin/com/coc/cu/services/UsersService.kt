@@ -70,6 +70,7 @@ class UsersService(
         for (user in users) {
             val accounts = memberAccountRepository.findByMemberId(user.id)
             user.accounts = objectMapper.convertValue(accounts, accountsTypeRef)
+            user.transactionCount = transactionsRepository.countByMemberId(user.id)
         }
 
         return users

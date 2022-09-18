@@ -52,6 +52,12 @@ interface AccountTransactionsRepository: CrudRepository<Transaction, Long> {
         nativeQuery = true
     )
     fun getTotalWithdrawals(memberId: Long): Double
+
+    @Query(
+        value = "SELECT COUNT(id) FROM TRANSACTION WHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1)",
+        nativeQuery = true
+    )
+    fun countByMemberId(id: Long?): Long
 }
 
 @Repository

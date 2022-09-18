@@ -71,6 +71,7 @@ class MemberResponseDto {
     var totalSavings: Double = 0.0
     var totalWithdrawals: Double = 0.0
     var totalBalance: Double = 0.0
+    var transactionCount: Long = 0
 
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
