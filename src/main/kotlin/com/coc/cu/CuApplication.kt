@@ -182,6 +182,7 @@ class CuApplication {
             transaction.createdDate =
                 LocalDateTime.parse(String.format("%s 00:00", record[5]), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
             var t = TransactionType.values().filter { t -> t.name == record[3].trim().replace(" ", "_") }
+            var member: Member? = null
             if (t.isNotEmpty()) {
                 transaction.type = t.first()
 
@@ -204,16 +205,19 @@ class CuApplication {
                         if ((account.createdDate == null || account.createdDate!!.isAfter(createdDate)) && record[5].isNotEmpty()) {
                             account.createdDate = createdDate
                             account = memberAccountRepository.save(account)
+                            member = account.member
                         }
 
 
                     } else if (record[1].isNotEmpty()) {
                         var memberOptional = membersRepository.findById(record[1].toLong())
                         if (memberOptional.isPresent) {
-                            account = Account(memberOptional.get(), accountType, accountNumber)
+                            member = memberOptional.get()
+                            account = Account(member, accountType, accountNumber)
                             account.createdDate = createdDate
 
                             account = memberAccountRepository.save(account)
+
                         }
 
                     }
@@ -221,21 +225,21 @@ class CuApplication {
                     transaction.account = account
 
 
-                    if (account!!.member != null) {
-                        val member = account.member
-                        if (member != null) {
-                            if (member.createdDate == null || member.createdDate!!.isAfter(transaction.createdDate)) {
-                                member.createdDate = transaction.createdDate
-                                membersRepository.save(member)
-                            }
-                        }
-                    }
+
                 }
 
 
             }
 
             repository.save(transaction)
+
+//            val member = transaction.account!!.member
+            if (member != null) {
+                if (member.createdDate == null || member.createdDate!!.isAfter(transaction.createdDate)) {
+                    member.createdDate = transaction.createdDate
+                    membersRepository.save(member)
+                }
+            }
         }
     }
 
