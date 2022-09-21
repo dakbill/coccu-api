@@ -1,12 +1,14 @@
 package com.coc.cu.services
 
 import com.coc.cu.domain.*
+import com.coc.cu.domain.models.ApiResponse
 import com.coc.cu.entities.Account
 import com.coc.cu.entities.Transaction
 import com.coc.cu.repositories.AccountTransactionsRepository
 import com.coc.cu.repositories.MemberAccountRepository
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -29,9 +31,15 @@ class TransactionsService(var repository: AccountTransactionsRepository,var acco
         return null
     }
 
-    fun list(memberId: Long): List<TransactionResponseDto>? {
+    fun list(memberId: Long?): List<TransactionResponseDto>? {
         val typeRef = object : TypeReference<List<TransactionResponseDto>>() {}
-        var transactions = repository.findAllByMemberId(memberId)
+
+
+        var transactions: List<Transaction> = if (memberId == null) {
+            repository.findAll().toList()
+        } else {
+            repository.findAllByMemberId(memberId)
+        }
 
 
         return objectMapper.convertValue(transactions, typeRef)

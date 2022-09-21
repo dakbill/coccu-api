@@ -22,7 +22,8 @@ class TransactionsController(val transactionsService: TransactionsService) {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping
-    fun list(@RequestParam memberId: Long): ApiResponse<List<TransactionResponseDto>> {
+    fun list(@RequestParam(required = false) memberId: Long?): ApiResponse<List<TransactionResponseDto>> {
+
         return ApiResponse(transactionsService.list(memberId), HttpStatus.OK)
     }
 
