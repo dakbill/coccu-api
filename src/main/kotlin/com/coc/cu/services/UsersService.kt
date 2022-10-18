@@ -36,7 +36,7 @@ class UsersService(
         if (res.isPresent) {
             var userEntity = res.get()
 
-            val accountTypeRef = object : TypeReference<List<AccountBaseResponseDto>>() {}
+            val accountTypeRef = object : TypeReference<List<AccountResponseDto>>() {}
             val accounts =
                 objectMapper.convertValue(memberAccountRepository.findByMemberId(userEntity.id), accountTypeRef)
 
@@ -60,7 +60,7 @@ class UsersService(
 
     fun list(query: String): List<MemberResponseDto>? {
         val typeRef = object : TypeReference<List<MemberResponseDto>>() {}
-        val accountsTypeRef = object : TypeReference<List<AccountBaseResponseDto>>() {}
+        val accountsTypeRef = object : TypeReference<List<AccountResponseDto>>() {}
 
         val members = repository.findByQuery(query.lowercase())
         val users = objectMapper.convertValue(members, typeRef)
