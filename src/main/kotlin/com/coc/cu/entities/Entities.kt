@@ -4,6 +4,8 @@ package com.coc.cu.entities
 import com.coc.cu.domain.AccountType
 import com.coc.cu.domain.TransactionType
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import org.hibernate.annotations.Fetch
+import org.hibernate.annotations.FetchMode
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -28,6 +30,7 @@ class Member(
     var email: String? = null,
     var address: String? = null,
     var city: String? = null,
+    var transactionCount: Long = 0,
     var firstOfKinName: String? = null,
     var firstOfKinPhone: String? = null,
     var firstOfKinEmail: String? = null,
@@ -42,6 +45,7 @@ class Member(
 
 
 @Entity
+@EntityListeners(TransactionListener::class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Transaction(
     @Enumerated(value = EnumType.STRING) var type: TransactionType? = null,

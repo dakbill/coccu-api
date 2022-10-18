@@ -54,7 +54,7 @@ interface AccountTransactionsRepository: CrudRepository<Transaction, Long> {
     fun getTotalWithdrawals(memberId: Long): Double
 
     @Query(
-        value = "SELECT COUNT(id) FROM TRANSACTION WHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1)",
+        value = "SELECT COUNT(DISTINCT id) FROM TRANSACTION WHERE account_id IN (SELECT DISTINCT id FROM ACCOUNT WHERE member_id=?1)",
         nativeQuery = true
     )
     fun countByMemberId(id: Long?): Long
@@ -74,11 +74,17 @@ interface MembersRepository : CrudRepository<Member, Long> {
                     "( " +
                     "   (( LOWER(?1) <> UPPER(?1) ) AND CAST(account.member_id AS CHAR) LIKE '%' || ?1 || '%') OR " +
                     "   (CAST(MEMBER.id AS CHAR) LIKE '%' || ?1 || '%' ) OR " +
-                    "   (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )" +
-                    " )",
+                    "   (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' ) " +
+                    ")",
         nativeQuery = true
     )
     fun findByQuery(query: String?): List<Member>
+
+    @Query(
+        value = "UPDATE member SET transaction_count=(SELECT COUNT(id) FROM TRANSACTION WHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1)) WHERE id=?1 RETURNING TRUE",
+        nativeQuery = true
+    )
+    fun updateTransactionCount(id: Long?): Boolean
 }
 
 

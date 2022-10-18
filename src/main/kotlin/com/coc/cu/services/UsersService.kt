@@ -9,6 +9,8 @@ import com.coc.cu.repositories.MembersRepository
 import com.coc.cu.utils.JwtUtils
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.hibernate.Session
+import org.hibernate.SessionFactory
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UserDetails
@@ -26,6 +28,7 @@ class UsersService(
     val restTemplate: RestTemplate,
     val storageService: StorageService,
     val authenticationManager: AuthenticationManager,
+    val sessionFactory: SessionFactory,
     val jwtUtils: JwtUtils
 ) {
 
@@ -67,11 +70,13 @@ class UsersService(
 
 
         val users = objectMapper.convertValue(members, typeRef)
-        for (user in users) {
-            val accounts = memberAccountRepository.findByMemberId(user.id)
-            user.accounts = objectMapper.convertValue(accounts, accountsTypeRef)
-            user.transactionCount = transactionsRepository.countByMemberId(user.id)
+        users.stream().forEach { user ->
+            run {
+                val accounts = memberAccountRepository.findByMemberId(user.id)
+                user.accounts = objectMapper.convertValue(accounts, accountsTypeRef)
+            }
         }
+
 
         return users
     }
