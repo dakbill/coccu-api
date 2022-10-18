@@ -130,7 +130,8 @@ class CuApplication {
 
 
         for (record in csvParser.records) {
-            var user = Member()
+
+            var user = repository.findById(record[0].toLong()).orElse(Member())
             user.name = record[1]
             user.id = record[0].toLong()
             user.phone = record[2]
