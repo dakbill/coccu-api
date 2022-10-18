@@ -9,8 +9,6 @@ import com.coc.cu.repositories.MembersRepository
 import com.coc.cu.utils.JwtUtils
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.hibernate.Session
-import org.hibernate.SessionFactory
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UserDetails
@@ -28,7 +26,6 @@ class UsersService(
     val restTemplate: RestTemplate,
     val storageService: StorageService,
     val authenticationManager: AuthenticationManager,
-    val sessionFactory: SessionFactory,
     val jwtUtils: JwtUtils
 ) {
 
@@ -39,12 +36,11 @@ class UsersService(
         if (res.isPresent) {
             var userEntity = res.get()
 
-            val accountTypeRef = object : TypeReference<List<AccountResponseDto>>() {}
+            val accountTypeRef = object : TypeReference<List<AccountBaseResponseDto>>() {}
             val accounts =
                 objectMapper.convertValue(memberAccountRepository.findByMemberId(userEntity.id), accountTypeRef)
 
             for (account in accounts!!) {
-                account.member = null
                 if (account.type == AccountType.SAVINGS) {
                     account.balance = transactionsRepository.findBySavingsBalance(account.id)
                 } else {
@@ -64,19 +60,17 @@ class UsersService(
 
     fun list(query: String): List<MemberResponseDto>? {
         val typeRef = object : TypeReference<List<MemberResponseDto>>() {}
-        val accountsTypeRef = object : TypeReference<List<AccountResponseDto>>() {}
+        val accountsTypeRef = object : TypeReference<List<AccountBaseResponseDto>>() {}
 
         val members = repository.findByQuery(query.lowercase())
-
-
         val users = objectMapper.convertValue(members, typeRef)
+
         users.stream().forEach { user ->
             run {
                 val accounts = memberAccountRepository.findByMemberId(user.id)
                 user.accounts = objectMapper.convertValue(accounts, accountsTypeRef)
             }
         }
-
 
         return users
     }

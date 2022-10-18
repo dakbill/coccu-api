@@ -1,6 +1,8 @@
 package com.coc.cu.domain
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
@@ -10,13 +12,14 @@ import lombok.Data
 import java.time.LocalDateTime
 
 
-class AccountResponseDto {
+class AccountBaseResponseDto {
     var id: String? = null
     var number: String? = null
     var balance: Double = 0.0
     var type: AccountType? = null
-    var member: MemberResponseDto? = null
-    var transactions: List<TransactionResponseDto>? = null
+
+    @JsonIgnore var member: MemberResponseDto? = null
+    @JsonIgnore var transactions: List<TransactionResponseDto>? = null
 
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
@@ -30,6 +33,28 @@ class AccountResponseDto {
 
 }
 
+class AccountResponseDto {
+    var id: String? = null
+    var number: String? = null
+    var balance: Double = 0.0
+    var type: AccountType? = null
+
+    var member: MemberResponseDto? = null
+    var transactions: List<TransactionResponseDto>? = null
+
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+    var createdDate: LocalDateTime? = null
+
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+    var updatedDate: LocalDateTime? = null
+
+
+
+}
 
 class TransactionResponseDto {
     var id: Long? = null
@@ -54,7 +79,7 @@ class MemberResponseDto {
     var id: Long? = null
     var name: String? = null
     var phone: String? = null
-    var accounts: List<AccountResponseDto>? = null
+    var accounts: List<AccountBaseResponseDto>? = null
 
 
     var image: String? = null
