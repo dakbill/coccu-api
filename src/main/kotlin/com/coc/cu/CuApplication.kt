@@ -90,10 +90,21 @@ class CuApplication {
         val passwordEncoder = passwordEncoder()
         val users: User.UserBuilder = User.builder()
         val manager = InMemoryUserDetailsManager()
-        manager.createUser(users.username("taichobill@gmail.com").password(passwordEncoder!!.encode("password")).roles("USER", "ADMIN").build())
-        manager.createUser(users.username("eben.ashley@gmail.com").password(passwordEncoder!!.encode("password")).roles("USER", "ADMIN").build())
-        manager.createUser(users.username("admin").password(passwordEncoder!!.encode("admin")).roles("USER", "ADMIN").build())
-        manager.createUser(users.username("bernardakuffo@hotmail.com").password(passwordEncoder!!.encode("password")).roles("USER", "ADMIN").build())
+        manager.createUser(
+            users.username("taichobill@gmail.com").password(passwordEncoder!!.encode("password")).roles("USER", "ADMIN")
+                .build()
+        )
+        manager.createUser(
+            users.username("eben.ashley@gmail.com").password(passwordEncoder!!.encode("password"))
+                .roles("USER", "ADMIN").build()
+        )
+        manager.createUser(
+            users.username("admin").password(passwordEncoder!!.encode("admin")).roles("USER", "ADMIN").build()
+        )
+        manager.createUser(
+            users.username("bernardakuffo@hotmail.com").password(passwordEncoder!!.encode("password"))
+                .roles("USER", "ADMIN").build()
+        )
         return manager
     }
 
@@ -131,18 +142,22 @@ class CuApplication {
 
         for (record in csvParser.records) {
 
-            var user = repository.findById(record[0].toLong()).orElse(Member())
-            user.name = record[1]
-            user.id = record[0].toLong()
-            user.phone = record[2]
-            user = repository.save(user)
+            val userId = record[0].toLong()
+            var member = repository.findById(userId)
+                .orElse(
+                    Member(
+                        id = userId,
+                        name = record[1],
+                        createdDate = LocalDateTime.now(),
+                        phone = record[2]
+                    )
+                )
+            member = repository.save(member)
 
-            var accountNumber = user.id.toString()
-            var accountOptional = memberAccountRepository.findById(accountNumber)
-            if (accountOptional.isEmpty) {
-                var account = Account(user, AccountType.SAVINGS, accountNumber)
-                memberAccountRepository.save(account)
-            }
+            var accountNumber = member.id.toString()
+            var account = memberAccountRepository.findById(accountNumber)
+                .orElse(Account(member, AccountType.SAVINGS, accountNumber, createdDate = LocalDateTime.now()))
+            memberAccountRepository.save(account)
 
 
         }
@@ -164,7 +179,7 @@ class CuApplication {
                 )
         )
 
-        val transactionsCount =  repository.count()
+        val transactionsCount = repository.count()
 
         for ((counter, record) in csvParser.records.withIndex()) {
 
@@ -172,88 +187,102 @@ class CuApplication {
                 continue
             }
 
-            var transaction = Transaction()
+            var t = TransactionType.values().filter { t -> t.name == record[3].trim().replace(" ", "_") }
+            if (t.isEmpty()) {
+                continue
+            }
+
+            var transaction = Transaction(
+                createdDate = LocalDateTime.parse(
+                    String.format("%s 00:00", record[5]),
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                ),
+                type = t.first()
+            )
+
 
             if (record[4].isNotEmpty()) {
                 transaction.amount = record[4]
                     .replace("GHS", "")
-                    .replace(",", "").toFloat()
+                    .replace(",", "")
+                    .toFloat()
             }
 
-            transaction.createdDate =
-                LocalDateTime.parse(String.format("%s 00:00", record[5]), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
-            var t = TransactionType.values().filter { t -> t.name == record[3].trim().replace(" ", "_") }
-            var member: Member? = null
-            if (t.isNotEmpty()) {
-                transaction.type = t.first()
+            if (Strings.isNotEmpty(record[1])) {
+                val memberId = record[1].toLong()
+                var accountNumber = memberId.toString()
+                val accountType =
+                    if (transaction.type!!.name.contains("LOAN")) AccountType.LOAN else AccountType.SAVINGS
 
 
-                if (Strings.isNotEmpty(record[1])) {
-                    var accountNumber = record[1].toLong().toString()
-                    var accountType = AccountType.SAVINGS
-                    if (transaction.type!!.name.contains("LOAN")) {
-                        accountNumber = String.format("LOAN-%s", accountNumber.toLong())
-                        accountType = AccountType.LOAN
-                    }
+                if (transaction.type.toString().contains("LOAN")) {
+                    var loanAccountsCount = memberAccountRepository.countByMemberIdAndType(
+                        memberId,
+                        arrayOf(AccountType.LOAN.name)
+                    )
 
-                    var account: Account? = null
-                    var accountOptional = memberAccountRepository.findById(accountNumber)
-                    var createdDate =
-                        LocalDateTime.parse(String.format("%s 00:00", record[5].trim()), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                    val lastLoanAccountNumber = "LOAN-${memberId}-${loanAccountsCount}"
+                    val lastTransaction = repository.lastByAccountId(lastLoanAccountNumber)
 
-                    if (accountOptional.isPresent) {
-                        account = accountOptional.get()
-                        if ((account.createdDate == null || account.createdDate!!.isAfter(createdDate)) && record[5].isNotEmpty()) {
-                            account.createdDate = createdDate
-                            account = memberAccountRepository.save(account)
-                            member = account.member
+                    accountNumber =
+                        if (
+                            (arrayOf(
+                                TransactionType.LOAN_CHEQUE,
+                                TransactionType.LOAN
+                            ).contains(transaction.type) || loanAccountsCount == 0L)
+                            && !(lastTransaction != null && arrayOf(
+                                TransactionType.LOAN_CHEQUE,
+                                TransactionType.LOAN
+                            ).contains(lastTransaction.type))
+                        ) {
+                            "LOAN-${memberId}-${loanAccountsCount + 1}"
+                        } else {
+                            lastLoanAccountNumber
                         }
-
-
-                    } else if (record[1].isNotEmpty()) {
-                        var memberOptional = membersRepository.findById(record[1].toLong())
-                        if (memberOptional.isPresent) {
-                            member = memberOptional.get()
-                            account = Account(member, accountType, accountNumber)
-                            account.createdDate = createdDate
-
-                            account = memberAccountRepository.save(account)
-
-                        }
-
-                    }
-
-                    transaction.account = account
-
-
 
                 }
 
 
-            }
 
-            repository.save(transaction)
+                var memberOptional = membersRepository.findById(record[1].toLong())
+                if (!memberOptional.isPresent) continue
 
-//            val member = transaction.account!!.member
-            if (member != null) {
-                if (member.createdDate == null || member.createdDate!!.isAfter(transaction.createdDate)) {
+                //update member creation date if transaction is older
+                val member = memberOptional.get()
+                if (member.createdDate!!.isAfter(transaction.createdDate)) {
                     member.createdDate = transaction.createdDate
                     membersRepository.save(member)
                 }
+
+                var account = memberAccountRepository.findById(accountNumber)
+                    .orElse(
+                        Account(
+                            member = member,
+                            type = accountType,
+                            id = accountNumber,
+                            createdDate = transaction.createdDate
+                        )
+                    )
+
+                if (account.createdDate!!.isAfter(transaction.createdDate)) {
+                    account.createdDate = transaction.createdDate
+                }
+
+                transaction.account = memberAccountRepository.save(account)
+
             }
+
+
+            repository.save(transaction)
+
         }
     }
 
 }
 
 
-
 fun main(args: Array<String>) {
-
-
     runApplication<CuApplication>(*args)
-
-
 }
 
 

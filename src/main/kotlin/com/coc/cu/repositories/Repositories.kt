@@ -58,6 +58,12 @@ interface AccountTransactionsRepository: CrudRepository<Transaction, Long> {
         nativeQuery = true
     )
     fun countByMemberId(id: Long?): Long
+
+    @Query(
+        value = "SELECT * FROM TRANSACTION WHERE account_id=?1 ORDER BY created_date DESC LIMIT 1",
+        nativeQuery = true
+    )
+    fun lastByAccountId(accountId: String): Transaction?
 }
 
 @Repository

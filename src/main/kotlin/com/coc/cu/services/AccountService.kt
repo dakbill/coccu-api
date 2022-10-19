@@ -160,7 +160,7 @@ class AccountService(
 
     fun getClosingBooksMetrics(dayInFocus: LocalDate): ClosingBooksResponseDto {
         val response = ClosingBooksResponseDto()
-        val endOfDay = dayInFocus.atStartOfDay().plusSeconds((24 * 60 * 60)).toLocalDate()
+        val endOfDay = dayInFocus.atStartOfDay().plusSeconds(((24 * 60 * 60).toLong())).toLocalDate()
 
         val transactionSumsDto = repository.getDashboardStatistics(dayInFocus, endOfDay)
         for (record in transactionSumsDto) {
