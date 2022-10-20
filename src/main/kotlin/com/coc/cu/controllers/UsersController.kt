@@ -6,7 +6,6 @@ import com.coc.cu.domain.UserRequestDto
 import com.coc.cu.domain.models.ApiResponse
 import com.coc.cu.services.TransactionsService
 import com.coc.cu.services.UsersService
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
