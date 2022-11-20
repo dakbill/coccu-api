@@ -51,7 +51,7 @@ class UsersController(val usersService: UsersService,val transactionsService: Tr
     @GetMapping("/send-sms")
     fun sendSms(@RequestParam message: String,@RequestParam to: String): ApiResponse<MemberResponseDto> {
 
-        val res = restTemplate.getForObject("https://apps.mnotify.net/smsapi?key=WsdWfqH7Kr6fyiXDgLS25Ju62&to=${to}&msg=${message}&sender_id=izzuki", GoogleTokenInfoResponseDto::class.java)
+        val res = restTemplate.getForObject("https://apps.mnotify.net/smsapi?key=WsdWfqH7Kr6fyiXDgLS25Ju62&to=${to}&msg=${message}&sender_id=izzuki", String::class.java)
         return ApiResponse(null, "Success", HttpStatus.OK)
     }
 
