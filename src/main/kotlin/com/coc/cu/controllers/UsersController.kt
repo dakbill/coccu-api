@@ -1,6 +1,7 @@
 package com.coc.cu.controllers
 
 
+import com.coc.cu.domain.GoogleTokenInfoResponseDto
 import com.coc.cu.domain.MemberResponseDto
 import com.coc.cu.domain.UserRequestDto
 import com.coc.cu.domain.models.ApiResponse
@@ -9,11 +10,12 @@ import com.coc.cu.services.UsersService
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.client.RestTemplate
 
 
 @RequestMapping("/api/v1/users")
 @RestController
-class UsersController(val usersService: UsersService,val transactionsService: TransactionsService) {
+class UsersController(val usersService: UsersService,val transactionsService: TransactionsService,val restTemplate: RestTemplate) {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping
@@ -43,6 +45,14 @@ class UsersController(val usersService: UsersService,val transactionsService: Tr
     fun update(@PathVariable id: Long, @ModelAttribute model: UserRequestDto): ApiResponse<MemberResponseDto> {
 
         return ApiResponse(usersService.update(id,model), "Success", HttpStatus.OK)
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/send-sms")
+    fun sendSms(@RequestParam message: String,@RequestParam to: String): ApiResponse<MemberResponseDto> {
+
+        val res = restTemplate.getForObject("https://apps.mnotify.net/smsapi?key=WsdWfqH7Kr6fyiXDgLS25Ju62&to=${to}&msg=${message}&sender_id=izzuki", GoogleTokenInfoResponseDto::class.java)
+        return ApiResponse(null, "Success", HttpStatus.OK)
     }
 
 
