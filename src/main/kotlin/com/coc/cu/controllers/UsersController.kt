@@ -1,7 +1,6 @@
 package com.coc.cu.controllers
 
 
-import com.coc.cu.domain.GoogleTokenInfoResponseDto
 import com.coc.cu.domain.MemberResponseDto
 import com.coc.cu.domain.UserRequestDto
 import com.coc.cu.domain.models.ApiResponse
@@ -49,9 +48,9 @@ class UsersController(val usersService: UsersService,val transactionsService: Tr
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/send-sms")
-    fun sendSms(@RequestParam message: String,@RequestParam to: String): ApiResponse<String> {
+    fun sendSms(@RequestParam message: String,@RequestParam to: String,@RequestParam sender: String): ApiResponse<String> {
 
-        val res = restTemplate.getForObject("https://apps.mnotify.net/smsapi?key=WsdWfqH7Kr6fyiXDgLS25Ju62&to=${to}&msg=${message}&sender_id=izzuki", String::class.java)
+        val res = restTemplate.getForObject("https://apps.mnotify.net/smsapi?key=WsdWfqH7Kr6fyiXDgLS25Ju62&to=${to}&msg=${message}&sender_id=${sender}", String::class.java)
         return ApiResponse(res, "Success", HttpStatus.OK)
     }
 
