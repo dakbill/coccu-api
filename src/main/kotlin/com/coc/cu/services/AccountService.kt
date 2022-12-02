@@ -77,20 +77,20 @@ class AccountService(
                 continue
             }
 
-            if (record.type.contains("SAVINGS")) {
+            if (arrayOf("SAVINGS", "SAVINGS_CHEQUE").contains(record.type)) {
                 response.savings += record.amount
-            } else if (record.type.contains("WITHDRAWAL")) {
+            } else if (arrayOf("WITHDRAWAL", "WITHDRAWAL_CHEQUE").contains(record.type)) {
                 response.withdrawals += record.amount
-            } else if (record.type.contains("LOAN_REPAYMENT")) {
+            } else if (arrayOf("LOAN_REPAYMENT", "LOAN_REPAYMENT_CHEQUE").contains(record.type)) {
                 response.loanRepayments += record.amount
-            } else if (Regex("^(LOAN|LOAN_CHEQUE)$").matches(record.type)) {
+            } else if (arrayOf("LOAN", "LOAN_CHEQUE").contains(record.type)) {
                 response.loans += record.amount
             }
         }
 
 
         val zoneId = ZoneId.of("GMT")
-        val diff = endDate.atStartOfDay(zoneId).toEpochSecond()-startDate.atStartOfDay(zoneId).toEpochSecond()
+        val diff = endDate.atStartOfDay(zoneId).toEpochSecond() - startDate.atStartOfDay(zoneId).toEpochSecond()
 
 
         val step = if (diff < (24 * 60 * 60)) {
@@ -168,25 +168,29 @@ class AccountService(
                 continue
             }
 
-            if (record.type.equals(TransactionType.SAVINGS.name)) {
+            if (record.type == TransactionType.SAVINGS.name) {
                 response.totalSavings += record.amount
                 response.totalIn += record.amount
-            } else if (record.type.equals(TransactionType.SAVINGS_CHEQUE.name)) {
+            } else if (record.type == TransactionType.SAVINGS_CHEQUE.name) {
                 response.totalSavingsCheque += record.amount
                 response.totalInCheque += record.amount
-            } else if (record.type.equals(TransactionType.OPENING_BALANCE.name)) {
+            } else if (record.type == TransactionType.OPENING_BALANCE.name) {
                 response.openingBalance += record.amount
                 response.totalIn += record.amount
-            } else if (record.type.equals(TransactionType.CARD.name)) {
+            } else if (record.type == TransactionType.CARD.name) {
                 response.cards += record.amount
                 response.totalIn += record.amount
-            } else if (record.type.equals(TransactionType.WITHDRAWAL.name)) {
+            } else if (record.type == TransactionType.WITHDRAWAL.name) {
                 response.totalWithdrawals += record.amount
                 response.totalOut += record.amount
-            } else if (record.type.equals(TransactionType.WITHDRAWAL_CHEQUE.name)) {
+            } else if (record.type == TransactionType.WITHDRAWAL_CHEQUE.name) {
                 response.totalWithdrawalsCheque += record.amount
                 response.totalOutCheque += record.amount
-            } else if (arrayOf(TransactionType.INCENTIVE_TO_PERSONNEL.name, TransactionType.STATIONERY.name, TransactionType.TRANSPORT.name).contains(
+            } else if (arrayOf(
+                    TransactionType.INCENTIVE_TO_PERSONNEL.name,
+                    TransactionType.STATIONERY.name,
+                    TransactionType.TRANSPORT.name
+                ).contains(
                     record.type
                 )
             ) {
@@ -199,16 +203,16 @@ class AccountService(
             ) {
                 response.totalAdminExpensesCheque += record.amount
                 response.totalOutCheque += record.amount
-            } else if (record.type.equals(TransactionType.LOAN.name)) {
+            } else if (record.type == TransactionType.LOAN.name) {
                 response.totalLoans += record.amount
                 response.totalOut += record.amount
-            } else if (record.type.equals(TransactionType.LOAN_CHEQUE.name)) {
+            } else if (record.type == TransactionType.LOAN_CHEQUE.name) {
                 response.totalLoansCheque += record.amount
                 response.totalOutCheque += record.amount
-            } else if (record.type.equals(TransactionType.LOAN_REPAYMENT.name)) {
+            } else if (record.type == TransactionType.LOAN_REPAYMENT.name) {
                 response.totalLoanRepayments += record.amount
                 response.totalIn += record.amount
-            } else if (record.type.equals(TransactionType.LOAN_REPAYMENT_CHEQUE.name)) {
+            } else if (record.type == TransactionType.LOAN_REPAYMENT_CHEQUE.name) {
                 response.totalLoanRepaymentsCheque += record.amount
                 response.totalInCheque += record.amount
             } else if (arrayOf(
