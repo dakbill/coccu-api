@@ -69,6 +69,10 @@ class AccountService(
         return response
     }
 
+    fun getGuarantorDebtorAccounts(memberId: Long): List<Account>? {
+        return repository.getGuarantorDebtorAccounts(memberId)
+    }
+
     fun getDashboardMetrics(startDate: LocalDate, endDate: LocalDate): DashboardResponseDto {
         val response = DashboardResponseDto()
         val transactionSumsDto = repository.getDashboardStatistics(startDate, endDate)

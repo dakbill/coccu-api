@@ -133,5 +133,31 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
         nativeQuery = true
     )
     fun getDebtors(): List<Account>?
+
+
+    @Query(
+        value = "SELECT distinct \"account\".* FROM (\n" +
+                "\tSELECT guarantors_id,account_guarantors.account_id,SUM(\n" +
+                "\t\t(CASE \n" +
+                "\t\t\tWHEN \"transaction\".\"type\" in ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE') THEN -1 \n" +
+                "\t\t\tWHEN \"transaction\".\"type\" in ('LOAN','LOAN_CHEQUE') THEN 1 \n" +
+                "\t\t\tELSE 0 \n" +
+                "\t\t END) * amount\n" +
+                "\t) AS arrears \n" +
+                "\tFROM \n" +
+                "\t\taccount_guarantors \n" +
+                "\t\tLEFT JOIN account ON(account.id=account_guarantors.account_id)\n" +
+                "\t\tLEFT JOIN \"transaction\" ON(\"transaction\".account_id=account_guarantors.account_id) \n" +
+                "\tGROUP BY account_guarantors.account_id, guarantors_id\n" +
+                ") guarantor_arrears \n" +
+                "LEFT JOIN account ON(account.id=guarantor_arrears.account_id)\n" +
+                "LEFT JOIN \"member\" ON(\"member\".id=\"account\".member_id)\n" +
+                "WHERE \n" +
+                "arrears > 0 AND guarantors_id = ?1",
+        nativeQuery = true
+    )
+    fun getGuarantorDebtorAccounts(memberId: Long): List<Account>?
+
+
 }
 

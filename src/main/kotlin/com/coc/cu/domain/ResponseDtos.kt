@@ -78,6 +78,9 @@ class MemberResponseDto {
     var totalBalance: Double = 0.0
     var transactionCount: Long = 0
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    var guarantorDebtorAccounts: List<AccountResponseDto>? = null
+
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
