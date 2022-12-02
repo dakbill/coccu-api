@@ -1,20 +1,18 @@
 package com.coc.cu.services
 
 import com.coc.cu.domain.*
-import com.coc.cu.domain.models.ApiResponse
-import com.coc.cu.entities.Account
 import com.coc.cu.entities.Transaction
 import com.coc.cu.repositories.AccountTransactionsRepository
 import com.coc.cu.repositories.MemberAccountRepository
+import com.coc.cu.repositories.MembersRepository
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.stream.Collectors
 
 @Service
-class TransactionsService(var repository: AccountTransactionsRepository,var accountRepository: MemberAccountRepository, var objectMapper: ObjectMapper) {
+class TransactionsService(var repository: AccountTransactionsRepository, var membersRepository: MembersRepository, var memberAccountRepository: MemberAccountRepository, var objectMapper: ObjectMapper) {
 
     fun single(id: Long): TransactionResponseDto? {
         val typeRef = object : TypeReference<TransactionResponseDto>() {}
@@ -50,8 +48,22 @@ class TransactionsService(var repository: AccountTransactionsRepository,var acco
         var transaction = objectMapper.convertValue(model,transactionTypeRef)
 
         transaction.createdDate = LocalDateTime.now()
-        transaction.account = accountRepository.findById(model.accountId!!).get()
+        transaction.account = memberAccountRepository.findById(model.accountId!!).get()
         transaction = repository.save(transaction)
+
+        if (!model.guarantors.isNullOrEmpty()) {
+            val account = memberAccountRepository.findById(model.accountId!!).get()
+            val members = model.guarantors!!.stream().map { s ->
+                membersRepository.findById(
+                    s.toLong()
+                ).get()
+            }
+                .collect(Collectors.toList())
+
+            account.guarantors = members
+
+            memberAccountRepository.save(account)
+        }
 
 
 

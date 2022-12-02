@@ -35,9 +35,11 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager
 import org.springframework.web.client.RestTemplate
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+import java.util.stream.Collectors
 
 
 @SpringBootApplication
@@ -224,6 +226,7 @@ class CuApplication {
                     val lastLoanAccountNumber = "LOAN-${memberId}-${loanAccountsCount}"
                     val lastTransaction = repository.lastByAccountId(lastLoanAccountNumber)
 
+
                     accountNumber =
                         if (
                             (arrayOf(
@@ -263,6 +266,25 @@ class CuApplication {
                             createdDate = transaction.createdDate
                         )
                     )
+
+                if (record[9].toString().isNotEmpty()) {
+                    val p: Pattern = Pattern.compile("\\[Guarantors.*\\)\\]", Pattern.MULTILINE)
+                    val m: Matcher = p.matcher(record[9].toString())
+                    if (m.find()) {
+                        val members = m.group().split(Pattern.compile("(\\(|\\)|,|Guarantors\\:)")).stream()
+                            .filter { s -> s.trim().matches(Pattern.compile("\\d+").toRegex()) }
+                            .map { s ->
+                                membersRepository.findById(
+                                    s.toLong()
+                                ).get()
+                            }
+                            .collect(Collectors.toList())
+
+                        account.guarantors = members
+
+                        account = memberAccountRepository.save(account)
+                    }
+                }
 
                 if (account.createdDate!!.isAfter(transaction.createdDate)) {
                     account.createdDate = transaction.createdDate

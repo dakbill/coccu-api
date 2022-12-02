@@ -1,6 +1,8 @@
 package com.coc.cu.domain
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
@@ -17,6 +19,9 @@ class AccountResponseDto {
     var type: AccountType? = null
     var member: MemberResponseDto? = null
     var transactions: List<TransactionResponseDto>? = null
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    var guarantors: List<MemberMinimalResponseDto>? = null
 
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
@@ -72,6 +77,23 @@ class MemberResponseDto {
     var totalWithdrawals: Double = 0.0
     var totalBalance: Double = 0.0
     var transactionCount: Long = 0
+
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+    var createdDate: LocalDateTime? = null
+
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+    var updatedDate: LocalDateTime? = null
+}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+class MemberMinimalResponseDto {
+    var id: Long? = null
+    var name: String? = null
+    var image: String? = null
 
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)

@@ -18,7 +18,8 @@ data class Account(
     @Id var id: String? = null,
     var createdDate: LocalDateTime? = null,
     var updatedDate: LocalDateTime? = null,
-    @OneToMany var transactions: List<Transaction>? = arrayListOf()
+    @OneToMany var transactions: List<Transaction>? = arrayListOf(),
+    @OneToMany var guarantors: List<Member>? = arrayListOf()
 )
 
 @Entity

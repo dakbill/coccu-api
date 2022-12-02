@@ -21,6 +21,7 @@ class TransactionRequestDto(accountId: Long, amount: Float, type: TransactionTyp
 
 class RawTransactionRequestDto {
     var accountId: String? = null
+    var guarantors: List<String>? = null
     var type: String? = null
     var comment: String? = null
     var amount: Float? = null

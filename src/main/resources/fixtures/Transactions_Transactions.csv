@@ -3172,7 +3172,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,471,Godwin Mankata,SAVINGS,"GHS1,700.00",2021-05-23,,,,
 ,530,Hannah Ayine,SAVINGS,GHS800.00,2021-05-23,,,,
 2/28/2021 10:39:15,347,Isaac Agyekum,LOAN REPAYMENT,"GHS1,900.00",2021-05-23,,,,
-,500,Isaac Armah,LOAN,"GHS2,000.00",2021-05-23,,,,"Guarantor=004,002"
+,500,Isaac Armah,LOAN,"GHS2,000.00",2021-05-23,,,,"[Guarantors:(004,002)]"
 ,500,Isaac Armah,SAVINGS,GHS200.00,2021-05-23,,,,
 ,464,James Arthur,WITHDRAWAL,GHS200.00,2021-05-23,,,,
 ,485,Kojo Dadzie,SAVINGS,GHS200.00,2021-05-23,,,,
@@ -4208,7 +4208,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,134,Francis Azu,SAVINGS,GHS500.00,2022-10-16,,,,
 ,530,Hannah Ayine,SAVINGS,GHS170.00,2022-10-16,,,,
 ,546,Hannah Enterprise,LOAN,"GHS3,000.00",2022-10-16,,,,
-,546,Hannah Enterprise,LOAN CHEQUE,"GHS5,000.00",2022-10-16,,,,
+,546,Hannah Enterprise,LOAN CHEQUE,"GHS5,000.00",2022-10-16,,,,[Guarantors:(001,002,003)]
 ,043,Kweku Siaw,SAVINGS,GHS30.00,2022-10-16,,,,
 ,309,Margaret Mensah,WITHDRAWAL,GHS500.00,2022-10-16,,,,
 ,491,Michael Nkansah (Taxi),SAVINGS,GHS300.00,2022-10-16,,,,
