@@ -23,9 +23,9 @@ interface AccountTransactionsRepository: CrudRepository<Transaction, Long> {
 
     @Query(
         value = "SELECT ( " +
-                "(SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE account_id = ?1 AND TYPE IN ('OPENING_BALANCE','SAVINGS','SAVINGS_CHEQUE')) " +
+                "(SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id = ?1 AND TYPE IN ('OPENING_BALANCE','SAVINGS','SAVINGS_CHEQUE')) " +
                 " - " +
-                "(SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE account_id = ?1 AND TYPE IN ('WITHDRAWAL','WITHDRAWAL_CHEQUE')) " +
+                "(SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id = ?1 AND TYPE IN ('WITHDRAWAL','WITHDRAWAL_CHEQUE')) " +
                 ")",
         nativeQuery = true
     )
@@ -33,22 +33,22 @@ interface AccountTransactionsRepository: CrudRepository<Transaction, Long> {
 
     @Query(
         value = "SELECT ( " +
-                "(SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE account_id = ?1 AND TYPE IN ('OPENING_LOAN_BALANCE','LOAN','LOAN_CHEQUE')) " +
+                "(SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id = ?1 AND TYPE IN ('OPENING_LOAN_BALANCE','LOAN','LOAN_CHEQUE')) " +
                 " - " +
-                "(SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE account_id = ?1 AND TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE')) " +
+                "(SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id = ?1 AND TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE')) " +
                 ") ",
         nativeQuery = true
     )
     fun findByLoanBalance(id: String?): Double
 
     @Query(
-        value = "SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE account_id = (SELECT id FROM ACCOUNT WHERE member_id=?1 AND TYPE='SAVINGS') AND TYPE IN ('OPENING_BALANCE','SAVINGS','SAVINGS_CHEQUE')",
+        value = "SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id = (SELECT id FROM ACCOUNT WHERE member_id=?1 AND TYPE='SAVINGS') AND TYPE IN ('OPENING_BALANCE','SAVINGS','SAVINGS_CHEQUE')",
         nativeQuery = true
     )
     fun getTotalSavings(memberId: Long): Double
 
     @Query(
-        value = "SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1 AND TYPE='SAVINGS') AND TYPE IN ('WITHDRAWAL','WITHDRAWAL_CHEQUE')",
+        value = "SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1 AND TYPE='SAVINGS') AND TYPE IN ('WITHDRAWAL','WITHDRAWAL_CHEQUE')",
         nativeQuery = true
     )
     fun getTotalWithdrawals(memberId: Long): Double
@@ -106,19 +106,19 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
 
 
     @Query(
-        value = "SELECT SUM(AMOUNT) AS AMOUNT, TYPE FROM TRANSACTION WHERE CREATED_DATE BETWEEN ?1 AND ?2 GROUP BY TYPE",
+        value = "SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) AS AMOUNT, TYPE FROM TRANSACTION WHERE CREATED_DATE BETWEEN ?1 AND ?2 GROUP BY TYPE",
         nativeQuery = true
     )
     fun getDashboardStatistics(startDate: LocalDate, endDate: LocalDate): List<TransactionSumsDto>
 
     @Query(
-        value = "SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE TYPE IN (?1) AND CREATED_DATE BETWEEN ?2 AND ?3",
+        value = "SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN (?1) AND CREATED_DATE BETWEEN ?2 AND ?3",
         nativeQuery = true
     )
     fun sumAmounts(transactionTypes: Array<String>, startDate: LocalDate, endDate: LocalDate): Double
 
     @Query(
-        value = "SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE TYPE IN (?2) AND ACCOUNT_ID=?1 ",
+        value = "SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN (?2) AND ACCOUNT_ID=?1 ",
         nativeQuery = true
     )
     fun sumAmounts(accountId: String, transactionTypes: Array<String>): Double
@@ -126,9 +126,9 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
     @Query(
         value = "SELECT account.* FROM account WHERE account.type='LOAN' " +
                 "AND (" +
-                "   (SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE TYPE IN ('LOAN','LOAN_CHEQUE') AND ACCOUNT_ID=account.id) " +
+                "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN','LOAN_CHEQUE') AND ACCOUNT_ID=account.id) " +
                 "   - " +
-                "   (SELECT COALESCE(SUM(AMOUNT),0) FROM TRANSACTION WHERE TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE') AND ACCOUNT_ID=account.id) " +
+                "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE') AND ACCOUNT_ID=account.id) " +
                 ") > 0",
         nativeQuery = true
     )
