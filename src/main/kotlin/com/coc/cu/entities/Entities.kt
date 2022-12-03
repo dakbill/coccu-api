@@ -31,6 +31,7 @@ class Member(
     var email: String? = null,
     var address: String? = null,
     var city: String? = null,
+    var totalBalance: Double = 0.00,
     var transactionCount: Long = 0,
     var firstOfKinName: String? = null,
     var firstOfKinPhone: String? = null,

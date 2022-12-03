@@ -64,7 +64,6 @@ class UsersController(
         var memberResponseDto = usersService.single(id)
         memberResponseDto!!.totalSavings = transactionsService.getTotalSavings(id)
         memberResponseDto!!.totalWithdrawals = transactionsService.getTotalWithdrawals(id)
-        memberResponseDto!!.totalBalance = memberResponseDto.totalSavings - memberResponseDto.totalWithdrawals;
         return ApiResponse(memberResponseDto, "Success", HttpStatus.OK)
     }
 

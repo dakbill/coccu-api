@@ -91,6 +91,23 @@ interface MembersRepository : CrudRepository<Member, Long> {
         nativeQuery = true
     )
     fun updateTransactionCount(id: Long?): Boolean
+
+    @Query(
+        value = "UPDATE member SET total_balance=(\n" +
+                "\tSELECT\n" +
+                "\t\tSUM(\n" +
+                "\t\t\t(CASE \n" +
+                "\t\t\t\t\tWHEN \"transaction\".\"type\" in ('WITHDRAWAL','WITHDRAWAL_CHEQUE') THEN -1 \n" +
+                "\t\t\t\t\tWHEN \"transaction\".\"type\" in ('SAVINGS','SAVINGS_CHEQUE') THEN 1 \n" +
+                "\t\t\t\t\tELSE 0 \n" +
+                "\t\t\tEND) * amount\n" +
+                "\t\t) AS total_balance \n" +
+                "\tFROM \"transaction\" \n" +
+                "\tWHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1)\n" +
+                ") WHERE id=?1 RETURNING TRUE\n" ,
+        nativeQuery = true
+    )
+    fun updateTotalBalance(id: Long?): Boolean
 }
 
 
