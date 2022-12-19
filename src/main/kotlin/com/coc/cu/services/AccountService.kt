@@ -7,12 +7,13 @@ import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.repositories.MembersRepository
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.Period
 import java.time.ZoneId
-import java.util.*
 import java.util.stream.Collectors
 
 
@@ -48,10 +49,10 @@ class AccountService(
         return objectMapper.convertValue(repository.findAll(), typeRef)
     }
 
-    fun getDebtors(pageRequest: PageRequest): List<AccountResponseDto>? {
-        val accounts = repository.getDebtors(pageRequest)
+    fun getDebtors(query: String, pageRequest: PageRequest): Page<AccountResponseDto> {
+        val accountsPage = repository.getDebtors(query, pageRequest)
         val typeRef = object : TypeReference<List<AccountResponseDto>>() {}
-        val response = objectMapper.convertValue(accounts, typeRef)
+        val response = objectMapper.convertValue(accountsPage.content, typeRef)
 
         for (record in response) {
             record.balance = repository.sumAmounts(
@@ -67,7 +68,7 @@ class AccountService(
             )
         }
 
-        return response
+        return PageImpl(response, pageRequest, accountsPage.totalElements)
     }
 
     fun getGuarantorDebtorAccounts(memberId: Long): List<Account>? {

@@ -11,6 +11,8 @@ import com.coc.cu.services.UsersService
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
+import org.springframework.data.jpa.domain.JpaSort
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -40,10 +42,25 @@ class UsersController(
         @RequestParam(name = "size", defaultValue = "10") size: Int,
         @RequestParam(name = "q", defaultValue = "") query: String,
         @RequestParam(name = "getGuarantorDebtorAccounts", defaultValue = "false") getGuarantorDebtorAccounts: Boolean,
+        @RequestParam(name = "properties", required = false) properties: Array<String>?,
+        @RequestParam(name = "direction", required = false) direction: Array<String>?,
 
         ): ApiResponse<List<MemberResponseDto>> {
 
-        val membersPage = usersService.list(query, PageRequest.of(page, size))
+        var sort: Sort = JpaSort.unsafe(Sort.Direction.ASC, "(name)")
+        if (properties != null && properties.isNotEmpty()) {
+
+            sort = JpaSort.unsafe(Sort.Direction.valueOf(direction!![0].uppercase()), properties[0])
+            properties.forEachIndexed { index, property ->
+                run {
+                    if (index > 0) {
+                        sort.and(JpaSort.unsafe(Sort.Direction.valueOf(direction[index].uppercase()), property))
+                    }
+                }
+            }
+        }
+
+        val membersPage = usersService.list(query, PageRequest.of(page, size, sort))
         if (getGuarantorDebtorAccounts) {
             val typeRef = object : TypeReference<List<AccountResponseDto>>() {}
             membersPage.content!!.stream().forEach { m ->

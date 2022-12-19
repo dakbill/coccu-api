@@ -1,29 +1,44 @@
 package com.coc.cu.repositories
 
 import com.coc.cu.domain.TransactionSumsDto
-import com.coc.cu.domain.TransactionType
-import com.coc.cu.entities.Member
 import com.coc.cu.entities.Account
+import com.coc.cu.entities.Member
 import com.coc.cu.entities.Transaction
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
-import java.util.*
 
 @Repository
 interface AccountTransactionsRepository: JpaRepository<Transaction, Long> {
     fun findByAccountId(accountId: String?): List<Transaction>
 
     @Query(
-        value = "SELECT * FROM TRANSACTION WHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1) ORDER BY created_date DESC",
+        value = "SELECT * FROM TRANSACTION WHERE " +
+                "  ( (?1=0) OR (account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1)) )   " +
+                " AND  ( (LENGTH(?2)=0) OR (?2 = \"account_id\" ) )   " +
+                " AND  ( (LENGTH(?3)=0) OR (?3 = \"type\" ) )   " +
+                " AND  ( created_date BETWEEN CAST(?4 AS DATE) AND CAST(?5 AS DATE) )   " +
+                "",
+        countQuery = "SELECT COUNT(TRANSACTION.id) FROM TRANSACTION WHERE " +
+                "  ( (?1=0) OR (account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1)) )   " +
+                " AND  ( (LENGTH(?2)=0) OR (?2 = \"account_id\" ) )   " +
+                " AND  ( (LENGTH(?3)=0) OR (?3 = \"type\" ) )   " +
+                " AND  ( created_date BETWEEN CAST(?4 AS DATE) AND CAST(?5 AS DATE) )   " ,
+
         nativeQuery = true
     )
-    fun findAllByMemberId(memberId: Long, pageable: Pageable): List<Transaction>
+    fun findAllByMemberId(
+        memberId: Long,
+        accountId: String,
+        transactionType: String,
+        startDate: LocalDate,
+        endDate: LocalDate,
+        pageable: Pageable
+    ): Page<Transaction>
 
     @Query(
         value = "SELECT ( " +
@@ -86,6 +101,19 @@ interface MembersRepository : CrudRepository<Member, Long> {
                     "   (CAST(MEMBER.id AS CHAR) LIKE '%' || ?1 || '%' ) OR " +
                     "   (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' ) " +
                     ")",
+
+        countQuery = "" +
+                "SELECT " +
+                "COUNT(DISTINCT member.id) " +
+                "FROM " +
+                "member LEFT JOIN account ON(account.member_id=member.id) " +
+                "WHERE " +
+                "( LENGTH(MEMBER.name) > 0 ) AND"+
+                "( " +
+                "   (( LOWER(?1) <> UPPER(?1) ) AND CAST(account.member_id AS CHAR) LIKE '%' || ?1 || '%') OR " +
+                "   (CAST(MEMBER.id AS CHAR) LIKE '%' || ?1 || '%' ) OR " +
+                "   (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' ) " +
+                ")",
         nativeQuery = true
     )
     fun findByQuery(query: String?, pageRequest: Pageable): Page<Member>
@@ -145,15 +173,27 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
     fun sumAmounts(accountId: String, transactionTypes: Array<String>): Double
 
     @Query(
-        value = "SELECT account.* FROM account WHERE account.type='LOAN' " +
+        value = "SELECT account.*, (" +
+                "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN','LOAN_CHEQUE') AND ACCOUNT_ID=account.id) " +
+                "   - " +
+                "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE') AND ACCOUNT_ID=account.id) " +
+                ") AS balance FROM account LEFT JOIN member ON(member.id=member_id) WHERE account.type='LOAN' " +
                 "AND (" +
                 "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN','LOAN_CHEQUE') AND ACCOUNT_ID=account.id) " +
                 "   - " +
                 "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE') AND ACCOUNT_ID=account.id) " +
-                ") > 0",
+                ") > 0 " +
+                "AND (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )",
+        countQuery = "SELECT COUNT(account.id) FROM account LEFT JOIN member ON(member.id=member_id) WHERE account.type='LOAN' " +
+                "AND (" +
+                "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN','LOAN_CHEQUE') AND ACCOUNT_ID=account.id) " +
+                "   - " +
+                "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE') AND ACCOUNT_ID=account.id) " +
+                ") > 0 " +
+                "AND (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )",
         nativeQuery = true
     )
-    fun getDebtors(pageable: Pageable): List<Account>?
+    fun getDebtors(query: String, pageable: Pageable): Page<Account>
 
 
     @Query(

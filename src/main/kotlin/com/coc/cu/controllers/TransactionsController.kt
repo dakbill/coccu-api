@@ -5,9 +5,13 @@ import com.coc.cu.domain.TransactionResponseDto
 import com.coc.cu.domain.models.ApiResponse
 import com.coc.cu.services.TransactionsService
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
+import org.springframework.data.jpa.domain.JpaSort
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDate
 
 
 @RequestMapping("/api/v1/transactions")
@@ -24,12 +28,42 @@ class TransactionsController(val transactionsService: TransactionsService) {
     @PreAuthorize("isAuthenticated()")
     @GetMapping
     fun list(
+        @RequestParam(name = "transactionType", required = false) transactionType: String?,
+        @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(required = false) startDate: LocalDate,
+        @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(required = false) endDate: LocalDate,
         @RequestParam(name = "page", defaultValue = "0") page: Int,
         @RequestParam(name = "size", defaultValue = "10") size: Int,
-        @RequestParam(required = false) memberId: Long?
+        @RequestParam(required = false, defaultValue = "0") memberId: Long,
+        @RequestParam(required = false) accountId: String?,
+        @RequestParam(name = "properties", required = false) properties: Array<String>?,
+        @RequestParam(name = "direction", required = false) direction: Array<String>?,
     ): ApiResponse<List<TransactionResponseDto>> {
 
-        return ApiResponse(transactionsService.list(memberId, PageRequest.of(page, size)), HttpStatus.OK)
+        val sortMaps = mapOf(
+            "(name)" to "(" +
+                        "SELECT member.name FROM " +
+                            "member LEFT JOIN account ON(member.id=account.member_id) " +
+                        "WHERE account.id=transaction.account_id" +
+                    ")",
+        )
+
+        var sort: Sort = JpaSort.unsafe(Sort.Direction.ASC, sortMaps.getOrDefault("(name)","(name)"))
+        if (properties != null && properties.isNotEmpty()) {
+
+            sort = JpaSort.unsafe(Sort.Direction.valueOf(direction!![0].uppercase()), sortMaps.getOrDefault(properties[0],properties[0]))
+            properties.forEachIndexed { index, property ->
+                run {
+                    if (index > 0) {
+                        sort.and(JpaSort.unsafe(Sort.Direction.valueOf(direction[index].uppercase()), sortMaps.getOrDefault(property,property)))
+                    }
+                }
+            }
+        }
+
+        val transactionsPage =
+            transactionsService.list(memberId, accountId, transactionType, startDate, endDate, PageRequest.of(page, size, sort))
+
+        return ApiResponse(transactionsPage.content, "OK", HttpStatus.OK, page, size, transactionsPage.totalElements)
     }
 
     @PreAuthorize("isAuthenticated()")

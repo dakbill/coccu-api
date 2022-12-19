@@ -7,9 +7,13 @@ import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.repositories.MembersRepository
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.*
 import java.util.stream.Collectors
 
 @Service
@@ -30,18 +34,31 @@ class TransactionsService(var repository: AccountTransactionsRepository, var mem
         return null
     }
 
-    fun list(memberId: Long?, pageRequest: PageRequest): List<TransactionResponseDto>? {
+    fun list(
+        memberId: Long,
+        accountId: String?,
+        transactionType: String?,
+        startDate: LocalDate,
+        endDate: LocalDate,
+        pageRequest: PageRequest
+    ): Page<TransactionResponseDto> {
         val typeRef = object : TypeReference<List<TransactionResponseDto>>() {}
 
 
-        var transactions: List<Transaction> = if (memberId == null) {
-            repository.findAll(pageRequest).toList()
-        } else {
-            repository.findAllByMemberId(memberId, pageRequest)
-        }
+        var transactionsPage: Page<Transaction> = repository.findAllByMemberId(
+            memberId,
+            Optional.ofNullable(accountId).orElse(""),
+            Optional.ofNullable(transactionType).orElse(""),
+            startDate,
+            endDate,
+            pageRequest
+        )
 
-
-        return objectMapper.convertValue(transactions, typeRef)
+        return PageImpl(
+            objectMapper.convertValue(transactionsPage.content, typeRef),
+            pageRequest,
+            transactionsPage.totalElements
+        )
     }
 
     fun create(model: RawTransactionRequestDto): TransactionResponseDto? {

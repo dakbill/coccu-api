@@ -5,10 +5,11 @@ import com.coc.cu.domain.AccountResponseDto
 import com.coc.cu.domain.models.ApiResponse
 import com.coc.cu.services.AccountService
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
+import org.springframework.data.jpa.domain.JpaSort
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
-
 
 
 @RequestMapping("/api/v1/accounts")
@@ -38,16 +39,33 @@ class AccountsController(var accountService: AccountService) {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/debtors")
     fun getDebtors(
+        @RequestParam(name = "q", defaultValue = "_") query: String,
         @RequestParam(name = "page", defaultValue = "0") page: Int,
         @RequestParam(name = "size", defaultValue = "10") size: Int,
-    ): ApiResponse<List<AccountResponseDto>> {
-        return ApiResponse(
-            accountService.getDebtors(
-                PageRequest.of(
-                    page, size
-                )
-            ), HttpStatus.OK
+        @RequestParam(name = "properties", required = false) properties: Array<String>?,
+        @RequestParam(name = "direction", required = false) direction: Array<String>?,
+
+        ): ApiResponse<List<AccountResponseDto>> {
+
+        val sortMaps = mapOf(
+            "(name)" to "(member.name)",
         )
+
+        var sort: Sort = JpaSort.unsafe(Sort.Direction.ASC, sortMaps.getOrDefault("(name)","(name)"))
+        if (properties != null && properties.isNotEmpty()) {
+
+            sort = JpaSort.unsafe(Sort.Direction.valueOf(direction!![0].uppercase()), sortMaps.getOrDefault(properties[0],properties[0]))
+            properties.forEachIndexed { index, property ->
+                run {
+                    if (index > 0) {
+                        sort.and(JpaSort.unsafe(Sort.Direction.valueOf(direction[index].uppercase()), sortMaps.getOrDefault(property,property)))
+                    }
+                }
+            }
+        }
+
+        val debtorsPage = accountService.getDebtors(query, PageRequest.of(page, size, sort))
+        return ApiResponse(debtorsPage.content, "OK", HttpStatus.OK, page, size, debtorsPage.totalElements)
     }
 
 
