@@ -7,6 +7,7 @@ import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.repositories.MembersRepository
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.Period
@@ -47,8 +48,8 @@ class AccountService(
         return objectMapper.convertValue(repository.findAll(), typeRef)
     }
 
-    fun getDebtors(): List<AccountResponseDto>? {
-        val accounts = repository.getDebtors()
+    fun getDebtors(pageRequest: PageRequest): List<AccountResponseDto>? {
+        val accounts = repository.getDebtors(pageRequest)
         val typeRef = object : TypeReference<List<AccountResponseDto>>() {}
         val response = objectMapper.convertValue(accounts, typeRef)
 

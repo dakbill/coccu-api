@@ -7,6 +7,7 @@ import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.repositories.MembersRepository
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.stream.Collectors
@@ -29,14 +30,14 @@ class TransactionsService(var repository: AccountTransactionsRepository, var mem
         return null
     }
 
-    fun list(memberId: Long?): List<TransactionResponseDto>? {
+    fun list(memberId: Long?, pageRequest: PageRequest): List<TransactionResponseDto>? {
         val typeRef = object : TypeReference<List<TransactionResponseDto>>() {}
 
 
         var transactions: List<Transaction> = if (memberId == null) {
-            repository.findAll().toList()
+            repository.findAll(pageRequest).toList()
         } else {
-            repository.findAllByMemberId(memberId)
+            repository.findAllByMemberId(memberId, pageRequest)
         }
 
 

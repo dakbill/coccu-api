@@ -5,6 +5,10 @@ import com.coc.cu.domain.TransactionType
 import com.coc.cu.entities.Member
 import com.coc.cu.entities.Account
 import com.coc.cu.entities.Transaction
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
@@ -12,14 +16,14 @@ import java.time.LocalDate
 import java.util.*
 
 @Repository
-interface AccountTransactionsRepository: CrudRepository<Transaction, Long> {
+interface AccountTransactionsRepository: JpaRepository<Transaction, Long> {
     fun findByAccountId(accountId: String?): List<Transaction>
 
     @Query(
         value = "SELECT * FROM TRANSACTION WHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1) ORDER BY created_date DESC",
         nativeQuery = true
     )
-    fun findAllByMemberId(memberId: Long): List<Transaction>
+    fun findAllByMemberId(memberId: Long, pageable: Pageable): List<Transaction>
 
     @Query(
         value = "SELECT ( " +
@@ -84,7 +88,7 @@ interface MembersRepository : CrudRepository<Member, Long> {
                     ")",
         nativeQuery = true
     )
-    fun findByQuery(query: String?): List<Member>
+    fun findByQuery(query: String?, pageRequest: Pageable): Page<Member>
 
     @Query(
         value = "UPDATE member SET transaction_count=(SELECT COUNT(id) FROM TRANSACTION WHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1)) WHERE id=?1 RETURNING TRUE",
@@ -149,7 +153,7 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
                 ") > 0",
         nativeQuery = true
     )
-    fun getDebtors(): List<Account>?
+    fun getDebtors(pageable: Pageable): List<Account>?
 
 
     @Query(

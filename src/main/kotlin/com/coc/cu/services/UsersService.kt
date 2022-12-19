@@ -9,6 +9,10 @@ import com.coc.cu.repositories.MembersRepository
 import com.coc.cu.utils.JwtUtils
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.vividsolutions.jts.util.Memory.total
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UserDetails
@@ -58,12 +62,12 @@ class UsersService(
         return null
     }
 
-    fun list(query: String): List<MemberResponseDto>? {
+    fun list(query: String, pageRequest: PageRequest): Page<MemberResponseDto> {
         val typeRef = object : TypeReference<List<MemberResponseDto>>() {}
         val accountsTypeRef = object : TypeReference<List<AccountResponseDto>>() {}
 
-        val members = repository.findByQuery(query.lowercase())
-        val users = objectMapper.convertValue(members, typeRef)
+        val members = repository.findByQuery(query.lowercase(), pageRequest)
+        val users = objectMapper.convertValue(members.content, typeRef)
 
         users.stream().forEach { user ->
             run {
@@ -72,7 +76,7 @@ class UsersService(
             }
         }
 
-        return users
+        return PageImpl(users, pageRequest, members.totalElements)
     }
 
     fun create(model: UserRequestDto): MemberResponseDto? {

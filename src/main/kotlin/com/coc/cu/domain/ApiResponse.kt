@@ -20,6 +20,21 @@ class ApiResponse<T> : ResponseEntity<CustomBody<T>> {
     ) : super(CustomBody<T>(status, message, data, errors), status)
 
 
+    constructor(
+        data: T?,
+        message: String,
+        status: HttpStatus,
+        page: Int,
+        size: Int,
+        total: Long,
+    ) : super(CustomBody<T>(status, message, data, page, size, total), status)
+
+
+
+
+}
+
+class Pager(var page: Int, var size: Int, var total: Long) : Serializable {
 }
 
 class CustomBody<T>(data: T?) : Serializable {
@@ -29,6 +44,8 @@ class CustomBody<T>(data: T?) : Serializable {
     var message: String = "Success"
 
     var data: T? = data
+
+    var pager: Pager? = null
 
     var errors: List<Map<String, String>>? = null
 
@@ -42,6 +59,13 @@ class CustomBody<T>(data: T?) : Serializable {
         this.code = status.value() * 10
         this.data = data
         this.message = message
+    }
+
+    constructor(status: HttpStatus, message: String, data: T?, page: Int, size: Int, total: Long) : this(data) {
+        this.code = status.value() * 10
+        this.data = data
+        this.message = message
+        this.pager = Pager(page, size, total)
     }
 
     constructor(status: HttpStatus, message: String, data: T?, errors: List<Map<String, String>>?) : this(data) {

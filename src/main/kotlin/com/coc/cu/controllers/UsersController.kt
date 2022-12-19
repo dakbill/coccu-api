@@ -10,6 +10,7 @@ import com.coc.cu.services.TransactionsService
 import com.coc.cu.services.UsersService
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -35,15 +36,17 @@ class UsersController(
     @PreAuthorize("isAuthenticated()")
     @GetMapping
     fun list(
+        @RequestParam(name = "page", defaultValue = "0") page: Int,
+        @RequestParam(name = "size", defaultValue = "10") size: Int,
         @RequestParam(name = "q", defaultValue = "") query: String,
         @RequestParam(name = "getGuarantorDebtorAccounts", defaultValue = "false") getGuarantorDebtorAccounts: Boolean,
 
         ): ApiResponse<List<MemberResponseDto>> {
-//
-        val members = usersService.list(query)
+
+        val membersPage = usersService.list(query, PageRequest.of(page, size))
         if (getGuarantorDebtorAccounts) {
             val typeRef = object : TypeReference<List<AccountResponseDto>>() {}
-            members!!.stream().forEach { m ->
+            membersPage.content!!.stream().forEach { m ->
                 run {
                     val accounts = accountService.getGuarantorDebtorAccounts(m.id!!)
                     if (!accounts.isNullOrEmpty()) {
@@ -54,7 +57,8 @@ class UsersController(
                 }
             }
         }
-        return ApiResponse(members, HttpStatus.OK)
+
+        return ApiResponse(membersPage.content, "OK", HttpStatus.OK, page, size, membersPage.totalElements)
     }
 
     @PreAuthorize("isAuthenticated()")

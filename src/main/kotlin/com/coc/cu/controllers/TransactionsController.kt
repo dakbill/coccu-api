@@ -4,6 +4,7 @@ import com.coc.cu.domain.RawTransactionRequestDto
 import com.coc.cu.domain.TransactionResponseDto
 import com.coc.cu.domain.models.ApiResponse
 import com.coc.cu.services.TransactionsService
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -22,9 +23,13 @@ class TransactionsController(val transactionsService: TransactionsService) {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping
-    fun list(@RequestParam(required = false) memberId: Long?): ApiResponse<List<TransactionResponseDto>> {
+    fun list(
+        @RequestParam(name = "page", defaultValue = "0") page: Int,
+        @RequestParam(name = "size", defaultValue = "10") size: Int,
+        @RequestParam(required = false) memberId: Long?
+    ): ApiResponse<List<TransactionResponseDto>> {
 
-        return ApiResponse(transactionsService.list(memberId), HttpStatus.OK)
+        return ApiResponse(transactionsService.list(memberId, PageRequest.of(page, size)), HttpStatus.OK)
     }
 
     @PreAuthorize("isAuthenticated()")

@@ -2,10 +2,9 @@ package com.coc.cu.controllers
 
 import com.coc.cu.domain.AccountRequestDto
 import com.coc.cu.domain.AccountResponseDto
-import com.coc.cu.domain.MemberResponseDto
-import com.coc.cu.domain.UserRequestDto
 import com.coc.cu.domain.models.ApiResponse
 import com.coc.cu.services.AccountService
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -38,8 +37,17 @@ class AccountsController(var accountService: AccountService) {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/debtors")
-    fun getDebtors(): ApiResponse<List<AccountResponseDto>> {
-        return ApiResponse(accountService.getDebtors(), HttpStatus.OK)
+    fun getDebtors(
+        @RequestParam(name = "page", defaultValue = "0") page: Int,
+        @RequestParam(name = "size", defaultValue = "10") size: Int,
+    ): ApiResponse<List<AccountResponseDto>> {
+        return ApiResponse(
+            accountService.getDebtors(
+                PageRequest.of(
+                    page, size
+                )
+            ), HttpStatus.OK
+        )
     }
 
 
