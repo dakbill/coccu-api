@@ -8,9 +8,11 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.coc.cu.domain.AccountType
 import com.coc.cu.domain.TransactionType
 import com.coc.cu.entities.Account
+import com.coc.cu.entities.Guarantor
 import com.coc.cu.entities.Member
 import com.coc.cu.entities.Transaction
 import com.coc.cu.repositories.AccountTransactionsRepository
+import com.coc.cu.repositories.GuarantorRepository
 import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.repositories.MembersRepository
 import com.coc.cu.utils.JwtUtils
@@ -62,10 +64,11 @@ class CuApplication {
     fun init(
         membersRepository: MembersRepository,
         accountTransactionsRepository: AccountTransactionsRepository,
-        memberAccountRepository: MemberAccountRepository
+        memberAccountRepository: MemberAccountRepository,
+        guarantorRepository: GuarantorRepository
     ) = CommandLineRunner {
         registerMembers(membersRepository, memberAccountRepository)
-        recordTransactions(accountTransactionsRepository, membersRepository, memberAccountRepository)
+        recordTransactions(accountTransactionsRepository, membersRepository, memberAccountRepository, guarantorRepository)
     }
 
 
@@ -168,7 +171,8 @@ class CuApplication {
     fun recordTransactions(
         repository: AccountTransactionsRepository,
         membersRepository: MembersRepository,
-        memberAccountRepository: MemberAccountRepository
+        memberAccountRepository: MemberAccountRepository,
+        guarantorRepository: GuarantorRepository,
     ) {
         val bufferedReader =
             BufferedReader((InputStreamReader(ClassPathResource("/fixtures/Transactions_Transactions.csv").inputStream)))
@@ -271,16 +275,23 @@ class CuApplication {
                     val p: Pattern = Pattern.compile("\\[Guarantors.*\\)\\]", Pattern.MULTILINE)
                     val m: Matcher = p.matcher(record[9].toString())
                     if (m.find()) {
-                        val members = m.group().split(Pattern.compile("(\\(|\\)|,|Guarantors\\:)")).stream()
+                        account.guarantors = m.group().split(Pattern.compile("(\\(|\\)|,|Guarantors\\:)")).stream()
                             .filter { s -> s.trim().matches(Pattern.compile("\\d+").toRegex()) }
                             .map { s ->
-                                membersRepository.findById(
+                                val member = membersRepository.findById(
                                     s.toLong()
                                 ).get()
+                                guarantorRepository.save(
+                                    Guarantor(
+                                        member = member,
+                                        amount = 0.0f,
+                                        createdDate = transaction.createdDate,
+                                    )
+                                )
+
                             }
                             .collect(Collectors.toList())
 
-                        account.guarantors = members
 
                         account = memberAccountRepository.save(account)
                     }

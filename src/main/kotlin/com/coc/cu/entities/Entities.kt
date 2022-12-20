@@ -4,8 +4,6 @@ package com.coc.cu.entities
 import com.coc.cu.domain.AccountType
 import com.coc.cu.domain.TransactionType
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import org.hibernate.annotations.Fetch
-import org.hibernate.annotations.FetchMode
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -19,7 +17,18 @@ data class Account(
     var createdDate: LocalDateTime? = null,
     var updatedDate: LocalDateTime? = null,
     @OneToMany var transactions: List<Transaction>? = arrayListOf(),
-    @OneToMany var guarantors: List<Member>? = arrayListOf()
+    @OneToMany var guarantors: List<Guarantor>? = arrayListOf()
+)
+
+@Entity
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Guarantor(
+    @Id @GeneratedValue(strategy = GenerationType.AUTO) var id: Long? = null,
+    @ManyToOne var member: Member?,
+    var amount: Float? = null,
+    var fundReleased: Boolean = false,
+    var createdDate: LocalDateTime? = null,
+    var updatedDate: LocalDateTime? = null
 )
 
 @Entity

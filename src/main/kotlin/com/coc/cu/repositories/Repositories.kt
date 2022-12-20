@@ -2,6 +2,7 @@ package com.coc.cu.repositories
 
 import com.coc.cu.domain.TransactionSumsDto
 import com.coc.cu.entities.Account
+import com.coc.cu.entities.Guarantor
 import com.coc.cu.entities.Member
 import com.coc.cu.entities.Transaction
 import org.springframework.data.domain.Page
@@ -221,4 +222,8 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
 
 
 }
+
+
+@Repository
+interface GuarantorRepository : CrudRepository<Guarantor, Long> {}
 

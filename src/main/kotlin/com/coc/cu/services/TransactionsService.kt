@@ -1,8 +1,10 @@
 package com.coc.cu.services
 
 import com.coc.cu.domain.*
+import com.coc.cu.entities.Guarantor
 import com.coc.cu.entities.Transaction
 import com.coc.cu.repositories.AccountTransactionsRepository
+import com.coc.cu.repositories.GuarantorRepository
 import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.repositories.MembersRepository
 import com.fasterxml.jackson.core.type.TypeReference
@@ -17,7 +19,7 @@ import java.util.*
 import java.util.stream.Collectors
 
 @Service
-class TransactionsService(var repository: AccountTransactionsRepository, var membersRepository: MembersRepository, var memberAccountRepository: MemberAccountRepository, var objectMapper: ObjectMapper) {
+class TransactionsService(var repository: AccountTransactionsRepository, var membersRepository: MembersRepository, var memberAccountRepository: MemberAccountRepository, var guarantorRepository: GuarantorRepository, var objectMapper: ObjectMapper) {
 
     fun single(id: Long): TransactionResponseDto? {
         val typeRef = object : TypeReference<TransactionResponseDto>() {}
@@ -71,14 +73,20 @@ class TransactionsService(var repository: AccountTransactionsRepository, var mem
 
         if (!model.guarantors.isNullOrEmpty()) {
             val account = memberAccountRepository.findById(model.accountId!!).get()
-            val members = model.guarantors!!.stream().map { s ->
-                membersRepository.findById(
-                    s.toLong()
+            account.guarantors =  model.guarantors!!.stream().map { g ->
+                val member = membersRepository.findById(
+                    g.memberId!!
                 ).get()
+                guarantorRepository.save(
+                    Guarantor(
+                        member = member,
+                        amount = g.amount,
+                        createdDate = transaction.createdDate,
+                    )
+                )
+
             }
                 .collect(Collectors.toList())
-
-            account.guarantors = members
 
             memberAccountRepository.save(account)
         }

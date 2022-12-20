@@ -31,6 +31,7 @@ class TransactionsController(val transactionsService: TransactionsService) {
         @RequestParam(name = "transactionType", required = false) transactionType: String?,
         @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(required = false) startDate: LocalDate,
         @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(required = false) endDate: LocalDate,
+        @RequestParam(name = "exportToExcel", defaultValue = "false") exportToExcel: Boolean,
         @RequestParam(name = "page", defaultValue = "0") page: Int,
         @RequestParam(name = "size", defaultValue = "10") size: Int,
         @RequestParam(required = false, defaultValue = "0") memberId: Long,
@@ -60,8 +61,16 @@ class TransactionsController(val transactionsService: TransactionsService) {
             }
         }
 
+
         val transactionsPage =
-            transactionsService.list(memberId, accountId, transactionType, startDate, endDate, PageRequest.of(page, size, sort))
+            transactionsService.list(
+                memberId,
+                accountId,
+                transactionType,
+                startDate,
+                endDate,
+                PageRequest.of(if (exportToExcel) 0 else page, if (exportToExcel) Int.MAX_VALUE else size, sort)
+            )
 
         return ApiResponse(transactionsPage.content, "OK", HttpStatus.OK, page, size, transactionsPage.totalElements)
     }

@@ -39,6 +39,7 @@ class AccountsController(var accountService: AccountService) {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/debtors")
     fun getDebtors(
+        @RequestParam(name = "exportToExcel", defaultValue = "false") exportToExcel: Boolean,
         @RequestParam(name = "q", defaultValue = "_") query: String,
         @RequestParam(name = "page", defaultValue = "0") page: Int,
         @RequestParam(name = "size", defaultValue = "10") size: Int,
@@ -64,7 +65,7 @@ class AccountsController(var accountService: AccountService) {
             }
         }
 
-        val debtorsPage = accountService.getDebtors(query, PageRequest.of(page, size, sort))
+        val debtorsPage = accountService.getDebtors(query, PageRequest.of(if (exportToExcel) 0 else page, if (exportToExcel) Int.MAX_VALUE else size, sort))
         return ApiResponse(debtorsPage.content, "OK", HttpStatus.OK, page, size, debtorsPage.totalElements)
     }
 

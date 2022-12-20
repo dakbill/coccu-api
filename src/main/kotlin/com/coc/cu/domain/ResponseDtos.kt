@@ -21,7 +21,7 @@ class AccountResponseDto {
     var transactions: List<TransactionResponseDto>? = null
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    var guarantors: List<MemberMinimalResponseDto>? = null
+    var guarantors: List<GuarantorResponseDto>? = null
 
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
@@ -107,6 +107,15 @@ class MemberMinimalResponseDto {
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
     var updatedDate: LocalDateTime? = null
+}
+
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+class GuarantorResponseDto {
+    var id: Long? = null
+    var member: MemberMinimalResponseDto? = null
+    var amount = 0.0f
+    var fundReleased: Boolean = false
 }
 
 class AuthResponseDto {
