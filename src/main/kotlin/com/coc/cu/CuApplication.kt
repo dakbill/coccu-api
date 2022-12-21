@@ -68,7 +68,12 @@ class CuApplication {
         guarantorRepository: GuarantorRepository
     ) = CommandLineRunner {
         registerMembers(membersRepository, memberAccountRepository)
-        recordTransactions(accountTransactionsRepository, membersRepository, memberAccountRepository, guarantorRepository)
+        recordTransactions(
+            accountTransactionsRepository,
+            membersRepository,
+            memberAccountRepository,
+            guarantorRepository
+        )
     }
 
 
@@ -96,7 +101,8 @@ class CuApplication {
         val users: User.UserBuilder = User.builder()
         val manager = InMemoryUserDetailsManager()
         manager.createUser(
-            users.username("taichobill@gmail.com").password(passwordEncoder!!.encode("0541928449")).roles("USER", "ADMIN")
+            users.username("taichobill@gmail.com").password(passwordEncoder!!.encode("0541928449"))
+                .roles("USER", "ADMIN")
                 .build()
         )
         manager.createUser(
@@ -250,7 +256,6 @@ class CuApplication {
                 }
 
 
-
                 var memberOptional = membersRepository.findById(record[1].toLong())
                 if (!memberOptional.isPresent) continue
 
@@ -275,22 +280,29 @@ class CuApplication {
                     val p: Pattern = Pattern.compile("\\[Guarantors.*\\)\\]", Pattern.MULTILINE)
                     val m: Matcher = p.matcher(record[9].toString())
                     if (m.find()) {
-                        account.guarantors = m.group().split(Pattern.compile("(\\(|\\)|,|Guarantors\\:)")).stream()
+
+                        if (account.guarantors!!.isEmpty()) {
+                            account.guarantors = arrayListOf()
+                        }
+
+                        m.group().split(Pattern.compile("(\\(|\\)|,|Guarantors\\:)")).stream()
                             .filter { s -> s.trim().matches(Pattern.compile("\\d+").toRegex()) }
-                            .map { s ->
+                            .forEach { s ->
                                 val member = membersRepository.findById(
                                     s.toLong()
                                 ).get()
-                                guarantorRepository.save(
-                                    Guarantor(
-                                        member = member,
-                                        amount = 0.0f,
-                                        createdDate = transaction.createdDate,
+                                account.guarantors!!.add(
+                                    guarantorRepository.save(
+                                        Guarantor(
+                                            member = member,
+                                            amount = 0.0f,
+                                            createdDate = transaction.createdDate,
+                                        )
                                     )
                                 )
 
+
                             }
-                            .collect(Collectors.toList())
 
 
                         account = memberAccountRepository.save(account)

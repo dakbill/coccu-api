@@ -17,7 +17,7 @@ data class Account(
     var createdDate: LocalDateTime? = null,
     var updatedDate: LocalDateTime? = null,
     @OneToMany var transactions: List<Transaction>? = arrayListOf(),
-    @OneToMany var guarantors: List<Guarantor>? = arrayListOf()
+    @OneToMany var guarantors: MutableList<Guarantor>? = arrayListOf()
 )
 
 @Entity

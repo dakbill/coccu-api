@@ -17,9 +17,16 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 import java.util.stream.Collectors
+import kotlin.collections.ArrayList
 
 @Service
-class TransactionsService(var repository: AccountTransactionsRepository, var membersRepository: MembersRepository, var memberAccountRepository: MemberAccountRepository, var guarantorRepository: GuarantorRepository, var objectMapper: ObjectMapper) {
+class TransactionsService(
+    var repository: AccountTransactionsRepository,
+    var membersRepository: MembersRepository,
+    var memberAccountRepository: MemberAccountRepository,
+    var guarantorRepository: GuarantorRepository,
+    var objectMapper: ObjectMapper
+) {
 
     fun single(id: Long): TransactionResponseDto? {
         val typeRef = object : TypeReference<TransactionResponseDto>() {}
@@ -67,7 +74,7 @@ class TransactionsService(var repository: AccountTransactionsRepository, var mem
 
     fun create(model: RawTransactionRequestDto): TransactionResponseDto? {
         val transactionTypeRef = object : TypeReference<Transaction>() {}
-        var transaction = objectMapper.convertValue(model,transactionTypeRef)
+        var transaction = objectMapper.convertValue(model, transactionTypeRef)
 
         transaction.createdDate = LocalDateTime.now()
         transaction.account = memberAccountRepository.findById(model.accountId!!).get()
@@ -75,25 +82,32 @@ class TransactionsService(var repository: AccountTransactionsRepository, var mem
 
         if (!model.guarantors.isNullOrEmpty()) {
             val account = memberAccountRepository.findById(model.accountId!!).get()
-            account.guarantors =  model.guarantors!!.stream().map { g ->
+            if (account.guarantors!!.isEmpty()) {
+                account.guarantors = arrayListOf()
+            }
+
+            model.guarantors!!.stream().forEach { g ->
                 val member = membersRepository.findById(
                     g.memberId!!
                 ).get()
-                guarantorRepository.save(
-                    Guarantor(
-                        member = member,
-                        amount = g.amount,
-                        createdDate = transaction.createdDate,
+
+                account.guarantors!!.add(
+                    guarantorRepository.save(
+                        Guarantor(
+                            member = member,
+                            amount = g.amount,
+                            createdDate = transaction.createdDate,
+                        )
                     )
                 )
 
+
             }
-                .collect(Collectors.toList())
+
+
 
             memberAccountRepository.save(account)
         }
-
-
 
 
         val typeRef = object : TypeReference<TransactionResponseDto>() {}
