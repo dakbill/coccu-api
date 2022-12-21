@@ -37,6 +37,7 @@ class TransactionsService(var repository: AccountTransactionsRepository, var mem
     }
 
     fun list(
+        query: String?,
         memberId: Long,
         accountId: String?,
         transactionType: String?,
@@ -48,6 +49,7 @@ class TransactionsService(var repository: AccountTransactionsRepository, var mem
 
 
         var transactionsPage: Page<Transaction> = repository.findAllByMemberId(
+            Optional.ofNullable(query).orElse(""),
             memberId,
             Optional.ofNullable(accountId).orElse(""),
             Optional.ofNullable(transactionType).orElse(""),

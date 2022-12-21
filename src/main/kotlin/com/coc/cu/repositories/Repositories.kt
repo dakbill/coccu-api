@@ -19,20 +19,21 @@ interface AccountTransactionsRepository: JpaRepository<Transaction, Long> {
 
     @Query(
         value = "SELECT * FROM TRANSACTION WHERE " +
-                "  ( (?1=0) OR (account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1)) )   " +
-                " AND  ( (LENGTH(?2)=0) OR (?2 = \"account_id\" ) )   " +
-                " AND  ( (LENGTH(?3)=0) OR (?3 = \"type\" ) )   " +
-                " AND  ( created_date BETWEEN CAST(?4 AS DATE) AND CAST(?5 AS DATE) )   " +
-                "",
+                "  ( (LENGTH(?1)=0) OR ( SELECT LOWER(name) LIKE '%' || ?1 || '%' FROM member WHERE id=(SELECT member_id FROM ACCOUNT WHERE id=TRANSACTION.account_id LIMIT 1) )   )   " +
+                " AND ( (?2=0) OR (account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?2)) )   " +
+                " AND  ( (LENGTH(?3)=0) OR (?3 = \"account_id\" ) )   " +
+                " AND  ( (LENGTH(?4)=0) OR (?4 = \"type\" ) )   " +
+                " AND  ( created_date BETWEEN CAST(?5 AS DATE) AND CAST(?6 AS DATE) )   ",
         countQuery = "SELECT COUNT(TRANSACTION.id) FROM TRANSACTION WHERE " +
-                "  ( (?1=0) OR (account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1)) )   " +
-                " AND  ( (LENGTH(?2)=0) OR (?2 = \"account_id\" ) )   " +
-                " AND  ( (LENGTH(?3)=0) OR (?3 = \"type\" ) )   " +
-                " AND  ( created_date BETWEEN CAST(?4 AS DATE) AND CAST(?5 AS DATE) )   " ,
-
+                "  ( (LENGTH(?1)=0) OR ( SELECT LOWER(name) LIKE '%' || ?1 || '%' FROM member WHERE id=(SELECT member_id FROM ACCOUNT WHERE id=TRANSACTION.account_id LIMIT 1) )   )   " +
+                " AND ( (?2=0) OR (account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?2)) )   " +
+                " AND  ( (LENGTH(?3)=0) OR (?3 = \"account_id\" ) )   " +
+                " AND  ( (LENGTH(?4)=0) OR (?4 = \"type\" ) )   " +
+                " AND  ( created_date BETWEEN CAST(?5 AS DATE) AND CAST(?6 AS DATE) )   ",
         nativeQuery = true
     )
     fun findAllByMemberId(
+        query: String,
         memberId: Long,
         accountId: String,
         transactionType: String,

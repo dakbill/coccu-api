@@ -28,6 +28,7 @@ class TransactionsController(val transactionsService: TransactionsService) {
     @PreAuthorize("isAuthenticated()")
     @GetMapping
     fun list(
+        @RequestParam(name = "q", required = false) query: String?,
         @RequestParam(name = "transactionType", required = false) transactionType: String?,
         @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(required = false) startDate: LocalDate,
         @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(required = false) endDate: LocalDate,
@@ -64,6 +65,7 @@ class TransactionsController(val transactionsService: TransactionsService) {
 
         val transactionsPage =
             transactionsService.list(
+                query,
                 memberId,
                 accountId,
                 transactionType,
