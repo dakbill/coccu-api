@@ -1,5 +1,6 @@
 package com.coc.cu.repositories
 
+import com.coc.cu.domain.GuarantorAccountResponseDto
 import com.coc.cu.domain.TransactionSumsDto
 import com.coc.cu.entities.Account
 import com.coc.cu.entities.Guarantor
@@ -12,6 +13,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
+import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 @Repository
 interface AccountTransactionsRepository: JpaRepository<Transaction, Long> {
@@ -199,27 +201,37 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
 
 
     @Query(
-        value = "SELECT distinct \"account\".* FROM (\n" +
-                "\tSELECT guarantors_id,account_guarantors.account_id,SUM(\n" +
-                "\t\t(CASE \n" +
-                "\t\t\tWHEN \"transaction\".\"type\" in ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE') THEN -1 \n" +
-                "\t\t\tWHEN \"transaction\".\"type\" in ('LOAN','LOAN_CHEQUE') THEN 1 \n" +
-                "\t\t\tELSE 0 \n" +
-                "\t\t END) * amount\n" +
-                "\t) AS arrears \n" +
-                "\tFROM \n" +
-                "\t\taccount_guarantors \n" +
-                "\t\tLEFT JOIN account ON(account.id=account_guarantors.account_id)\n" +
-                "\t\tLEFT JOIN \"transaction\" ON(\"transaction\".account_id=account_guarantors.account_id) \n" +
-                "\tGROUP BY account_guarantors.account_id, guarantors_id\n" +
-                ") guarantor_arrears \n" +
-                "LEFT JOIN account ON(account.id=guarantor_arrears.account_id)\n" +
-                "LEFT JOIN \"member\" ON(\"member\".id=\"account\".member_id)\n" +
-                "WHERE \n" +
-                "arrears > 0 AND guarantors_id = ?1",
+        value = "SELECT \n" +
+                "\tDISTINCT account_guarantors.* \n" +
+                "FROM \n" +
+                "\taccount_guarantors INNER JOIN guarantor ON(guarantor.id=account_guarantors.guarantors_id)\n" +
+                "\tRIGHT JOIN account ON(account.id=account_guarantors.account_id)\n" +
+                "\tLEFT JOIN (\n" +
+                "\t\tSELECT transaction.account_id,SUM(\n" +
+                "\t\t\t(CASE \n" +
+                "\t\t\t\tWHEN \"transaction\".\"type\" in ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE') THEN -1 \n" +
+                "\t\t\t\tWHEN \"transaction\".\"type\" in ('LOAN','LOAN_CHEQUE') THEN 1 \n" +
+                "\t\t\t\tELSE 0 \n" +
+                "\t\t\t END) * \"transaction\".amount\n" +
+                "\t\t) AS arrears \n" +
+                "\t\tFROM \n" +
+                "\t\t\t\"transaction\"\n" +
+                "\t\tGROUP BY transaction.account_id\n" +
+                "\t) guarantor_arrears ON(guarantor_arrears.account_id=account.id)\n" +
+                "WHERE\n" +
+                "\t\n" +
+                "\tguarantor.member_id=?1 \n" +
+                "\tAND guarantor_arrears.arrears > 0\n" +
+                "\tAND guarantor.fund_released = FALSE",
         nativeQuery = true
     )
-    fun getGuarantorDebtorAccounts(memberId: Long): List<Account>?
+    fun getGuarantorDebtorAccounts(memberId: Long): List<Map<String,Any>>
+
+    @Query(
+        value = "SELECT COALESCE(total_balance-(SELECT SUM(guarantor.amount) FROM guarantor RIGHT JOIN member ON(member.id=guarantor.member_id ) WHERE guarantor.member_id=?1 AND NNOT guarantor.fund_released),0) FROM member WHERE id=?1",
+        nativeQuery = true
+    )
+    fun getAvailableBalance(memberId: Long?): Double
 
 
 }

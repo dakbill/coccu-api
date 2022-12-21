@@ -15,6 +15,7 @@ import java.time.LocalDate
 import java.time.Period
 import java.time.ZoneId
 import java.util.stream.Collectors
+import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 
 @Service
@@ -71,7 +72,7 @@ class AccountService(
         return PageImpl(response, pageRequest, accountsPage.totalElements)
     }
 
-    fun getGuarantorDebtorAccounts(memberId: Long): List<Account>? {
+    fun getGuarantorDebtorAccounts(memberId: Long): List<Map<String,Any>> {
         return repository.getGuarantorDebtorAccounts(memberId)
     }
 

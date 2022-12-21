@@ -78,6 +78,7 @@ class TransactionsService(
 
         transaction.createdDate = LocalDateTime.now()
         transaction.account = memberAccountRepository.findById(model.accountId!!).get()
+
         transaction = repository.save(transaction)
 
         if (!model.guarantors.isNullOrEmpty()) {

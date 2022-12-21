@@ -1,10 +1,10 @@
 package com.coc.cu.controllers
 
 
-import com.coc.cu.domain.AccountResponseDto
-import com.coc.cu.domain.MemberResponseDto
-import com.coc.cu.domain.UserRequestDto
+import com.coc.cu.domain.*
 import com.coc.cu.domain.models.ApiResponse
+import com.coc.cu.repositories.GuarantorRepository
+import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.services.AccountService
 import com.coc.cu.services.TransactionsService
 import com.coc.cu.services.UsersService
@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.RestTemplate
+import java.math.BigInteger
 
 
 @RequestMapping("/api/v1/users")
@@ -24,6 +25,8 @@ import org.springframework.web.client.RestTemplate
 class UsersController(
     val usersService: UsersService,
     val accountService: AccountService,
+    val memberAccountRepository: MemberAccountRepository,
+    val guarantorRepository: GuarantorRepository,
     val objectMapper: ObjectMapper,
     val transactionsService: TransactionsService,
     val restTemplate: RestTemplate
@@ -63,14 +66,32 @@ class UsersController(
 
         val membersPage = usersService.list(query, PageRequest.of(if (exportToExcel) 0 else page, if (exportToExcel) Int.MAX_VALUE else size, sort))
         if (getGuarantorDebtorAccounts) {
-            val typeRef = object : TypeReference<List<AccountResponseDto>>() {}
+            val accountTypeRef = object : TypeReference<MinimalAccountResponseDto>() {}
+            val guarantorTypeRef = object : TypeReference<GuarantorResponseDto>() {}
             membersPage.content!!.stream().forEach { m ->
                 run {
-                    val accounts = accountService.getGuarantorDebtorAccounts(m.id!!)
-                    if (!accounts.isNullOrEmpty()) {
-                        m.guarantorDebtorAccounts =
-                            objectMapper.convertValue(accounts, typeRef)
-                    }
+                    m.availableBalance = memberAccountRepository.getAvailableBalance(m.id)
+                    m.guarantorDebtorAccounts =
+                        accountService.getGuarantorDebtorAccounts(m.id!!).map {
+
+                            val guarantorAccountResponseDto = GuarantorAccountResponseDto(
+                            )
+
+                            val account = memberAccountRepository.findById(it["account_id"] as String).get()
+                            guarantorAccountResponseDto.account = objectMapper.convertValue(
+                                account,
+                                accountTypeRef
+                            )
+
+                            val guarantor = guarantorRepository.findById((it["guarantors_id"] as BigInteger).toLong()).get()
+                            guarantorAccountResponseDto.guarantor = objectMapper.convertValue(
+                                guarantor,
+                                guarantorTypeRef
+                            )
+
+                            guarantorAccountResponseDto
+
+                        }
 
                 }
             }

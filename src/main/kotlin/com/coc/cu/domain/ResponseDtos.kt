@@ -35,6 +35,28 @@ class AccountResponseDto {
 
 }
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+class MinimalAccountResponseDto {
+    var id: String? = null
+    var number: String? = null
+    var balance: Double = 0.0
+    var type: AccountType? = null
+    var member: MemberResponseDto? = null
+
+
+
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+    var createdDate: LocalDateTime? = null
+
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+    var updatedDate: LocalDateTime? = null
+
+}
+
 
 class TransactionResponseDto {
     var id: Long? = null
@@ -76,10 +98,11 @@ class MemberResponseDto {
     var totalSavings: Double = 0.0
     var totalWithdrawals: Double = 0.0
     var totalBalance: Double = 0.0
+    var availableBalance: Double = 0.0
     var transactionCount: Long = 0
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    var guarantorDebtorAccounts: List<AccountResponseDto>? = null
+    var guarantorDebtorAccounts: List<GuarantorAccountResponseDto>? = null
 
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
@@ -117,6 +140,14 @@ class GuarantorResponseDto {
     var amount = 0.0f
     var fundReleased: Boolean = false
 }
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+class GuarantorAccountResponseDto {
+    var guarantor: GuarantorResponseDto? = null
+    var account: MinimalAccountResponseDto? = null
+}
+
+
 
 class AuthResponseDto {
     var member: MemberResponseDto? = null
