@@ -8,6 +8,7 @@ import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.services.AccountService
 import com.coc.cu.services.TransactionsService
 import com.coc.cu.services.UsersService
+import com.coc.cu.utils.JwtUtils
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.data.domain.PageRequest
@@ -29,7 +30,8 @@ class UsersController(
     val guarantorRepository: GuarantorRepository,
     val objectMapper: ObjectMapper,
     val transactionsService: TransactionsService,
-    val restTemplate: RestTemplate
+    val restTemplate: RestTemplate,
+    val jwtUtils: JwtUtils
 ) {
 
     @PreAuthorize("isAuthenticated()")
@@ -125,10 +127,7 @@ class UsersController(
         @RequestParam sender: String
     ): ApiResponse<String> {
 
-        val res = restTemplate.getForObject(
-            "https://apps.mnotify.net/smsapi?key=WsdWfqH7Kr6fyiXDgLS25Ju62&to=${to}&msg=${message}&sender_id=${sender}",
-            String::class.java
-        )
+        val res = jwtUtils.sendSms(sender,to, message, restTemplate)
         return ApiResponse(res, "Success", HttpStatus.OK)
     }
 

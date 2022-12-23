@@ -240,3 +240,7 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
 @Repository
 interface GuarantorRepository : CrudRepository<Guarantor, Long> {}
 
+
+
+
+

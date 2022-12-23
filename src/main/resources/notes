@@ -1,0 +1,31 @@
+
+
+---Query to get acounts who have not paid expected installment
+SELECT a.id,
+       a.principal,
+       (a.principal-a.repayments)             AS balance,
+       Round((a.principal-a.repayments)/12,2) AS installment
+FROM   (
+              SELECT account.id,
+                     (
+                            SELECT coalesce(sum(cast(Coalesce(amount, 0) AS DECIMAL)), 0)
+                            FROM   transaction
+                            WHERE  type IN ( 'LOAN',
+                                            'LOAN_CHEQUE' )
+                            AND    account_id = account.id) AS principal,
+                     (
+                            SELECT coalesce(sum(cast(coalesce( amount, 0) AS DECIMAL)), 0)
+                            FROM   transaction
+                            WHERE  type IN ( 'LOAN_REPAYMENT',
+                                            'LOAN_REPAYMENT_CHEQUE' )
+                            AND    account_id = account.id) AS repayments
+              FROM   account
+              WHERE  account.type = 'LOAN' ) a
+WHERE  (
+              a.principal-a.repayments) > 0
+AND
+       (
+              SELECT count(transaction.id)=0
+              FROM   "transaction"
+              WHERE  to_char(created_date, 'YYYY-MM') =to_char(now(), 'YYYY-MM')
+              AND    "transaction".account_id=a.id )

@@ -4,6 +4,7 @@ import io.jsonwebtoken.*
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.web.client.RestTemplate
 import java.util.*
 
 class JwtUtils {
@@ -49,4 +50,13 @@ class JwtUtils {
         }
         return false
     }
+
+    fun sendSms(sender:String, to: String, message: String,restTemplate: RestTemplate): String? {
+       return restTemplate.getForObject(
+           "https://apps.mnotify.net/smsapi?key=WsdWfqH7Kr6fyiXDgLS25Ju62&to=${to}&msg=${message}&sender_id=${sender}",
+           String::class.java
+       )
+    }
+
+
 }

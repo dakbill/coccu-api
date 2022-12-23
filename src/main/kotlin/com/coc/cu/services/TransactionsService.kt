@@ -7,12 +7,14 @@ import com.coc.cu.repositories.AccountTransactionsRepository
 import com.coc.cu.repositories.GuarantorRepository
 import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.repositories.MembersRepository
+import com.coc.cu.utils.JwtUtils
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
+import org.springframework.web.client.RestTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -25,7 +27,9 @@ class TransactionsService(
     var membersRepository: MembersRepository,
     var memberAccountRepository: MemberAccountRepository,
     var guarantorRepository: GuarantorRepository,
-    var objectMapper: ObjectMapper
+    var objectMapper: ObjectMapper,
+    var restTemplate: RestTemplate,
+    var jwtUtils: JwtUtils
 ) {
 
     fun single(id: Long): TransactionResponseDto? {
@@ -100,6 +104,22 @@ class TransactionsService(
                             createdDate = transaction.createdDate,
                         )
                     )
+                )
+
+                jwtUtils.sendSms(
+                    "COCCU",
+                    member.phone!!,
+                    "Transaction: Loan Guarantor\nFor: ${account.member!!.name}\nAmount: ${g.amount}\nDate: ${
+                        String.format(
+                            "%s-%s-%s %d:%d",
+                            transaction.createdDate!!.year,
+                            transaction.createdDate!!.monthValue,
+                            transaction.createdDate!!.dayOfMonth,
+                            transaction.createdDate!!.hour,
+                            transaction.createdDate!!.minute
+                        )
+                    }",
+                    restTemplate
                 )
 
 
