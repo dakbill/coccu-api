@@ -160,6 +160,7 @@ class CuApplication {
                         id = userId,
                         name = record[1],
                         createdDate = LocalDateTime.now(),
+                        totalBalance = 0.0,
                         phone = record[2]
                     )
                 )
