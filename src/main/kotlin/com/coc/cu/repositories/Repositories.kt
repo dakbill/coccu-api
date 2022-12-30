@@ -228,7 +228,7 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
     fun getGuarantorDebtorAccounts(memberId: Long): List<Map<String,Any>>
 
     @Query(
-        value = "SELECT COALESCE(total_balance-(SELECT SUM(guarantor.amount) FROM guarantor RIGHT JOIN member ON(member.id=guarantor.member_id ) WHERE guarantor.member_id=?1 AND NOT guarantor.fund_released),0) FROM member WHERE id=?1",
+        value = "SELECT COALESCE(COALESCE(total_balance,0)-(SELECT SUM(COALESCE(guarantor.amount,0)) FROM guarantor RIGHT JOIN member ON(member.id=guarantor.member_id ) WHERE guarantor.member_id=?1 AND NOT guarantor.fund_released),0) FROM member WHERE id=?1",
         nativeQuery = true
     )
     fun getAvailableBalance(memberId: Long?): Double
