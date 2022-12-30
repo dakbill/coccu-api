@@ -66,7 +66,14 @@ class UsersController(
             }
         }
 
-        val membersPage = usersService.list(query, PageRequest.of(if (exportToExcel) 0 else page, if (exportToExcel) Int.MAX_VALUE else size, sort))
+        val membersPage = usersService.list(
+            query,
+            PageRequest.of(
+                if (exportToExcel || getGuarantorDebtorAccounts) 0 else page,
+                if (exportToExcel || getGuarantorDebtorAccounts) Int.MAX_VALUE else size,
+                sort
+            )
+        )
         if (getGuarantorDebtorAccounts) {
             val accountTypeRef = object : TypeReference<MinimalAccountResponseDto>() {}
             val guarantorTypeRef = object : TypeReference<GuarantorResponseDto>() {}
