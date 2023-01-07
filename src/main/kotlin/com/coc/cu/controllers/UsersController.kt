@@ -3,6 +3,7 @@ package com.coc.cu.controllers
 
 import com.coc.cu.domain.*
 import com.coc.cu.domain.models.ApiResponse
+import com.coc.cu.repositories.AccountTransactionsRepository
 import com.coc.cu.repositories.GuarantorRepository
 import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.services.AccountService
@@ -28,6 +29,7 @@ class UsersController(
     val accountService: AccountService,
     val memberAccountRepository: MemberAccountRepository,
     val guarantorRepository: GuarantorRepository,
+    val transactionsRepository: AccountTransactionsRepository,
     val objectMapper: ObjectMapper,
     val transactionsService: TransactionsService,
     val restTemplate: RestTemplate,
@@ -116,6 +118,34 @@ class UsersController(
         var memberResponseDto = usersService.single(id)
         memberResponseDto!!.totalSavings = transactionsService.getTotalSavings(id)
         memberResponseDto!!.totalWithdrawals = transactionsService.getTotalWithdrawals(id)
+
+        val accountTypeRef = object : TypeReference<MinimalAccountResponseDto>() {}
+        val guarantorTypeRef = object : TypeReference<GuarantorResponseDto>() {}
+
+        memberResponseDto.availableBalance = memberAccountRepository.getAvailableBalance(memberResponseDto.id)
+        memberResponseDto.guarantorDebtorAccounts =
+            accountService.getGuarantorDebtorAccounts(memberResponseDto.id!!).map {
+
+                val guarantorAccountResponseDto = GuarantorAccountResponseDto(
+                )
+
+                val account = memberAccountRepository.findById(it["account_id"] as String).get()
+                guarantorAccountResponseDto.account = objectMapper.convertValue(
+                    account,
+                    accountTypeRef
+                )
+
+                val guarantor = guarantorRepository.findById((it["guarantors_id"] as BigInteger).toLong()).get()
+                guarantorAccountResponseDto.guarantor = objectMapper.convertValue(
+                    guarantor,
+                    guarantorTypeRef
+                )
+
+                guarantorAccountResponseDto.account!!.balance = transactionsRepository.findByLoanBalance(account.id)
+
+                guarantorAccountResponseDto
+
+            }
         return ApiResponse(memberResponseDto, "Success", HttpStatus.OK)
     }
 
