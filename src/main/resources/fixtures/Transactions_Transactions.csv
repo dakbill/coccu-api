@@ -3873,7 +3873,6 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,480,Regina Arthur,SAVINGS,GHS200.00,2022-04-03,,,,
 ,027,Sarah Esson,WITHDRAWAL,GHS500.00,2022-04-03,,,,
 ,542,Yvonne Ekua Benyin,SAVINGS,GHS400.00,2022-04-03,,,,
-,195,Emmanuel Dadzie ,LOAN CHEQUE,"GHS20,000.00",2022-12-21,,,,
 ,540,Acheampong Akowuah,WITHDRAWAL,GHS70.00,2022-04-10,,,,
 ,346,Mary Inkoom,SAVINGS,GHS100.00,2022-04-10,,,,
 ,491,Michael Nkansah (Taxi),SAVINGS,GHS300.00,2022-04-10,,,,
@@ -4204,6 +4203,8 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,403,Sabina Tagoe,LOAN REPAYMENT,"GHS2,000.00",2022-09-25,,,,
 ,451,Sandra Esi Banyin Nyarko,SAVINGS,GHS50.00,2022-09-25,,,,
 ,354,Susana Quayson,WITHDRAWAL,GHS480.00,2022-09-25,,,,
+,223,Admin Expenses,STATIONERY CHEQUE,"GHS3,000.00",2022-09-25,,,,Audit Fees (David Kurakye Ankra-CUA)
+,223,Admin Expenses,STATIONERY CHEQUE,"GHS3,000.00",2022-09-25,,,,Audit Fees (Desmond Kwaku Mensah-CUA)
 ,354,Susana Quayson,INTEREST ON LOAN,GHS480.00,2022-09-25,,,,
 ,223,Admin Expenses,STATIONERY,GHS265.00,2022-10-02,,,,
 ,216,Akua Nyamekye,SAVINGS,GHS150.00,2022-10-02,,,,
@@ -4392,6 +4393,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,008,Mercy Fuah,LOAN REPAYMENT,GHS800.00,2022-12-18,,,,
 ,446,Ivy Amoako,WITHDRAWAL,GHS100.00,2022-12-18,,,,
 ,176,Juliet Nkansah,SAVINGS,GHS10.00,2022-12-18,,,,
+,195,Emmanuel Dadzie ,LOAN CHEQUE,"GHS20,000.00",2022-12-21,,,,
 ,548,Mavis Agyapong,SAVINGS,GHS300.00,2022-12-25,,,,
 ,346,Mary Inkoom,SAVINGS,GHS50.00,2022-12-25,,,,
 ,540,Acheampong Akowuah,SAVINGS,GHS10.00,2022-12-25,,,,
@@ -4406,6 +4408,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,477,Odorkor Church Of Christ Deacons,WITHDRAWAL,GHS900.00,2022-12-25,,,,
 ,482,Sandra Botchwey,WITHDRAWAL,GHS250.00,2022-12-25,,,,
 ,223,Admin Expenses,STATIONERY,GHS650.00,2022-12-25,,,,admin expenses
+,321,Patsy Ewurama Nyarkoh,LOAN CHEQUE,"GHS8,000.00",2022-12-25,,,,Incorrect date
 ,222,Opening Balance,OPENING BALANCE,GHS650.00,2023-01-01,,,,
 ,223,Admin Expenses,STATIONERY,GHS200.00,2023-01-01,,,,Food
 ,223,Admin Expenses,TRANSPORT,GHS150.00,2023-01-01,,,,Mr Ashley
@@ -4422,4 +4425,3 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,455,Esther Fordjour,SAVINGS,"GHS3,980.00",2023-01-08,,,,
 ,168,Michael Nkansah,SAVINGS,GHS150.00,2023-01-08,,,,
 ,176,Juliet Nkansah,SAVINGS,GHS50.00,2023-01-08,,,,
-,321,Patsy Ewurama Nyarkoh,LOAN CHEQUE,"GHS8,000.00",2022-12-25,,,,Incorrect date
