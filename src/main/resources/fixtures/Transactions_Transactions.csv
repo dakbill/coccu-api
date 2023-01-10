@@ -3825,7 +3825,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,346,Mary Inkoom,SAVINGS,GHS210.00,2022-03-13,,,,
 ,222,Opening Balance,OPENING BALANCE,"GHS2,320.00",2022-03-13,,,,
 ,327,Philip Opoku,WITHDRAWAL,"GHS1,000.00",2022-03-13,,,,
-,085,Mercy Nyanney,WITHDRAWAL CHEQUE,"GHS8,000.00",2022-03-20,,,,
+,085,Mercy Nyanney,LOAN CHEQUE,"GHS8,000.00",2022-03-20,,,,
 ,540,Acheampong Akowuah,SAVINGS,GHS10.00,2022-03-20,,,,
 ,509,Agnes Quaicoo,WITHDRAWAL,GHS500.00,2022-03-20,,,,
 ,400,Edwin Osei Addo,SAVINGS,GHS300.00,2022-03-20,,,,
