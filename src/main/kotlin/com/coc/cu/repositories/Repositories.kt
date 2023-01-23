@@ -201,6 +201,42 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
 
 
     @Query(
+        value = "SELECT account.* FROM account LEFT JOIN member ON(member.id=member_id) WHERE  " +
+                "(" +
+                    "(" +
+                    "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN','LOAN_CHEQUE') AND ACCOUNT_ID=account.id) " +
+                    "   - " +
+                    "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE') AND ACCOUNT_ID=account.id) " +
+                    ") < 0 " +
+                    "OR " +
+                    "(" +
+                    "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('SAVINGS','SAVINGS_CHEQUE') AND ACCOUNT_ID=account.id) " +
+                    "   - " +
+                    "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('WITHDRAWAL','WITHDRAWAL_CHEQUE') AND ACCOUNT_ID=account.id) " +
+                    ") < 0 " +
+                ") " +
+                "AND (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )",
+        countQuery = "SELECT COUNT(account.id) FROM account LEFT JOIN member ON(member.id=member_id) WHERE  " +
+                "(" +
+                    "(" +
+                    "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN','LOAN_CHEQUE') AND ACCOUNT_ID=account.id) " +
+                    "   - " +
+                    "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE') AND ACCOUNT_ID=account.id) " +
+                    ") < 0 " +
+                    "OR " +
+                    "(" +
+                    "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('SAVINGS','SAVINGS_CHEQUE') AND ACCOUNT_ID=account.id) " +
+                    "   - " +
+                    "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('WITHDRAWAL','WITHDRAWAL_CHEQUE') AND ACCOUNT_ID=account.id) " +
+                    ") < 0 " +
+                ") " +
+                "AND (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )",
+        nativeQuery = true
+    )
+    fun getNegativeBalanceAccounts(query: String, pageable: Pageable): Page<Account>
+
+
+    @Query(
         value = "SELECT \n" +
                 "\tDISTINCT account_guarantors.* \n" +
                 "FROM \n" +

@@ -70,4 +70,38 @@ class AccountsController(var accountService: AccountService) {
     }
 
 
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/negative-balance-accounts")
+    fun getNegativeBalanceAccounts(
+        @RequestParam(name = "exportToExcel", defaultValue = "false") exportToExcel: Boolean,
+        @RequestParam(name = "q", defaultValue = "_") query: String,
+        @RequestParam(name = "page", defaultValue = "0") page: Int,
+        @RequestParam(name = "size", defaultValue = "10") size: Int,
+        @RequestParam(name = "properties", required = false) properties: Array<String>?,
+        @RequestParam(name = "direction", required = false) direction: Array<String>?,
+
+        ): ApiResponse<List<AccountResponseDto>> {
+
+        val sortMaps = mapOf(
+            "(name)" to "(member.name)",
+        )
+
+        var sort: Sort = JpaSort.unsafe(Sort.Direction.ASC, sortMaps.getOrDefault("(name)","(name)"))
+        if (properties != null && properties.isNotEmpty()) {
+
+            sort = JpaSort.unsafe(Sort.Direction.valueOf(direction!![0].uppercase()), sortMaps.getOrDefault(properties[0],properties[0]))
+            properties.forEachIndexed { index, property ->
+                run {
+                    if (index > 0) {
+                        sort.and(JpaSort.unsafe(Sort.Direction.valueOf(direction[index].uppercase()), sortMaps.getOrDefault(property,property)))
+                    }
+                }
+            }
+        }
+
+        val negativeBalanceAccountsPage = accountService.getNegativeBalanceAccounts(query, PageRequest.of(if (exportToExcel) 0 else page, if (exportToExcel) Int.MAX_VALUE else size, sort))
+        return ApiResponse(negativeBalanceAccountsPage.content, "OK", HttpStatus.OK, page, size, negativeBalanceAccountsPage.totalElements)
+    }
+
+
 }

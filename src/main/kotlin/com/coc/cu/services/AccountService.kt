@@ -72,6 +72,43 @@ class AccountService(
         return PageImpl(response, pageRequest, accountsPage.totalElements)
     }
 
+    fun getNegativeBalanceAccounts(query: String, pageRequest: PageRequest): Page<AccountResponseDto> {
+        val accountsPage = repository.getNegativeBalanceAccounts(query, pageRequest)
+        val typeRef = object : TypeReference<List<AccountResponseDto>>() {}
+        val response = objectMapper.convertValue(accountsPage.content, typeRef)
+
+        for (record in response) {
+            if (AccountType.LOAN == record.type) {
+                record.balance = repository.sumAmounts(
+                    record.id!!, arrayOf(
+                        TransactionType.LOAN.name,
+                        TransactionType.LOAN_CHEQUE.name
+                    )
+                ) - repository.sumAmounts(
+                    record.id!!, arrayOf(
+                        TransactionType.LOAN_REPAYMENT.name,
+                        TransactionType.LOAN_REPAYMENT_CHEQUE.name
+                    )
+                )
+            } else if (AccountType.SAVINGS == record.type) {
+                record.balance = repository.sumAmounts(
+                    record.id!!, arrayOf(
+                        TransactionType.SAVINGS.name,
+                        TransactionType.SAVINGS_CHEQUE.name
+                    )
+                ) - repository.sumAmounts(
+                    record.id!!, arrayOf(
+                        TransactionType.WITHDRAWAL.name,
+                        TransactionType.WITHDRAWAL_CHEQUE.name
+                    )
+                )
+            }
+
+        }
+
+        return PageImpl(response, pageRequest, accountsPage.totalElements)
+    }
+
     fun getGuarantorDebtorAccounts(memberId: Long): List<Map<String,Any>> {
         return repository.getGuarantorDebtorAccounts(memberId)
     }
