@@ -51,7 +51,7 @@ class TransactionsService(
         query: String?,
         memberId: Long,
         accountId: String?,
-        transactionType: String?,
+        transactionTypes: Array<String>?,
         startDate: LocalDate,
         endDate: LocalDate,
         pageRequest: PageRequest
@@ -63,7 +63,7 @@ class TransactionsService(
             Optional.ofNullable(query).orElse(""),
             memberId,
             Optional.ofNullable(accountId).orElse(""),
-            Optional.ofNullable(transactionType).orElse(""),
+            transactionTypes ?: arrayOf("EMPTY"),
             startDate,
             endDate,
             pageRequest

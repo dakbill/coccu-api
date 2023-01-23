@@ -29,7 +29,7 @@ class TransactionsController(val transactionsService: TransactionsService) {
     @GetMapping
     fun list(
         @RequestParam(name = "q", required = false) query: String?,
-        @RequestParam(name = "transactionType", required = false) transactionType: String?,
+        @RequestParam(name = "transactionTypes", required = false) transactionTypes: Array<String>?,
         @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(required = false) startDate: LocalDate,
         @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(required = false) endDate: LocalDate,
         @RequestParam(name = "exportToExcel", defaultValue = "false") exportToExcel: Boolean,
@@ -68,7 +68,7 @@ class TransactionsController(val transactionsService: TransactionsService) {
                 query,
                 memberId,
                 accountId,
-                transactionType,
+                transactionTypes,
                 startDate,
                 endDate,
                 PageRequest.of(if (exportToExcel) 0 else page, if (exportToExcel) Int.MAX_VALUE else size, sort)
