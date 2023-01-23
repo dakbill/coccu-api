@@ -101,7 +101,6 @@ class AccountService(
             }
         }
 
-
         val zoneId = ZoneId.of("GMT")
         val diff = endDate.atStartOfDay(zoneId).toEpochSecond() - startDate.atStartOfDay(zoneId).toEpochSecond()
 

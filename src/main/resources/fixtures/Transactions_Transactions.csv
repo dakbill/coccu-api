@@ -3128,7 +3128,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 5/2/2021 12:25:47,068,Emmanuel Amoh,LOAN REPAYMENT,GHS671.00,2021-05-02,,,,
 5/2/2021 12:15:33,173,Cynthia Kwabia,SAVINGS,GHS400.00,2021-05-02,,,,
 5/2/2021 12:18:47,184,"Prisca, Ryan, Rhodney",SAVINGS,GHS100.00,2021-05-02,,,,
-5/2/2021 12:57:25,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONEL,"GHS2,050.00",2021-05-02,,,,
+5/2/2021 12:57:25,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONNEL,"GHS2,050.00",2021-05-02,,,,
 ,222,Opening Balance,OPENING BALANCE,GHS870.00,2021-05-02,,,,
 5/2/2021 12:17:33,309,Margaret Mensah,WITHDRAWAL,GHS500.00,2021-05-02,,,,
 5/2/2021 12:06:11,330,Seth Amoani,LOAN REPAYMENT,GHS341.25,2021-05-02,,,,
@@ -3294,9 +3294,9 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,534,Yvonne Addo,CARD,GHS10.00,2021-07-04,,,,
 ,534,Yvonne Addo,SAVINGS,GHS570.00,2021-07-04,,,,
 ,173,Cynthia Kwabia,SAVINGS,GHS50.00,2021-07-11,,,,
-,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONEL CHEQUE,GHS830.00,2021-07-11,,,,
-,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONEL CHEQUE,GHS830.00,2021-07-11,,,,
-,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONEL CHEQUE,GHS840.00,2021-07-11,,,,
+,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONNEL CHEQUE,GHS830.00,2021-07-11,,,,
+,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONNEL CHEQUE,GHS830.00,2021-07-11,,,,
+,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONNEL CHEQUE,GHS840.00,2021-07-11,,,,
 ,223,Admin Expenses,TRANSPORT,GHS400.00,2021-07-11,,,,Cash to Bank over 2 quarters (Deacon Amoh)
 ,308,Francis Donkoh,WITHDRAWAL,"GHS1,000.00",2021-07-11,,,,
 ,418,John Boafo,SAVINGS,"GHS1,000.00",2021-07-11,,,,
@@ -3313,7 +3313,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,536,Dansoman Zone,SAVINGS,GHS600.00,2021-07-11,,,,
 ,168,Michael Nkansah,SAVINGS,GHS100.00,2021-07-18,,,,
 ,176,Juliet Nkansah,SAVINGS,GHS20.00,2021-07-18,,,,
-,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONEL CHEQUE,GHS600.00,2021-07-18,,,,
+,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONNEL CHEQUE,GHS600.00,2021-07-18,,,,
 ,308,Francis Donkoh,SAVINGS,"GHS1,000.00",2021-07-18,,,,
 ,311,James Amoh,SAVINGS,GHS20.00,2021-07-18,,,,
 ,354,Susana Quayson,WITHDRAWAL,"GHS2,000.00",2021-07-18,,,,
@@ -3446,7 +3446,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,173,Cynthia Kwabia,LOAN,"GHS1,300.00",2021-09-12,,,,
 ,173,Cynthia Kwabia,LOAN REPAYMENT,GHS50.00,2021-09-12,,,,
 ,176,Juliet Nkansah,SAVINGS,GHS20.00,2021-09-12,,,,
-,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONEL,"GHS1,000.00",2021-09-12,,,,
+,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONNEL,"GHS1,000.00",2021-09-12,,,,
 ,309,Margaret Mensah,SAVINGS,"GHS1,000.00",2021-09-12,,,,
 ,347,Isaac Agyekum,LOAN REPAYMENT,"GHS1,300.00",2021-09-12,,,,
 ,382,Reuben Adama Quaye,WITHDRAWAL CHEQUE,"GHS10,000.00",2021-09-12,,,,
@@ -3618,7 +3618,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,122,Agnes Aidoo,SAVINGS,GHS40.00,2021-11-28,,,,
 ,168,Michael Nkansah,SAVINGS,GHS100.00,2021-11-28,,,,
 ,176,Juliet Nkansah,SAVINGS,GHS20.00,2021-11-28,,,,
-,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONEL CHEQUE,GHS500.00,2021-11-28,,,,
+,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONNEL CHEQUE,GHS500.00,2021-11-28,,,,
 ,325,Sampson Gyasi,SAVINGS,GHS600.00,2021-11-28,,,,
 ,400,Edwin Osei Addo,SAVINGS,GHS200.00,2021-11-28,,,,
 ,407,Godfred Osei,SAVINGS,GHS200.00,2021-11-28,,,,
@@ -3935,7 +3935,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,004,Emmanuel Larkai,LOAN REPAYMENT,GHS800.00,2022-05-01,,,,
 ,083,Georgina Appiah,SAVINGS,GHS100.00,2022-05-01,,,,
 ,223,Admin Expenses,STATIONERY,GHS318.00,2022-05-01,,,,Food and refreshment
-,223,Admin Expenses,INCENTIVE TO PERSONEL,GHS750.00,2022-05-01,,,,
+,223,Admin Expenses,INCENTIVE TO PERSONNEL,GHS750.00,2022-05-01,,,,
 ,223,Admin Expenses,TRANSPORT,GHS50.00,2022-05-01,,,,
 ,325,Sampson Gyasi,SAVINGS,"GHS1,200.00",2022-05-01,,,,
 ,346,Mary Inkoom,SAVINGS,GHS50.00,2022-05-01,,,,
@@ -3964,7 +3964,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,500,Isaac Armah,SAVINGS,GHS300.00,2022-05-08,,,,
 ,168,Michael Nkansah,SAVINGS,GHS150.00,2022-05-15,,,,
 ,176,Juliet Nkansah,SAVINGS,GHS40.00,2022-05-15,,,,
-,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONEL CHEQUE,GHS600.00,2022-05-15,,,,
+,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONNEL CHEQUE,GHS600.00,2022-05-15,,,,
 ,223,Admin Expenses,STATIONERY,GHS150.00,2022-05-15,,,,
 ,382,Reuben Adama Quaye,WITHDRAWAL,"GHS1,000.00",2022-05-15,,,,
 ,431,Emmanuel Kow Addo,SAVINGS,GHS100.00,2022-05-15,,,,
@@ -3985,10 +3985,10 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,169,Solomon Boateng,LOAN REPAYMENT,"GHS1,000.00",2022-05-29,,,,
 ,169,Solomon Boateng,SAVINGS,GHS500.00,2022-05-29,,,,
 ,223,Admin Expenses,STATIONERY,GHS150.00,2022-05-29,,,,Cost of food on training
-,223,Admin Expenses,INCENTIVE TO PERSONEL CHEQUE,GHS600.00,2022-05-29,,,,
-,223,Admin Expenses,INCENTIVE TO PERSONEL CHEQUE,GHS600.00,2022-05-29,,,,
-,223,Admin Expenses,INCENTIVE TO PERSONEL CHEQUE,GHS600.00,2022-05-29,,,,
-,223,Admin Expenses,INCENTIVE TO PERSONEL CHEQUE,"GHS1,000.00",2022-05-29,,,,
+,223,Admin Expenses,INCENTIVE TO PERSONNEL CHEQUE,GHS600.00,2022-05-29,,,,
+,223,Admin Expenses,INCENTIVE TO PERSONNEL CHEQUE,GHS600.00,2022-05-29,,,,
+,223,Admin Expenses,INCENTIVE TO PERSONNEL CHEQUE,GHS600.00,2022-05-29,,,,
+,223,Admin Expenses,INCENTIVE TO PERSONNEL CHEQUE,"GHS1,000.00",2022-05-29,,,,
 ,321,Patsy Ewurama Nyarkoh,LOAN REPAYMENT,"GHS1,400.00",2022-05-29,,,,
 ,321,Patsy Ewurama Nyarkoh,SAVINGS,GHS500.00,2022-05-29,,,,
 ,339,Beatrice Boateng,SAVINGS,GHS200.00,2022-05-29,,,,
@@ -4002,7 +4002,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,554,Bernadine Latrecan Lawson,SAVINGS,GHS700.00,2022-05-29,,,,
 ,094,Grace Abokyi,SAVINGS,GHS60.00,2022-06-05,,,,
 ,223,Admin Expenses,STATIONERY,GHS100.00,2022-06-05,,,,
-,223,Admin Expenses,INCENTIVE TO PERSONEL,GHS100.00,2022-06-05,,,,
+,223,Admin Expenses,INCENTIVE TO PERSONNEL,GHS100.00,2022-06-05,,,,
 ,223,Admin Expenses,STATIONERY,GHS100.00,2022-06-05,,,,
 ,346,Mary Inkoom,SAVINGS,GHS50.00,2022-06-05,,,,
 ,358,Priscilla Bimpong,SAVINGS,GHS100.00,2022-06-05,,,,
@@ -4019,7 +4019,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,176,Juliet Nkansah,SAVINGS,GHS40.00,2022-06-12,,,,
 ,179,Felicia Dadzie,SAVINGS,GHS500.00,2022-06-12,,,,
 ,222,Opening Balance,OPENING BALANCE,GHS5.40,2022-06-12,,,,cash overage added to balance
-,223,Admin Expenses,INCENTIVE TO PERSONEL,GHS250.40,2022-06-12,,,,refreshment for training
+,223,Admin Expenses,INCENTIVE TO PERSONNEL,GHS250.40,2022-06-12,,,,refreshment for training
 ,354,Susana Quayson,SAVINGS,GHS150.00,2022-06-12,,,,
 ,388,Emmanuel Mante Asare,SAVINGS,GHS30.00,2022-06-12,,,,
 ,410,Freda Asare,SAVINGS,GHS800.00,2022-06-12,,,,
@@ -4034,7 +4034,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,025,Joyce Amoh,LOAN CHEQUE,"GHS10,000.00",2022-06-19,,,,
 ,085,Mercy Nyanney,LOAN REPAYMENT CHEQUE,"GHS1,000.00",2022-06-19,,,,
 ,085,Mercy Nyanney,SAVINGS,GHS500.00,2022-06-19,,,,
-,223,Admin Expenses,INCENTIVE TO PERSONEL,GHS100.00,2022-06-19,,,,
+,223,Admin Expenses,INCENTIVE TO PERSONNEL,GHS100.00,2022-06-19,,,,
 ,433,Abigail Akua Amfoh,SAVINGS,GHS40.00,2022-06-19,,,,
 ,491,Michael Nkansah (Taxi),SAVINGS,GHS600.00,2022-06-19,,,,
 ,530,Hannah Ayine,SAVINGS,GHS200.00,2022-06-19,,,,
@@ -4074,7 +4074,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,509,Agnes Quaicoo,WITHDRAWAL,GHS300.00,2022-07-10,,,,
 ,523,Sylvia Frema Ampaabeng Kyeremeh,SAVINGS,GHS20.00,2022-07-10,,,,
 ,222,Opening Balance,LOAN REPAYMENT,"GHS1,500.00",2022-07-17,,,,confirm who
-,223,Admin Expenses,INCENTIVE TO PERSONEL,GHS54.00,2022-07-17,,,,refreshment for account work
+,223,Admin Expenses,INCENTIVE TO PERSONNEL,GHS54.00,2022-07-17,,,,refreshment for account work
 ,354,Susana Quayson,SAVINGS,GHS260.00,2022-07-17,,,,
 ,377,Adam Millicent Donkor,WITHDRAWAL,"GHS1,000.00",2022-07-17,,,,
 ,491,Michael Nkansah (Taxi),WITHDRAWAL CHEQUE,"GHS12,000.00",2022-07-17,,,,
@@ -4101,7 +4101,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,559,Freda Manu Yelbert,CARD,GHS10.00,2022-07-24,,,,
 ,559,Freda Manu Yelbert,SAVINGS,GHS40.00,2022-07-24,,,,
 ,205,Michael Prosper Tweneboah,SAVINGS,GHS200.00,2022-07-31,,,,
-,223,Admin Expenses,INCENTIVE TO PERSONEL,GHS170.00,2022-07-31,,,,expensees for lunch
+,223,Admin Expenses,INCENTIVE TO PERSONNEL,GHS170.00,2022-07-31,,,,expensees for lunch
 ,223,Admin Expenses,STATIONERY,GHS40.00,2022-07-31,,,,21 notebook
 ,398,Isaac Krampah,SAVINGS,GHS300.00,2022-07-31,,,,
 ,433,Abigail Akua Amfoh,SAVINGS,GHS60.00,2022-07-31,,,,
@@ -4118,7 +4118,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,068,Emmanuel Amoh,INTEREST ON LOAN,GHS73.00,2022-08-07,,,,
 ,085,Mercy Nyanney,SAVINGS,GHS500.00,2022-08-07,,,,
 ,085,Mercy Nyanney,LOAN REPAYMENT,"GHS1,000.00",2022-08-07,,,,
-,223,Admin Expenses,INCENTIVE TO PERSONEL,GHS100.00,2022-08-07,,,,Expenses fo lunch
+,223,Admin Expenses,INCENTIVE TO PERSONNEL,GHS100.00,2022-08-07,,,,Expenses fo lunch
 ,223,Admin Expenses,WITHDRAWAL,"GHS1,500.00",2022-08-07,,,,confirm who
 ,403,Sabina Tagoe,LOAN REPAYMENT,"GHS2,000.00",2022-08-07,,,,
 ,477,Odorkor Church Of Christ Deacons,SAVINGS,GHS380.00,2022-08-07,,,,
@@ -4191,9 +4191,9 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,068,Emmanuel Amoh,INTEREST ON LOAN,GHS58.00,2022-09-18,,,,
 ,090,Benjamin K. Maglo,SAVINGS,GHS150.00,2022-09-18,,,,
 ,094,Grace Abokyi,SAVINGS,GHS80.00,2022-09-18,,,,
-,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONEL,GHS600.00,2022-09-18,,,,IT Support
-,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONEL,GHS300.00,2022-09-18,,,,Albert Amoh
-,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONEL,GHS100.00,2022-09-18,,,,Lydia Boateng
+,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONNEL,GHS600.00,2022-09-18,,,,IT Support
+,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONNEL,GHS300.00,2022-09-18,,,,Albert Amoh
+,220,Allowance To Credit Union Staff,INCENTIVE TO PERSONNEL,GHS100.00,2022-09-18,,,,Lydia Boateng
 ,346,Mary Inkoom,SAVINGS,GHS150.00,2022-09-18,,,,
 ,350,Gladys Maglo,SAVINGS,GHS50.00,2022-09-18,,,,
 ,354,Susana Quayson,WITHDRAWAL CHEQUE,"GHS1,000.00",2022-09-18,,,,
@@ -4255,7 +4255,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,043,Kweku Siaw,SAVINGS,GHS30.00,2022-10-16,,,,
 ,068,Emmanuel Amoh,LOAN REPAYMENT,GHS627.00,2022-10-16,,,,
 ,134,Francis Azu,SAVINGS,GHS500.00,2022-10-16,,,,
-,223,Admin Expenses,INCENTIVE TO PERSONEL,GHS120.00,2022-10-16,,,,
+,223,Admin Expenses,INCENTIVE TO PERSONNEL,GHS120.00,2022-10-16,,,,
 ,223,Admin Expenses,CARD,GHS20.00,2022-10-16,,,,confirm who bought the card
 ,309,Margaret Mensah,WITHDRAWAL,GHS500.00,2022-10-16,,,,
 ,321,Patsy Ewurama Nyarkoh,SAVINGS,GHS300.00,2022-10-16,,,,
