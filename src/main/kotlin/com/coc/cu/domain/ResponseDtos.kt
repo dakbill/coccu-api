@@ -193,6 +193,9 @@ class DashboardResponseDto {
     var withdrawals: Double = 0.0
     var loans: Double = 0.0
     var loanRepayments: Double = 0.0
+    var interestOnLoan: Double = 0.0
+    var cardsAndProcessingFee: Double = 0.0
+    var expenditure: Double = 0.0
     var chart: Map<String,Any>? = null
 }
 

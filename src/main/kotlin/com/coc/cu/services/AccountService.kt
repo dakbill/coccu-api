@@ -92,6 +92,12 @@ class AccountService(
                 response.loanRepayments += record.amount
             } else if (arrayOf("LOAN", "LOAN_CHEQUE").contains(record.type)) {
                 response.loans += record.amount
+            } else if (arrayOf("INTEREST_ON_LOAN", "INTEREST_ON_LOAN_CHEQUE").contains(record.type)) {
+                response.interestOnLoan += record.amount
+            } else if (arrayOf("CARD").contains(record.type)) {
+                response.cardsAndProcessingFee += record.amount
+            } else if (arrayOf("STATIONERY","STATIONERY_CHEQUE","TRANSPORT","INCENTIVE_TO_PERSONNEL","INCENTIVE_TO_PERSONNEL_CHEQUE").contains(record.type)) {
+                response.expenditure += record.amount
             }
         }
 
