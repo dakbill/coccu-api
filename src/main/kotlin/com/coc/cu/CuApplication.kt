@@ -273,6 +273,9 @@ class CuApplication {
                             member = member,
                             type = accountType,
                             id = accountNumber,
+                            interestRate = if (AccountType.LOAN != accountType) null else
+                                if (transaction.createdDate!!.year <= 2022) 0.18f else 0.2f
+                            ,
                             createdDate = transaction.createdDate
                         )
                     )

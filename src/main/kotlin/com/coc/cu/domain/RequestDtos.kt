@@ -28,6 +28,7 @@ class RawTransactionRequestDto {
     var accountId: String? = null
     var guarantors: List<GuarantorRequestDto>? = null
     var type: String? = null
+    var interestRate: Float? = null
     var comment: String? = null
     var amount: Float? = null
     var date: Date? = null

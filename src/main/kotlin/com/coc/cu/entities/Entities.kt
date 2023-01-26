@@ -16,6 +16,7 @@ data class Account(
     @ManyToOne var member: Member?,
     @Enumerated(value = EnumType.STRING) var type: AccountType?,
     @Id var id: String? = null,
+    var interestRate: Float? = null,
     var createdDate: LocalDateTime? = null,
     var updatedDate: LocalDateTime? = null,
     @OneToMany var transactions: List<Transaction>? = arrayListOf(),
@@ -72,6 +73,8 @@ data class Transaction(
     var updatedDate: LocalDateTime? = null,
 
     @ManyToOne var account: Account? = null,
+
+    @ManyToOne var createdBy: Member? = null,
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO) var id: Long? = -1
 )

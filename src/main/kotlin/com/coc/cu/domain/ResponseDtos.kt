@@ -16,6 +16,7 @@ class AccountResponseDto {
     var id: String? = null
     var number: String? = null
     var balance: Double = 0.0
+    var interestRate: Float? = null
     var type: AccountType? = null
     var member: MemberResponseDto? = null
     var transactions: List<TransactionResponseDto>? = null
@@ -64,6 +65,7 @@ class TransactionResponseDto {
     var type: TransactionType? = null
     var amount: Float? = null
     var comment: String? = null
+    var createdBy: MemberResponseDto? = null
 
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)

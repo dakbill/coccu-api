@@ -3306,7 +3306,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,418,John Boafo,SAVINGS,"GHS1,000.00",2021-07-11,,,,
 ,435,Michael Amakye,SAVINGS,GHS300.00,2021-07-11,,,,
 ,445,Ebenezer Quayson,SAVINGS,GHS240.00,2021-07-11,,,,
-,473,Kwesi Botchwey,LOAN REPAYMENT,GHS50.00,2021-07-11,,,,
+,473,Kwesi Botchwey,INTEREST ON LOAN,GHS50.00,2021-07-11,,,,
 ,500,Isaac Armah,SAVINGS,GHS100.00,2021-07-11,,,,
 ,516,Dorcas Bentil,SAVINGS,GHS50.00,2021-07-11,,,,
 ,520,Kingsley Kwabena Baawuah,WITHDRAWAL,GHS100.00,2021-07-11,,,,

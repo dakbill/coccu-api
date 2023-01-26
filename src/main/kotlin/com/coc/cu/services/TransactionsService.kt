@@ -130,6 +130,13 @@ class TransactionsService(
             memberAccountRepository.save(account)
         }
 
+        if(model.interestRate != null){
+            val account = memberAccountRepository.findById(model.accountId!!).get()
+            account.interestRate = model.interestRate
+
+            memberAccountRepository.save(account)
+        }
+
 
         val typeRef = object : TypeReference<TransactionResponseDto>() {}
         return objectMapper.convertValue(repository.findById(transaction.id!!).get(), typeRef)
