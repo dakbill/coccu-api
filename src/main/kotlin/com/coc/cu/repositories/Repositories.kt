@@ -189,27 +189,45 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
     fun sumAmounts(accountId: String, transactionTypes: Array<String>): Double
 
     @Query(
-        value = "SELECT account.*, (" +
-                "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN','LOAN_CHEQUE') AND ACCOUNT_ID=account.id) " +
-                "   - " +
-                "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE') AND ACCOUNT_ID=account.id) " +
-                ") AS balance FROM account LEFT JOIN member ON(member.id=member_id) WHERE account.type='LOAN' " +
-                "AND (" +
-                "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN','LOAN_CHEQUE') AND ACCOUNT_ID=account.id) " +
-                "   - " +
-                "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE') AND ACCOUNT_ID=account.id) " +
-                ") > 0 " +
-                "AND (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )",
-        countQuery = "SELECT COUNT(account.id) FROM account LEFT JOIN member ON(member.id=member_id) WHERE account.type='LOAN' " +
-                "AND (" +
-                "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN','LOAN_CHEQUE') AND ACCOUNT_ID=account.id) " +
-                "   - " +
-                "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE') AND ACCOUNT_ID=account.id) " +
-                ") > 0 " +
-                "AND (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )",
+        value = "SELECT " +
+                "   account.* FROM account LEFT JOIN member ON(member.id=member_id) " +
+                "WHERE " +
+                "   account.type='LOAN' AND account.balance > 0 AND (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )",
+        countQuery = "SELECT " +
+                "   COUNT(account.id) FROM account LEFT JOIN member ON(member.id=member_id) " +
+                "WHERE " +
+                "   account.type='LOAN' AND account.balance > 0 AND (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )",
         nativeQuery = true
     )
     fun getDebtors(query: String, pageable: Pageable): Page<Account>
+
+
+    @Query(
+        value = "SELECT " +
+                "   account.* FROM account LEFT JOIN member ON(member.id=member_id) " +
+                "WHERE " +
+                "   account.type='LOAN' AND account.balance > 0 AND (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )",
+        countQuery = "SELECT " +
+                "   COUNT(account.id) FROM account LEFT JOIN member ON(member.id=member_id) " +
+                "WHERE " +
+                "   account.type='LOAN' AND account.balance > 0 AND (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )",
+        nativeQuery = true
+    )
+    fun getOutstandingDebtors(query: String, pageable: Pageable): Page<Account>
+
+
+    @Query(
+        value = "SELECT " +
+                "   account.* FROM account LEFT JOIN member ON(member.id=member_id) " +
+                "WHERE " +
+                "   account.type='LOAN' AND account.balance > 0 AND (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )",
+        countQuery = "SELECT " +
+                "   COUNT(account.id) FROM account LEFT JOIN member ON(member.id=member_id) " +
+                "WHERE " +
+                "   account.type='LOAN' AND account.balance > 0 AND (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )",
+        nativeQuery = true
+    )
+    fun getDefaultingDebtors(query: String, pageable: Pageable): Page<Account>
 
 
     @Query(

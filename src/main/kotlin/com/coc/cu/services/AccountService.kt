@@ -50,13 +50,28 @@ class AccountService(
         return objectMapper.convertValue(repository.findAll(), typeRef)
     }
 
-    fun getDebtors(query: String, pageRequest: PageRequest): Page<AccountResponseDto> {
-        val accountsPage = repository.getDebtors(query, pageRequest)
+    fun getDebtors(query: String, type: String?, pageRequest: PageRequest): Page<AccountResponseDto> {
+
+
+        var accountsPage = when (type) {
+            "outstanding" -> {
+                repository.getOutstandingDebtors(query, pageRequest)
+            }
+            "defaulting" -> {
+                repository.getDefaultingDebtors(query, pageRequest)
+            }
+            else -> {
+                repository.getDebtors(query, pageRequest)
+            }
+        }
+
         val typeRef = object : TypeReference<List<AccountResponseDto>>() {}
         val response = objectMapper.convertValue(accountsPage.content, typeRef)
 
         return PageImpl(response, pageRequest, accountsPage.totalElements)
     }
+
+
 
     fun getNegativeBalanceAccounts(query: String, pageRequest: PageRequest): Page<AccountResponseDto> {
         val accountsPage = repository.getNegativeBalanceAccounts(query, pageRequest)

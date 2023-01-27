@@ -204,143 +204,149 @@ class CuApplication {
 //                continue
 //            }
 
-            var t = TransactionType.values().filter { t -> t.name == record[3].trim().replace(" ", "_") }
-            if (t.isEmpty()) {
-                continue
-            }
 
-            var transaction = Transaction(
-                createdDate = LocalDateTime.parse(
-                    String.format("%s 00:00", record[5]),
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-                ),
-                type = t.first()
-            )
+            try {
 
-
-            if (record[4].isNotEmpty()) {
-                transaction.amount = record[4]
-                    .replace("GHS", "")
-                    .replace(",", "")
-                    .toFloat()
-            }
-
-            if (Strings.isNotEmpty(record[1])) {
-                val memberId = record[1].toLong()
-                var accountNumber = memberId.toString()
-                val accountType =
-                    if (transaction.type!!.name.contains("LOAN")) AccountType.LOAN else AccountType.SAVINGS
-
-
-                if (transaction.type.toString().contains("LOAN")) {
-                    var loanAccountsCount = memberAccountRepository.countByMemberIdAndType(
-                        memberId,
-                        arrayOf(AccountType.LOAN.name)
-                    )
-
-                    val lastLoanAccountNumber = "LOAN-${memberId}-${loanAccountsCount}"
-                    val lastTransaction = repository.lastByAccountId(lastLoanAccountNumber)
-
-
-                    accountNumber =
-                        if (
-                            (arrayOf(
-                                TransactionType.LOAN_CHEQUE,
-                                TransactionType.LOAN
-                            ).contains(transaction.type) || loanAccountsCount == 0L)
-                            && !(lastTransaction != null && arrayOf(
-                                TransactionType.LOAN_CHEQUE,
-                                TransactionType.LOAN
-                            ).contains(lastTransaction.type))
-                        ) {
-                            "LOAN-${memberId}-${loanAccountsCount + 1}"
-                        } else {
-                            lastLoanAccountNumber
-                        }
-
+                var t = TransactionType.values().filter { t -> t.name == record[3].trim().replace(" ", "_") }
+                if (t.isEmpty()) {
+                    continue
                 }
 
+                var transaction = Transaction(
+                    createdDate = LocalDateTime.parse(
+                        String.format("%s 00:00", record[5]),
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                    ),
+                    type = t.first()
+                )
 
-                var memberOptional = membersRepository.findById(record[1].toLong())
-                if (!memberOptional.isPresent) continue
 
-                //update member creation date if transaction is older
-                val member = memberOptional.get()
-                if (member.createdDate!!.isAfter(transaction.createdDate)) {
-                    member.createdDate = transaction.createdDate
-                    membersRepository.save(member)
+                if (record[4].isNotEmpty()) {
+                    transaction.amount = record[4]
+                        .replace("GHS", "")
+                        .replace(",", "")
+                        .toFloat()
                 }
 
-                var account = memberAccountRepository.findById(accountNumber)
-                    .orElse(
-                        Account(
-                            member = member,
-                            type = accountType,
-                            id = accountNumber,
-                            interestRate = if (AccountType.LOAN != accountType) null else
-                                if (transaction.createdDate!!.year <= 2022) 0.18f else 0.2f
-                            ,
-                            createdDate = transaction.createdDate
+                if (Strings.isNotEmpty(record[1])) {
+                    val memberId = record[1].toLong()
+                    var accountNumber = memberId.toString()
+                    val accountType =
+                        if (transaction.type!!.name.contains("LOAN")) AccountType.LOAN else AccountType.SAVINGS
+
+
+                    if (transaction.type.toString().contains("LOAN")) {
+                        var loanAccountsCount = memberAccountRepository.countByMemberIdAndType(
+                            memberId,
+                            arrayOf(AccountType.LOAN.name)
                         )
-                    )
 
-                if (record[9].toString().isNotEmpty()) {
-                    val p: Pattern = Pattern.compile("\\[Guarantors.*\\)\\]", Pattern.MULTILINE)
-                    val m: Matcher = p.matcher(record[9].toString())
-                    if (m.find()) {
-
-                        if (account.guarantors!!.isEmpty()) {
-                            account.guarantors = arrayListOf()
-                        }
-
-                        m.group().split(Pattern.compile("(\\(|\\)|,|Guarantors\\:)")).stream()
-                            .filter { s -> s.trim().matches(Pattern.compile("\\d+").toRegex()) }
-                            .forEach { s ->
-                                val member = membersRepository.findById(
-                                    s.toLong()
-                                ).get()
-                                account.guarantors!!.add(
-                                    guarantorRepository.save(
-                                        Guarantor(
-                                            member = member,
-                                            amount = 0.0f,
-                                            createdDate = transaction.createdDate,
-                                        )
-                                    )
-                                )
+                        val lastLoanAccountNumber = "LOAN-${memberId}-${loanAccountsCount}"
+                        val lastTransaction = repository.lastByAccountId(lastLoanAccountNumber)
 
 
+                        accountNumber =
+                            if (
+                                (arrayOf(
+                                    TransactionType.LOAN_CHEQUE,
+                                    TransactionType.LOAN
+                                ).contains(transaction.type) || loanAccountsCount == 0L)
+                                && !(lastTransaction != null && arrayOf(
+                                    TransactionType.LOAN_CHEQUE,
+                                    TransactionType.LOAN
+                                ).contains(lastTransaction.type))
+                            ) {
+                                "LOAN-${memberId}-${loanAccountsCount + 1}"
+                            } else {
+                                lastLoanAccountNumber
                             }
 
-
-                        account = memberAccountRepository.save(account)
                     }
+
+
+                    var memberOptional = membersRepository.findById(record[1].toLong())
+                    if (!memberOptional.isPresent) continue
+
+                    //update member creation date if transaction is older
+                    val member = memberOptional.get()
+                    if (member.createdDate!!.isAfter(transaction.createdDate)) {
+                        member.createdDate = transaction.createdDate
+                        membersRepository.save(member)
+                    }
+
+                    var account = memberAccountRepository.findById(accountNumber)
+                        .orElse(
+                            Account(
+                                member = member,
+                                type = accountType,
+                                id = accountNumber,
+                                interestRate = if (AccountType.LOAN != accountType) null else
+                                    if (transaction.createdDate!!.year <= 2022) 0.18f else 0.2f,
+                                createdDate = transaction.createdDate
+                            )
+                        )
+
+                    if (record[9].toString().isNotEmpty()) {
+                        val p: Pattern = Pattern.compile("\\[Guarantors.*\\)\\]", Pattern.MULTILINE)
+                        val m: Matcher = p.matcher(record[9].toString())
+                        if (m.find()) {
+
+                            if (account.guarantors!!.isEmpty()) {
+                                account.guarantors = arrayListOf()
+                            }
+
+                            m.group().split(Pattern.compile("(\\(|\\)|,|Guarantors\\:)")).stream()
+                                .filter { s -> s.trim().matches(Pattern.compile("\\d+").toRegex()) }
+                                .forEach { s ->
+                                    val member = membersRepository.findById(
+                                        s.toLong()
+                                    ).get()
+                                    account.guarantors!!.add(
+                                        guarantorRepository.save(
+                                            Guarantor(
+                                                member = member,
+                                                amount = 0.0f,
+                                                createdDate = transaction.createdDate,
+                                            )
+                                        )
+                                    )
+
+
+                                }
+
+
+                            account = memberAccountRepository.save(account)
+                        }
+                    }
+
+                    if (account.createdDate!!.isAfter(transaction.createdDate)) {
+                        account.createdDate = transaction.createdDate
+                    }
+
+
+
+                    transaction.account = memberAccountRepository.save(account)
+
                 }
 
-                if (account.createdDate!!.isAfter(transaction.createdDate)) {
-                    account.createdDate = transaction.createdDate
+
+                repository.save(transaction)
+
+                val account = transaction.account
+                if (account!!.type == AccountType.SAVINGS) {
+                    account.balance = repository.findBySavingsBalance(account.id)
+                } else if (account.type == AccountType.LOAN) {
+                    account.balance = repository.findByLoanBalance(account.id)
+                } else if (account.member!!.name!!.lowercase().contains("admin") || account.member!!.name!!.lowercase()
+                        .contains("expenses")
+                ) {
+                    account.balance = repository.findByAdminExpensesBalance(account.id)
                 }
-
-
-
-                transaction.account = memberAccountRepository.save(account)
-
+                memberAccountRepository.save(account)
+            } catch (ex: Exception) {
+                println(record)
+                ex.printStackTrace()
             }
-
-
-            repository.save(transaction)
-
-            val account = transaction.account
-            if (account!!.type == AccountType.SAVINGS) {
-                account.balance = repository.findBySavingsBalance(account.id)
-            } else if (account.type == AccountType.LOAN) {
-                account.balance = repository.findByLoanBalance(account.id)
-            } else if (account.member!!.name!!.lowercase().contains("admin") || account.member!!.name!!.lowercase()
-                    .contains("expenses")
-            ) {
-                account.balance = repository.findByAdminExpensesBalance(account.id)
-            }
-            memberAccountRepository.save(account)
 
         }
 

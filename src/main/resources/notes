@@ -6,34 +6,30 @@
 8.  Sale of Passbook & Registration - done
 7.  Savings Withdrawal - done
 9.  Administrative Expense - done
+4.  Repayment - Principal plus Interest. - done
+2.  I know provision would be made for the members number but the receipt number must also be captured to facilitate easy tracking
+    during dispute. - done
+3.  Give out Loan - Principal plus Interest  - done
+
+
+4.  And in the user profile interface , the information required there,
+    can’t give CU officers much details to track a member when he or she refuses to pay a loan
 
 1.  system alerting customers on their due date of paying loans and also alert
     them when their account becomes dormant for 3 months. And also teller
     should also get alert on the system too.
-4.  And in the user profile interface , the information required there,  can’t give CU officers much details
-    to track a member when he or she refuses to pay a loan
-4.  Repayment - Principal plus Interest. - done
-2.  I know provision would be made for the members number but the receipt number must also be captured to facilitate easy tracking
-    during dispute. - done
-
-3.  Give out Loan - Principal plus Interest  - done
 
 4.  Must have mechanism to flash those who are unable to make their loan repayment after 1 week.
 
-Can these be segmented
-
-For example
-
+Can these be segmented For example
 * Loans
-   - give out loans
-   - loan repayment
+   - give out loans - done
+   - loan repayment - done
    - outstanding loans
    - defaulted loans
-
-Something like this For instance again
-    * Payment
-    - deposit
-    - withdrawal
+* Payment
+    - deposit - done
+    - withdrawal - done
 
 ---Query to get accounts who have not paid expected installment
 SELECT a.id,
