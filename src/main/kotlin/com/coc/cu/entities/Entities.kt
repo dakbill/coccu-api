@@ -17,6 +17,7 @@ data class Account(
     @Enumerated(value = EnumType.STRING) var type: AccountType?,
     @Id var id: String? = null,
     var interestRate: Float? = null,
+    var balance: Double = 0.00,
     var createdDate: LocalDateTime? = null,
     var updatedDate: LocalDateTime? = null,
     @OneToMany var transactions: List<Transaction>? = arrayListOf(),

@@ -55,20 +55,6 @@ class AccountService(
         val typeRef = object : TypeReference<List<AccountResponseDto>>() {}
         val response = objectMapper.convertValue(accountsPage.content, typeRef)
 
-        for (record in response) {
-            record.balance = repository.sumAmounts(
-                record.id!!, arrayOf(
-                    TransactionType.LOAN.name,
-                    TransactionType.LOAN_CHEQUE.name
-                )
-            ) - repository.sumAmounts(
-                record.id!!, arrayOf(
-                    TransactionType.LOAN_REPAYMENT.name,
-                    TransactionType.LOAN_REPAYMENT_CHEQUE.name
-                )
-            )
-        }
-
         return PageImpl(response, pageRequest, accountsPage.totalElements)
     }
 
@@ -77,34 +63,6 @@ class AccountService(
         val typeRef = object : TypeReference<List<AccountResponseDto>>() {}
         val response = objectMapper.convertValue(accountsPage.content, typeRef)
 
-        for (record in response) {
-            if (AccountType.LOAN == record.type) {
-                record.balance = repository.sumAmounts(
-                    record.id!!, arrayOf(
-                        TransactionType.LOAN.name,
-                        TransactionType.LOAN_CHEQUE.name
-                    )
-                ) - repository.sumAmounts(
-                    record.id!!, arrayOf(
-                        TransactionType.LOAN_REPAYMENT.name,
-                        TransactionType.LOAN_REPAYMENT_CHEQUE.name
-                    )
-                )
-            } else if (AccountType.SAVINGS == record.type) {
-                record.balance = repository.sumAmounts(
-                    record.id!!, arrayOf(
-                        TransactionType.SAVINGS.name,
-                        TransactionType.SAVINGS_CHEQUE.name
-                    )
-                ) - repository.sumAmounts(
-                    record.id!!, arrayOf(
-                        TransactionType.WITHDRAWAL.name,
-                        TransactionType.WITHDRAWAL_CHEQUE.name
-                    )
-                )
-            }
-
-        }
 
         return PageImpl(response, pageRequest, accountsPage.totalElements)
     }

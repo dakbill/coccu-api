@@ -41,7 +41,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-import java.util.stream.Collectors
+import javax.persistence.EntityManager
+import javax.persistence.EntityManagerFactory
 
 
 @SpringBootApplication
@@ -65,14 +66,16 @@ class CuApplication {
         membersRepository: MembersRepository,
         accountTransactionsRepository: AccountTransactionsRepository,
         memberAccountRepository: MemberAccountRepository,
-        guarantorRepository: GuarantorRepository
+        guarantorRepository: GuarantorRepository,
+        emf: EntityManagerFactory
     ) = CommandLineRunner {
         registerMembers(membersRepository, memberAccountRepository)
         recordTransactions(
             accountTransactionsRepository,
             membersRepository,
             memberAccountRepository,
-            guarantorRepository
+            guarantorRepository,
+            emf
         )
     }
 
@@ -180,6 +183,7 @@ class CuApplication {
         membersRepository: MembersRepository,
         memberAccountRepository: MemberAccountRepository,
         guarantorRepository: GuarantorRepository,
+        emf: EntityManagerFactory,
     ) {
         val bufferedReader =
             BufferedReader((InputStreamReader(ClassPathResource("/fixtures/Transactions_Transactions.csv").inputStream)))
@@ -192,13 +196,13 @@ class CuApplication {
                 )
         )
 
-        val transactionsCount = repository.count()
+//        val transactionsCount = repository.count()
 
         for ((counter, record) in csvParser.records.withIndex()) {
 
-            if ((counter + 1) <= transactionsCount) {
-                continue
-            }
+//            if ((counter + 1) <= transactionsCount) {
+//                continue
+//            }
 
             var t = TransactionType.values().filter { t -> t.name == record[3].trim().replace(" ", "_") }
             if (t.isEmpty()) {
@@ -317,6 +321,8 @@ class CuApplication {
                     account.createdDate = transaction.createdDate
                 }
 
+
+
                 transaction.account = memberAccountRepository.save(account)
 
             }
@@ -324,7 +330,33 @@ class CuApplication {
 
             repository.save(transaction)
 
+            val account = transaction.account
+            if (account!!.type == AccountType.SAVINGS) {
+                account.balance = repository.findBySavingsBalance(account.id)
+            } else if (account.type == AccountType.LOAN) {
+                account.balance = repository.findByLoanBalance(account.id)
+            } else if (account.member!!.name!!.lowercase().contains("admin") || account.member!!.name!!.lowercase()
+                    .contains("expenses")
+            ) {
+                account.balance = repository.findByAdminExpensesBalance(account.id)
+            }
+            memberAccountRepository.save(account)
+
         }
+
+
+        val em: EntityManager = emf.createEntityManager()
+        em.transaction.begin();
+        em.createNativeQuery("UPDATE \"transaction\" SET account_id='LOAN-200-1' WHERE account_id='LOAN-200-2' AND amount=100 AND CAST(created_date AS DATE)='2015-08-15' AND type='LOAN_REPAYMENT'").executeUpdate()
+        em.createNativeQuery("UPDATE \"transaction\" SET account_id='LOAN-406-1' WHERE account_id='LOAN-406-2' AND amount=300 AND CAST(created_date AS DATE)='2015-02-08' AND type='LOAN'").executeUpdate()
+        em.createNativeQuery("DELETE FROM \"account\" WHERE id='LOAN-406-2'").executeUpdate()
+
+        em.createNativeQuery("UPDATE \"account\" SET balance=(SELECT ( (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id = 'LOAN-200-2' AND TYPE IN ('OPENING_LOAN_BALANCE','LOAN','LOAN_CHEQUE'))  - (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id = 'LOAN-200-2' AND TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE')) ) ) WHERE id='LOAN-200-2'").executeUpdate()
+        em.createNativeQuery("UPDATE \"account\" SET balance=(SELECT ( (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id = 'LOAN-406-1' AND TYPE IN ('OPENING_LOAN_BALANCE','LOAN','LOAN_CHEQUE'))  - (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id = 'LOAN-406-1' AND TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE')) ) ) WHERE id='LOAN-406-1'").executeUpdate()
+
+        em.transaction.commit();
+
+
     }
 
 }

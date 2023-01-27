@@ -65,6 +65,16 @@ interface AccountTransactionsRepository: JpaRepository<Transaction, Long> {
     fun findByLoanBalance(id: String?): Double
 
     @Query(
+        value = "SELECT ( " +
+                    "(SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id = ?1 AND TYPE IN ('STATIONERY','STATIONERY_CHEQUE','TRANSPORT','INCENTIVE_TO_PERSONNEL','INCENTIVE_TO_PERSONNEL_CHEQUE')) " +
+                    " - " +
+                    "(SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id = ?1 AND TYPE IN ('WITHDRAWAL')) " +
+                ") ",
+        nativeQuery = true
+    )
+    fun findByAdminExpensesBalance(id: String?): Double
+
+    @Query(
         value = "SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id = (SELECT id FROM ACCOUNT WHERE member_id=?1 AND TYPE='SAVINGS') AND TYPE IN ('OPENING_BALANCE','SAVINGS','SAVINGS_CHEQUE')",
         nativeQuery = true
     )
@@ -87,6 +97,8 @@ interface AccountTransactionsRepository: JpaRepository<Transaction, Long> {
         nativeQuery = true
     )
     fun lastByAccountId(accountId: String): Transaction?
+
+
 }
 
 @Repository
@@ -201,35 +213,9 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
 
 
     @Query(
-        value = "SELECT account.* FROM account LEFT JOIN member ON(member.id=member_id) WHERE  " +
-                "(" +
-                    "(" +
-                    "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN','LOAN_CHEQUE') AND ACCOUNT_ID=account.id) " +
-                    "   - " +
-                    "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE') AND ACCOUNT_ID=account.id) " +
-                    ") < 0 " +
-                    "OR " +
-                    "(" +
-                    "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('SAVINGS','SAVINGS_CHEQUE') AND ACCOUNT_ID=account.id) " +
-                    "   - " +
-                    "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('WITHDRAWAL','WITHDRAWAL_CHEQUE') AND ACCOUNT_ID=account.id) " +
-                    ") < 0 " +
-                ") " +
+        value = "SELECT account.* FROM account LEFT JOIN member ON(member.id=member_id) WHERE account.balance < 0 " +
                 "AND (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )",
-        countQuery = "SELECT COUNT(account.id) FROM account LEFT JOIN member ON(member.id=member_id) WHERE  " +
-                "(" +
-                    "(" +
-                    "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN','LOAN_CHEQUE') AND ACCOUNT_ID=account.id) " +
-                    "   - " +
-                    "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE') AND ACCOUNT_ID=account.id) " +
-                    ") < 0 " +
-                    "OR " +
-                    "(" +
-                    "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('SAVINGS','SAVINGS_CHEQUE') AND ACCOUNT_ID=account.id) " +
-                    "   - " +
-                    "   (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN ('WITHDRAWAL','WITHDRAWAL_CHEQUE') AND ACCOUNT_ID=account.id) " +
-                    ") < 0 " +
-                ") " +
+        countQuery = "SELECT COUNT(account.id) FROM account LEFT JOIN member ON(member.id=member_id) WHERE account.balance < 0 " +
                 "AND (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )",
         nativeQuery = true
     )

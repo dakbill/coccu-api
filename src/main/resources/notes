@@ -1,6 +1,41 @@
+2.  I suggest a check should be indicated on every member page, and that check
+    should justify or confirm that a member can be granted loan or not,
+    but if he/she does not qualify then the guarantor comes in and that process could be done manually by checking - done
+3.  I suggest any information need to be filled about the person should be done,
+    please is possible the system could allow taller to capture image of members for registration? - done
+8.  Sale of Passbook & Registration - done
+7.  Savings Withdrawal - done
+9.  Administrative Expense - done
 
+1.  system alerting customers on their due date of paying loans and also alert
+    them when their account becomes dormant for 3 months. And also teller
+    should also get alert on the system too.
+4.  And in the user profile interface , the information required there,  can’t give CU officers much details
+    to track a member when he or she refuses to pay a loan
+4.  Repayment - Principal plus Interest. - done
+2.  I know provision would be made for the members number but the receipt number must also be captured to facilitate easy tracking
+    during dispute. - done
 
----Query to get acounts who have not paid expected installment
+3.  Give out Loan - Principal plus Interest  - done
+
+4.  Must have mechanism to flash those who are unable to make their loan repayment after 1 week.
+
+Can these be segmented
+
+For example
+
+* Loans
+   - give out loans
+   - loan repayment
+   - outstanding loans
+   - defaulted loans
+
+Something like this For instance again
+    * Payment
+    - deposit
+    - withdrawal
+
+---Query to get accounts who have not paid expected installment
 SELECT a.id,
        a.principal,
        (a.principal-a.repayments)             AS balance,
