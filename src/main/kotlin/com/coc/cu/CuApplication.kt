@@ -164,6 +164,7 @@ class CuApplication {
                         name = record[1],
                         createdDate = LocalDateTime.now(),
                         totalBalance = 0.0,
+                        availableBalance = 0.0,
                         phone = record[2]
                     )
                 )
@@ -196,13 +197,8 @@ class CuApplication {
                 )
         )
 
-//        val transactionsCount = repository.count()
+        for (record in csvParser.records) {
 
-        for ((counter, record) in csvParser.records.withIndex()) {
-
-//            if ((counter + 1) <= transactionsCount) {
-//                continue
-//            }
 
 
             try {
