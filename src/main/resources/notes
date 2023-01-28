@@ -64,3 +64,20 @@ AND
               FROM   "transaction"
               WHERE  to_char(created_date, 'YYYY-MM') =to_char(now(), 'YYYY-MM')
               AND    "transaction".account_id=a.id )
+
+
+SELECT
+   account.*,
+   ROUND(
+		   CAST(
+		   	(
+			   LEAST(EXTRACT(year FROM age(NOW(),account.created_date))*12 + EXTRACT(month FROM age(NOW(),account.created_date)),12)
+				*
+			   (SELECT SUM(amount)/12.0 FROM transaction WHERE account_id=account.id AND "type" IN ('LOAN','LOAN_CHEQUE'))
+		   	) AS NUMERIC
+		   ),
+	   2)
+
+   FROM account
+WHERE
+   account.type='LOAN' AND account.balance > 0

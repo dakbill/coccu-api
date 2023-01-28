@@ -210,7 +210,7 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
         countQuery = "SELECT " +
                 "   COUNT(account.id) FROM account LEFT JOIN member ON(member.id=member_id) " +
                 "WHERE " +
-                "   (EXTRACT(year FROM age(NOW(),account.created_date))*12 + EXTRACT(month FROM age(NOW(),account.created_date))) <= 12 AND account.type='LOAN' AND account.balance > 0 AND (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )",
+                "    (EXTRACT(year FROM age(NOW(),account.created_date))*12 + EXTRACT(month FROM age(NOW(),account.created_date))) <= 12 AND account.type='LOAN' AND account.balance > 0 AND (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )",
         nativeQuery = true
     )
     fun getOutstandingDebtors(query: String, pageable: Pageable): Page<Account>
