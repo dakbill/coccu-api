@@ -21,6 +21,10 @@
 
 4.  Must have mechanism to flash those who are unable to make their loan repayment after 1 week.
 
+Outstanding loan = A loan whose repayment is missed within the stipulated period of repayment
+
+Defaulted loan = A loan whose repayment is missed beyond the stipulated period of repayment
+
 Can these be segmented For example
 * Loans
    - give out loans - done
