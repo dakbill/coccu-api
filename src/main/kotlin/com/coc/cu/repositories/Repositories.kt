@@ -221,8 +221,7 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
         value = "SELECT " +
                 "   account.* FROM account LEFT JOIN member ON(member.id=member_id) " +
                 "WHERE " +
-                "   (EXTRACT(year FROM age(NOW(),account.created_date))*12 + EXTRACT(month FROM age(NOW(),account.created_date))) <= 12 " +
-                "   AND account.type='LOAN' AND account.balance > 0 " +
+                "   account.type='LOAN' AND account.balance > 0 " +
                 "   AND (" +
                 "           (SELECT SUM(amount) FROM transaction WHERE account_id=account.id AND \"type\" IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE')) " +
                 "           <  " +
@@ -232,8 +231,7 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
         countQuery = "SELECT " +
                 "   COUNT(account.id) FROM account LEFT JOIN member ON(member.id=member_id) " +
                 "WHERE " +
-                "   (EXTRACT(year FROM age(NOW(),account.created_date))*12 + EXTRACT(month FROM age(NOW(),account.created_date))) <= 12 " +
-                "   AND account.type='LOAN' AND account.balance > 0 " +
+                "   account.type='LOAN' AND account.balance > 0 " +
                 "   AND (" +
                 "           (SELECT SUM(amount) FROM transaction WHERE account_id=account.id AND \"type\" IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE')) " +
                 "           <  " +
