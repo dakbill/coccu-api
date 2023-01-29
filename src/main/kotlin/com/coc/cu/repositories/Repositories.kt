@@ -223,9 +223,9 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
                 "WHERE " +
                 "   account.type='LOAN' AND account.balance > 0 " +
                 "   AND (" +
-                "           (SELECT SUM(amount) FROM transaction WHERE account_id=account.id AND \"type\" IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE')) " +
+                "           (SELECT COALESCE(SUM(amount),0) FROM transaction WHERE account_id=account.id AND \"type\" IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE')) " +
                 "           <  " +
-                "           ((SELECT SUM(amount)/12.0 FROM transaction WHERE account_id=account.id AND \"type\" IN ('LOAN','LOAN_CHEQUE')) * LEAST(EXTRACT(year FROM age(NOW(),account.created_date))*12 + EXTRACT(month FROM age(NOW(),account.created_date)),12) ) " +
+                "           ((SELECT COALESCE(SUM(amount)/12.0,0) FROM transaction WHERE account_id=account.id AND \"type\" IN ('LOAN','LOAN_CHEQUE')) * LEAST(EXTRACT(year FROM age(NOW(),account.created_date))*12 + EXTRACT(month FROM age(NOW(),account.created_date)),12) ) " +
                 "   ) " +
                 "   AND (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )",
         countQuery = "SELECT " +
@@ -233,9 +233,9 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
                 "WHERE " +
                 "   account.type='LOAN' AND account.balance > 0 " +
                 "   AND (" +
-                "           (SELECT SUM(amount) FROM transaction WHERE account_id=account.id AND \"type\" IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE')) " +
+                "           (SELECT COALESCE(SUM(amount),0) FROM transaction WHERE account_id=account.id AND \"type\" IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE')) " +
                 "           <  " +
-                "           ((SELECT SUM(amount)/12.0 FROM transaction WHERE account_id=account.id AND \"type\" IN ('LOAN','LOAN_CHEQUE')) * LEAST(EXTRACT(year FROM age(NOW(),account.created_date))*12 + EXTRACT(month FROM age(NOW(),account.created_date)),12) ) " +
+                "           ((SELECT COALESCE(SUM(amount)/12.0,0) FROM transaction WHERE account_id=account.id AND \"type\" IN ('LOAN','LOAN_CHEQUE')) * LEAST(EXTRACT(year FROM age(NOW(),account.created_date))*12 + EXTRACT(month FROM age(NOW(),account.created_date)),12) ) " +
                 "   ) " +
                 "   AND (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' )",
         nativeQuery = true
