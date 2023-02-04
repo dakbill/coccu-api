@@ -292,16 +292,18 @@ class CuApplication {
                             }
 
                             m.group().split(Pattern.compile("(\\(|\\)|,|Guarantors\\:)")).stream()
-                                .filter { s -> s.trim().matches(Pattern.compile("\\d+").toRegex()) }
+                                .filter { s -> s.trim().matches(Pattern.compile("(\\d|:)+").toRegex()) }
                                 .forEach { s ->
+                                    val (memberId, amount) = s.split(":")
+
                                     val member = membersRepository.findById(
-                                        s.toLong()
+                                        memberId.toLong()
                                     ).get()
                                     account.guarantors!!.add(
                                         guarantorRepository.save(
                                             Guarantor(
                                                 member = member,
-                                                amount = 0.0f,
+                                                amount = amount.toFloat(),
                                                 createdDate = transaction.createdDate,
                                             )
                                         )

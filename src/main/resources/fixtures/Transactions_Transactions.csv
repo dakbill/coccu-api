@@ -9,7 +9,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 5/3/2021 11:17:23,116,James Ayensu,OPENING BALANCE,GHS327.00,2013-10-06,,,,
 5/3/2021 14:13:46,195,Emmanuel Dadzie ,OPENING BALANCE,"GHS2,250.00",2014-01-01,,,,
 5/3/2021 14:14:41,195,Emmanuel Dadzie ,SAVINGS,GHS50.00,2014-01-12,,,,
-5/3/2021 10:58:09,131,Clement Baah,LOAN,"GHS5,000.00",2014-01-19,,,,[Guarantors:(174)]
+5/3/2021 10:58:09,131,Clement Baah,LOAN,"GHS5,000.00",2014-01-19,,,,[Guarantors:(174:0)]
 5/3/2021 14:16:24,195,Emmanuel Dadzie ,WITHDRAWAL,GHS300.00,2014-05-04,,,,
 5/3/2021 10:59:10,131,Clement Baah,LOAN REPAYMENT,GHS950.00,2014-06-01,,,,
 5/3/2021 14:17:07,195,Emmanuel Dadzie ,SAVINGS,GHS100.00,2014-06-15,,,,
@@ -2704,7 +2704,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,500,Isaac Armah,SAVINGS,GHS20.00,2020-07-26,,,,
 ,501,Elijah Nunoo,LOAN REPAYMENT,GHS100.00,2020-07-26,,,,
 ,421,Mr & Mrs Gyadu,SAVINGS,GHS600.00,2020-08-01,,,,
-,038,Joseph Baah,LOAN,"GHS3,000.00",2020-08-02,,,,[Guarantors:(078)]
+,038,Joseph Baah,LOAN,"GHS3,000.00",2020-08-02,,,,[Guarantors:(078:0)]
 ,173,Cynthia Kwabia,SAVINGS,GHS10.00,2020-08-02,,,,
 ,173,Cynthia Kwabia,WITHDRAWAL,GHS400.00,2020-08-02,,,,
 ,313,Charles Nii Odotei Odoi,SAVINGS,GHS50.00,2020-08-02,,,,
@@ -4490,7 +4490,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,Email Address,,ide,No
 ,386,Ebenezer Apori,SAVINGS,GHS680.00,2023-01-22,,,,
 ,436,Comfort Asantewah,SAVINGS,GHS200.00,2023-01-22,,,,
 ,441,Kofi Yeboah Afari,SAVINGS,GHS180.00,2023-01-22,,,,
-,473,Kwesi Botchwey,LOAN,"GHS1,000.00",2023-01-22,,,,[Guarantors:(472)]
+,473,Kwesi Botchwey,LOAN,"GHS1,000.00",2023-01-22,,,,"[Guarantors:(472:900,472:0)]"
 ,477,Odorkor Church Of Christ Deacons,SAVINGS,GHS360.00,2023-01-22,,,,
 ,487,Doris Arko,SAVINGS,GHS20.00,2023-01-22,,,,
 ,515,Lydia Boateng,SAVINGS,GHS200.00,2023-01-22,,,,
