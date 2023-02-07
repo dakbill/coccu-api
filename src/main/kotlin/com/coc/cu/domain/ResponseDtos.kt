@@ -90,6 +90,7 @@ class MemberResponseDto {
     var email: String? = null
     var address: String? = null
     var city: String? = null
+    var gender: String? = null
     var firstOfKinName: String? = null
     var firstOfKinPhone: String? = null
     var firstOfKinEmail: String? = null

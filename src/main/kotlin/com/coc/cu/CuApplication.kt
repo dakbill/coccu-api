@@ -165,6 +165,7 @@ class CuApplication {
                         createdDate = LocalDateTime.now(),
                         totalBalance = 0.0,
                         availableBalance = 0.0,
+                        gender = record[3],
                         phone = record[2]
                     )
                 )

@@ -43,6 +43,7 @@ class Member(
     var phone: String? = null,
     var email: String? = null,
     var address: String? = null,
+    var gender: String? = null,
     var city: String? = null,
     var totalBalance: Double? = 0.00,
     @Transient var availableBalance: Double? = 0.00,
