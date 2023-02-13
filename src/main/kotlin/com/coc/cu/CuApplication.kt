@@ -194,7 +194,7 @@ class CuApplication {
             CSVFormat.EXCEL.withFirstRecordAsHeader()
                 .withHeader(
                     "Col1", "Col2", "Col3", "Col5", "Col6",
-                    "Col7", "Col8", "Col9", "Col10"
+                    "Col7", "Col8", "Col9", "Col10", "Col11"
                 )
         )
 
