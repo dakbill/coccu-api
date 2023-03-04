@@ -43,6 +43,16 @@ class ReportsController(var accountService: AccountService, var usersService: Us
         @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam endDate: LocalDate
     ): ApiResponse<Map<String, Any>> {
 
+        val savingsTransactionTypeArray = arrayOf(
+            TransactionType.SAVINGS, TransactionType.SAVINGS_CHEQUE,
+        )
+
+        val depositsTransactionTypeArray = arrayOf(
+            TransactionType.SAVINGS, TransactionType.SAVINGS_CHEQUE,
+            TransactionType.LOAN_REPAYMENT, TransactionType.LOAN_REPAYMENT_CHEQUE,
+            TransactionType.CARD,
+        )
+
         return ApiResponse(
             mapOf(
                 "malesCount" to usersService.countByGender(startDate, endDate, "m"),
@@ -53,38 +63,38 @@ class ReportsController(var accountService: AccountService, var usersService: Us
                     startDate,
                     endDate,
                     "m",
-                    arrayOf(TransactionType.SAVINGS, TransactionType.SAVINGS_CHEQUE)
+                    savingsTransactionTypeArray
                 ),
                 "femalesSavings" to usersService.sumTransactionsByGenderAndTransactionTypes(
                     startDate,
                     endDate,
                     "f",
-                    arrayOf(TransactionType.SAVINGS, TransactionType.SAVINGS_CHEQUE)
+                    savingsTransactionTypeArray
                 ),
                 "groupsSavings" to usersService.sumTransactionsByGenderAndTransactionTypes(
                     startDate,
                     endDate,
                     "g",
-                    arrayOf(TransactionType.SAVINGS, TransactionType.SAVINGS_CHEQUE)
+                    savingsTransactionTypeArray
                 ),
 
                 "malesDeposits" to usersService.sumTransactionsByGenderAndTransactionTypes(
                     startDate,
                     endDate,
                     "m",
-                    arrayOf(TransactionType.SAVINGS, TransactionType.SAVINGS_CHEQUE)
+                    depositsTransactionTypeArray
                 ),
                 "femalesDeposits" to usersService.sumTransactionsByGenderAndTransactionTypes(
                     startDate,
                     endDate,
                     "f",
-                    arrayOf(TransactionType.SAVINGS, TransactionType.SAVINGS_CHEQUE)
+                    depositsTransactionTypeArray
                 ),
                 "groupsDeposits" to usersService.sumTransactionsByGenderAndTransactionTypes(
                     startDate,
                     endDate,
                     "g",
-                    arrayOf(TransactionType.SAVINGS, TransactionType.SAVINGS_CHEQUE)
+                    depositsTransactionTypeArray
                 ),
             ),
             HttpStatus.OK
