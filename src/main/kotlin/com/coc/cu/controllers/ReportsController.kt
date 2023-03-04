@@ -47,10 +47,8 @@ class ReportsController(var accountService: AccountService, var usersService: Us
             TransactionType.SAVINGS, TransactionType.SAVINGS_CHEQUE,
         )
 
-        val depositsTransactionTypeArray = arrayOf(
-            TransactionType.SAVINGS, TransactionType.SAVINGS_CHEQUE,
-            TransactionType.LOAN_REPAYMENT, TransactionType.LOAN_REPAYMENT_CHEQUE,
-            TransactionType.CARD,
+        val sharesTransactionTypeArray = arrayOf(
+            TransactionType.SHARES, TransactionType.SHARES_CHEQUE,
         )
 
         return ApiResponse(
@@ -78,23 +76,23 @@ class ReportsController(var accountService: AccountService, var usersService: Us
                     savingsTransactionTypeArray
                 ),
 
-                "malesDeposits" to usersService.sumTransactionsByGenderAndTransactionTypes(
+                "malesShares" to usersService.sumTransactionsByGenderAndTransactionTypes(
                     startDate,
                     endDate,
                     "m",
-                    depositsTransactionTypeArray
+                    sharesTransactionTypeArray
                 ),
-                "femalesDeposits" to usersService.sumTransactionsByGenderAndTransactionTypes(
+                "femalesShares" to usersService.sumTransactionsByGenderAndTransactionTypes(
                     startDate,
                     endDate,
                     "f",
-                    depositsTransactionTypeArray
+                    sharesTransactionTypeArray
                 ),
-                "groupsDeposits" to usersService.sumTransactionsByGenderAndTransactionTypes(
+                "groupsShares" to usersService.sumTransactionsByGenderAndTransactionTypes(
                     startDate,
                     endDate,
                     "g",
-                    depositsTransactionTypeArray
+                    sharesTransactionTypeArray
                 ),
             ),
             HttpStatus.OK

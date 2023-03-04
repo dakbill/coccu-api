@@ -14,6 +14,8 @@ enum class TransactionType {
     CARD,
     SAVINGS,
     SAVINGS_CHEQUE,
+    SHARES,
+    SHARES_CHEQUE,
     WITHDRAWAL,
     WITHDRAWAL_CHEQUE,
     LOAN,
