@@ -2,6 +2,7 @@ package com.coc.cu.repositories
 
 import com.coc.cu.domain.GuarantorAccountResponseDto
 import com.coc.cu.domain.TransactionSumsDto
+import com.coc.cu.domain.TransactionType
 import com.coc.cu.entities.Account
 import com.coc.cu.entities.Guarantor
 import com.coc.cu.entities.Member
@@ -156,6 +157,18 @@ interface MembersRepository : CrudRepository<Member, Long> {
         nativeQuery = true
     )
     fun updateTotalBalance(id: Long?): Boolean
+
+    @Query(
+        value = "SELECT COUNT(id) FROM member WHERE created_date BETWEEN ?1 AND ?2 AND gender=?3",
+        nativeQuery = true
+    )
+    fun countByGender(startDate: LocalDate, endDate: LocalDate,gender: String): Long
+
+    @Query(
+        value = "SELECT COALESCE(SUM(amount),0) FROM transaction WHERE created_date BETWEEN ?1 AND ?2 AND type IN (?4) AND account_id IN (SELECT account.id FROM account WHERE member_id IN (SELECT id FROM member WHERE gender=?3) )",
+        nativeQuery = true
+    )
+    fun sumBalanceByGender(startDate: LocalDate, endDate: LocalDate, gender: String, transactionTypes: Array<String>): Long
 }
 
 
@@ -182,11 +195,6 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
     )
     fun sumAmounts(transactionTypes: Array<String>, startDate: LocalDate, endDate: LocalDate): Double
 
-    @Query(
-        value = "SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE TYPE IN (?2) AND ACCOUNT_ID=?1 ",
-        nativeQuery = true
-    )
-    fun sumAmounts(accountId: String, transactionTypes: Array<String>): Double
 
     @Query(
         value = "SELECT " +

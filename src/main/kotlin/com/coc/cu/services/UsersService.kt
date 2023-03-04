@@ -17,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
+import java.time.LocalDate
 import java.util.stream.Collectors
 
 
@@ -181,6 +182,28 @@ class UsersService(
             .collect(Collectors.toList())
 
         return response
+    }
+
+    fun countByGender(startDate: LocalDate, endDate: LocalDate, gender: String): Long {
+        return repository.countByGender(
+            startDate,
+            endDate,
+            gender
+        )
+    }
+
+    fun sumTransactionsByGenderAndTransactionTypes(
+        startDate: LocalDate,
+        endDate: LocalDate,
+        gender: String,
+        transactionTypes: Array<TransactionType>
+    ): Long {
+        return repository.sumBalanceByGender(
+            startDate,
+            endDate,
+            gender,
+            transactionTypes.map { transactionType -> transactionType.name }.toTypedArray()
+        )
     }
 
 }
