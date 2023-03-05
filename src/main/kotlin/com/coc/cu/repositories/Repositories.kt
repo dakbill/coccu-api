@@ -223,6 +223,27 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
     )
     fun getOutstandingDebtors(query: String, pageable: Pageable): Page<Account>
 
+    @Query(
+        value = "SELECT " +
+                "   COUNT(account.id) FROM account LEFT JOIN member ON(member.id=member_id) " +
+                "WHERE " +
+                "   account.type='LOAN' AND account.balance > 0 AND account.created_date BETWEEN ?1 AND ?2 AND member.gender = ?3",
+        nativeQuery = true
+    )
+    fun countOutstandingLoansByGender(startDate: LocalDate, endDate: LocalDate, gender: String): Int
+
+
+    @Query(
+        value = "SELECT " +
+                "   COALESCE(SUM(account.balance),0) FROM account LEFT JOIN member ON(member.id=member_id) " +
+                "WHERE " +
+                "   account.type='LOAN' AND account.balance > 0 AND account.created_date BETWEEN ?1 AND ?2 AND member.gender = ?3",
+        nativeQuery = true
+    )
+    fun sumOutstandingLoansByGender(startDate: LocalDate, endDate: LocalDate, gender: String): Float
+
+
+
 
 //    (loan repayments) > ((principal/12) * months to date)
     @Query(

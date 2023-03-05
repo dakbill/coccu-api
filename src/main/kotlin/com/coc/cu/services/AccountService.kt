@@ -272,4 +272,36 @@ class AccountService(
         val typeRef = object : TypeReference<AccountResponseDto>() {}
         return objectMapper.convertValue(account, typeRef)
     }
+
+
+    fun countOutstandingLoansByGender(startDate: LocalDate, endDate: LocalDate, gender: String, type: String): Int {
+
+        var count = when (type) {
+            "outstanding" -> {
+                repository.countOutstandingLoansByGender(startDate, endDate, gender)
+            }
+            "defaulting" -> {
+                0
+            }
+            else -> 0
+        }
+
+        return count
+    }
+
+    fun sumOutstandingLoansByGender(startDate: LocalDate, endDate: LocalDate, gender: String, type: String?): Float {
+
+
+        var sum = when (type) {
+            "outstanding" -> {
+                repository.sumOutstandingLoansByGender(startDate, endDate, gender)
+            }
+            "defaulting" -> {
+                0f
+            }
+            else -> 0.0f
+        }
+
+        return sum
+    }
 }

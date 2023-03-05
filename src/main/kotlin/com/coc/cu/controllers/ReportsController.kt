@@ -108,27 +108,42 @@ class ReportsController(var accountService: AccountService, var usersService: Us
     ): ApiResponse<Map<String, Any>> {
         return ApiResponse(
             mapOf(
-                "outstandingLoansMalesCount" to usersService.countByGender(startDate, endDate, "m"),
-                "outstandingLoansFemalesCount" to usersService.countByGender(startDate, endDate, "f"),
-                "outstandingLoansGroupsCount" to usersService.countByGender(startDate, endDate, "g"),
-
-                "malesOutstandingLoans" to usersService.sumTransactionsByGenderAndTransactionTypes(
+                "outstandingLoansMalesCount" to accountService.countOutstandingLoansByGender(
                     startDate,
                     endDate,
                     "m",
-                    arrayOf(TransactionType.SAVINGS, TransactionType.SAVINGS_CHEQUE)
+                    "outstanding"
                 ),
-                "femalesOutstandingLoans" to usersService.sumTransactionsByGenderAndTransactionTypes(
+                "outstandingLoansFemalesCount" to accountService.countOutstandingLoansByGender(
                     startDate,
                     endDate,
                     "f",
-                    arrayOf(TransactionType.SAVINGS, TransactionType.SAVINGS_CHEQUE)
+                    "outstanding"
                 ),
-                "groupsOutstandingLoans" to usersService.sumTransactionsByGenderAndTransactionTypes(
+                "outstandingLoansGroupsCount" to accountService.countOutstandingLoansByGender(
                     startDate,
                     endDate,
                     "g",
-                    arrayOf(TransactionType.SAVINGS, TransactionType.SAVINGS_CHEQUE)
+                    "outstanding"
+                ),
+
+                "malesOutstandingLoans" to accountService.sumOutstandingLoansByGender(
+                    startDate,
+                    endDate,
+                    "m",
+                    "outstanding"
+                ),
+                "femalesOutstandingLoans" to accountService.sumOutstandingLoansByGender(
+                    startDate,
+                    endDate,
+                    "f",
+                    "outstanding"
+                ),
+                "groupsOutstandingLoans" to accountService.sumOutstandingLoansByGender(
+                    startDate,
+                    endDate,
+                    "g",
+                    "outstanding"
                 ),
 
                 "malesDelinquentBorrowersCount" to usersService.sumTransactionsByGenderAndTransactionTypes(
