@@ -21,7 +21,7 @@ data class Account(
     var createdDate: LocalDateTime? = null,
     var updatedDate: LocalDateTime? = null,
     @OneToMany var transactions: List<Transaction>? = arrayListOf(),
-    @OneToMany var guarantors: MutableList<Guarantor>? = arrayListOf()
+    @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL]) var guarantors: MutableList<Guarantor>? = arrayListOf()
 )
 
 @Entity

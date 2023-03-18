@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.Period
 import java.time.ZoneId
-import java.util.stream.Collectors
-import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 
 @Service
@@ -31,9 +29,9 @@ class AccountService(
 
         val typeRef = object : TypeReference<AccountResponseDto>() {}
 
-        var res = repository.findById(id)
+        val res = repository.findById(id)
         if (res.isPresent) {
-            var accountEntity = res.get()
+            val accountEntity = res.get()
 
             accountEntity.transactions = transactionsRepository.findByAccountId(accountEntity.id)
             return objectMapper.convertValue(accountEntity, typeRef)
@@ -53,7 +51,7 @@ class AccountService(
     fun getDebtors(query: String, type: String?, pageRequest: PageRequest): Page<AccountResponseDto> {
 
 
-        var accountsPage = when (type) {
+        val accountsPage = when (type) {
             "outstanding" -> {
                 repository.getOutstandingDebtors(query, pageRequest)
             }
@@ -90,9 +88,6 @@ class AccountService(
         val response = DashboardResponseDto()
         val transactionSumsDto = repository.getDashboardStatistics(startDate, endDate)
         for (record in transactionSumsDto) {
-            if (record.type == null) {
-                continue
-            }
 
             if (arrayOf("SAVINGS", "SAVINGS_CHEQUE").contains(record.type)) {
                 response.savings += record.amount
@@ -127,8 +122,10 @@ class AccountService(
             Period.ofYears(1)
         }
 
-        val dates: List<LocalDate> = startDate.datesUntil(endDate, step)
-            .collect(Collectors.toList())
+//        val dates: List<LocalDate> = startDate.datesUntil(endDate, step)
+//            .collect(Collectors.toList())
+        val dates: List<LocalDate> = generateSequence(startDate) { it.plus(step) }.takeWhile(endDate::equals).toList()
+
 
         response.chart =
             mapOf(
@@ -186,9 +183,6 @@ class AccountService(
 
         val transactionSumsDto = repository.getDashboardStatistics(dayInFocus, endOfDay)
         for (record in transactionSumsDto) {
-            if (record.type == null) {
-                continue
-            }
 
             if (record.type == TransactionType.SAVINGS.name) {
                 response.totalSavings += record.amount
@@ -257,7 +251,7 @@ class AccountService(
     fun create(model: AccountRequestDto): AccountResponseDto? {
         val accountTypeRef = object : TypeReference<Account>() {}
         var account = objectMapper.convertValue(model, accountTypeRef)
-        var loanAccountsCount = repository.countByMemberIdAndType(
+        val loanAccountsCount = repository.countByMemberIdAndType(
             model.memberId,
             arrayOf(AccountType.LOAN.name)
         )
@@ -276,7 +270,7 @@ class AccountService(
 
     fun countOutstandingLoansByGender(startDate: LocalDate, endDate: LocalDate, gender: String, type: String): Int {
 
-        var count = when (type) {
+        val count = when (type) {
             "outstanding" -> {
                 repository.countOutstandingLoansByGender(startDate, endDate, gender)
             }
@@ -292,7 +286,7 @@ class AccountService(
     fun sumOutstandingLoansByGender(startDate: LocalDate, endDate: LocalDate, gender: String, type: String?): Float {
 
 
-        var sum = when (type) {
+        val sum = when (type) {
             "outstanding" -> {
                 repository.sumOutstandingLoansByGender(startDate, endDate, gender)
             }
