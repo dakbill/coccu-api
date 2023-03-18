@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.Period
+import java.time.format.DateTimeFormatter
 
 
 @RequestMapping("/api/v1/reports")
@@ -24,6 +27,33 @@ class ReportsController(var accountService: AccountService, var usersService: Us
     @GetMapping("/closing-books")
     fun getClosingBooks(@DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam dayInFocus: LocalDate): ApiResponse<ClosingBooksResponseDto> {
         return ApiResponse(accountService.getClosingBooksMetrics(dayInFocus), HttpStatus.OK)
+    }
+
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/monies-to-bank")
+    fun getMoniesToBank(
+        @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam startDate: LocalDate,
+        @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam endDate: LocalDate
+    ): ApiResponse<List<Map<String,Any>>> {
+
+        val startOfWeekStartDate = startDate.with(DayOfWeek.SUNDAY)
+        val startOfWeekEndDate = endDate.with(DayOfWeek.SUNDAY)
+
+        val closingBooksResponseDto: List<Map<String,Any>> =
+            generateSequence(startOfWeekStartDate) { it.plus(Period.ofWeeks(1)) }
+                .takeWhile { it.isBefore(startOfWeekEndDate) }
+                .map {
+                    mapOf(
+                        "closingBooks" to accountService.getClosingBooksMetrics(it),
+                        "date" to it.format(
+                             DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                        )
+                    )
+                }
+                .toList()
+
+        return ApiResponse(closingBooksResponseDto, HttpStatus.OK)
     }
 
 
