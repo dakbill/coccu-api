@@ -225,9 +225,9 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
 
     @Query(
         value = "SELECT " +
-                "   COUNT(account.id) FROM account LEFT JOIN member ON(member.id=member_id) " +
+                "   COUNT(account.id) FROM account RIGHT JOIN member ON(member.id=member_id AND member.gender = ?3) " +
                 "WHERE " +
-                "   account.type='LOAN' AND account.balance > 0 AND account.created_date BETWEEN ?1 AND ?2 AND member.gender = ?3",
+                "    account.type='LOAN' AND account.balance > 0 AND account.created_date BETWEEN ?1 AND ?2",
         nativeQuery = true
     )
     fun countOutstandingLoansByGender(startDate: LocalDate, endDate: LocalDate, gender: String): Int
@@ -235,9 +235,9 @@ interface MemberAccountRepository : CrudRepository<Account, String> {
 
     @Query(
         value = "SELECT " +
-                "   COALESCE(SUM(account.balance),0) FROM account LEFT JOIN member ON(member.id=member_id) " +
+                "   COALESCE(SUM(account.balance),0) FROM account RIGHT JOIN member ON(member.id=member_id AND member.gender = ?3) " +
                 "WHERE " +
-                "   account.type='LOAN' AND account.balance > 0 AND account.created_date BETWEEN ?1 AND ?2 AND member.gender = ?3",
+                "    account.type='LOAN' AND account.balance > 0 AND account.created_date BETWEEN ?1 AND ?2",
         nativeQuery = true
     )
     fun sumOutstandingLoansByGender(startDate: LocalDate, endDate: LocalDate, gender: String): Float
