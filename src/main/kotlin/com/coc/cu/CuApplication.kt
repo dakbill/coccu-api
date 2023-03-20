@@ -354,10 +354,12 @@ class CuApplication {
         em.transaction.begin();
         em.createNativeQuery("UPDATE \"transaction\" SET account_id='LOAN-200-1' WHERE account_id='LOAN-200-2' AND amount=100 AND CAST(created_date AS DATE)='2015-08-15' AND type='LOAN_REPAYMENT'").executeUpdate()
         em.createNativeQuery("UPDATE \"transaction\" SET account_id='LOAN-406-1' WHERE account_id='LOAN-406-2' AND amount=300 AND CAST(created_date AS DATE)='2015-02-08' AND type='LOAN'").executeUpdate()
+        em.createNativeQuery("UPDATE \"transaction\" SET account_id='LOAN-546-1' WHERE account_id='LOAN-546-2' AND amount=1000 AND CAST(created_date AS DATE)='2022-11-20' AND type='LOAN_REPAYMENT'").executeUpdate()
         em.createNativeQuery("DELETE FROM \"account\" WHERE id='LOAN-406-2'").executeUpdate()
 
         em.createNativeQuery("UPDATE \"account\" SET balance=(SELECT ( (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id = 'LOAN-200-2' AND TYPE IN ('OPENING_LOAN_BALANCE','LOAN','LOAN_CHEQUE'))  - (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id = 'LOAN-200-2' AND TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE')) ) ) WHERE id='LOAN-200-2'").executeUpdate()
         em.createNativeQuery("UPDATE \"account\" SET balance=(SELECT ( (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id = 'LOAN-406-1' AND TYPE IN ('OPENING_LOAN_BALANCE','LOAN','LOAN_CHEQUE'))  - (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id = 'LOAN-406-1' AND TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE')) ) ) WHERE id='LOAN-406-1'").executeUpdate()
+        em.createNativeQuery("UPDATE \"account\" SET balance=(SELECT ( (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id = 'LOAN-546-1' AND TYPE IN ('OPENING_LOAN_BALANCE','LOAN','LOAN_CHEQUE'))  - (SELECT COALESCE(SUM(CAST(COALESCE(AMOUNT,0) AS DECIMAL )),0) FROM TRANSACTION WHERE account_id = 'LOAN-546-1' AND TYPE IN ('LOAN_REPAYMENT','LOAN_REPAYMENT_CHEQUE')) ) ) WHERE id='LOAN-546-1'").executeUpdate()
 
         em.transaction.commit();
 
