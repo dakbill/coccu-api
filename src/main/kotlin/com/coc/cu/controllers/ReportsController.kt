@@ -42,7 +42,7 @@ class ReportsController(var accountService: AccountService, var usersService: Us
 
         val closingBooksResponseDto: List<Map<String,Any>> =
             generateSequence(startOfWeekStartDate) { it.plus(Period.ofWeeks(1)) }
-                .takeWhile { it.isEqual(startOfWeekEndDate) }
+                .takeWhile { it.isBefore(startOfWeekEndDate) || it.isEqual(startOfWeekEndDate) }
                 .map {
                     mapOf(
                         "closingBooks" to accountService.getClosingBooksMetrics(it),
