@@ -38,11 +38,10 @@ class ReportsController(var accountService: AccountService, var usersService: Us
     ): ApiResponse<List<Map<String,Any>>> {
 
         val startOfWeekStartDate = startDate.with(DayOfWeek.SUNDAY)
-        val startOfWeekEndDate = endDate.with(DayOfWeek.SUNDAY)
 
         val closingBooksResponseDto: List<Map<String,Any>> =
-            generateSequence(startOfWeekStartDate) { it.plus(Period.ofWeeks(1)) }
-                .takeWhile { it.isBefore(startOfWeekEndDate) || it.isEqual(startOfWeekEndDate) }
+            generateSequence(startOfWeekStartDate) { it.with(DayOfWeek.SUNDAY).plus(Period.ofWeeks(1)) }
+                .takeWhile { it.isBefore(endDate) || it.isEqual(endDate) }
                 .map {
                     mapOf(
                         "closingBooks" to accountService.getClosingBooksMetrics(it),
