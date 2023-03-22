@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.Period
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 
 @Service
@@ -122,14 +123,14 @@ class AccountService(
             Period.ofYears(1)
         }
 
-//        val dates: List<LocalDate> = startDate.datesUntil(endDate, step)
-//            .collect(Collectors.toList())
-        val dates: List<LocalDate> = generateSequence(startDate) { it.plus(step) }.takeWhile(endDate::equals).toList()
+
+        val dates: List<LocalDate> =
+            generateSequence(startDate) { it.plus(step) }.takeWhile { it.isBefore(endDate) }.toList()
 
 
         response.chart =
             mapOf(
-                "x" to dates.map { String.format("%s-%s-%s", it.year, it.monthValue, it.dayOfMonth) },
+                "x" to dates.map { it.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) },
                 "series" to mapOf(
                     TransactionType.SAVINGS.name to dates.map {
                         repository.sumAmounts(
@@ -171,6 +172,7 @@ class AccountService(
                             ), it, it.plus(step)
                         )
                     },
+                    "MONIES_TO_BANK" to dates.map { this.getClosingBooksMetrics(it) },
                 )
             )
 
