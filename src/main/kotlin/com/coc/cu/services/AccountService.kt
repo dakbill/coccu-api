@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.Period
 import java.time.ZoneId
@@ -172,7 +173,7 @@ class AccountService(
                             ), it, it.plus(step)
                         )
                     },
-                    "MONIES_TO_BANK" to dates.map { this.getClosingBooksMetrics(it).moneyToBank },
+                    "MONIES_TO_BANK" to dates.map { this.getTotalMoniesToBank(it, it.plus(step)) },
                 )
             )
 
@@ -247,6 +248,18 @@ class AccountService(
         response.cashBalance = response.totalIn - response.totalOut
         response.moneyToBank = response.cashBalance + response.totalInCheque
         return response
+    }
+
+    fun getTotalMoniesToBank(startDate: LocalDate, endDate: LocalDate): Double {
+        val startOfWeekStartDate = startDate.with(DayOfWeek.SUNDAY)
+
+
+        return generateSequence(startOfWeekStartDate) { it.with(DayOfWeek.SUNDAY).plus(Period.ofWeeks(1)) }
+            .takeWhile { it.isBefore(endDate) || it.isEqual(endDate) }
+            .map {
+                this.getClosingBooksMetrics(it).moneyToBank
+            }
+            .sum()
     }
 
 
