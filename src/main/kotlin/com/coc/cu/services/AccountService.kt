@@ -172,7 +172,7 @@ class AccountService(
                             ), it, it.plus(step)
                         )
                     },
-                    "MONIES_TO_BANK" to dates.map { this.getClosingBooksMetrics(it) },
+                    "MONIES_TO_BANK" to dates.map { this.getClosingBooksMetrics(it).moneyToBank },
                 )
             )
 
