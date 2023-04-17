@@ -37,11 +37,11 @@ class ReportsController(var accountService: AccountService, var usersService: Us
         @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam endDate: LocalDate
     ): ApiResponse<List<Map<String,Any>>> {
 
-        val startOfWeekStartDate = startDate.with(DayOfWeek.SUNDAY)
+
 
         val closingBooksResponseDto: List<Map<String,Any>> =
-            generateSequence(startOfWeekStartDate) { it.with(DayOfWeek.SUNDAY).plus(Period.ofWeeks(1)) }
-                .takeWhile { it.isBefore(endDate) || it.isEqual(endDate) }
+            generateSequence(endDate.with(DayOfWeek.SUNDAY)) { it.with(DayOfWeek.SUNDAY).minus(Period.ofWeeks(1)) }
+                .takeWhile { it.isAfter(startDate) || it.isEqual(startDate) }
                 .map {
                     mapOf(
                         "closingBooks" to accountService.getClosingBooksMetrics(it),
