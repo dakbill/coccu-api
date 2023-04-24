@@ -147,7 +147,7 @@ interface MembersRepository : CrudRepository<Member, Long> {
                 "\t\tSUM(\n" +
                 "\t\t\t(CASE \n" +
                 "\t\t\t\t\tWHEN \"transaction\".\"type\" in ('WITHDRAWAL','WITHDRAWAL_CHEQUE') THEN -1 \n" +
-                "\t\t\t\t\tWHEN \"transaction\".\"type\" in ('SAVINGS','SAVINGS_CHEQUE') THEN 1 \n" +
+                "\t\t\t\t\tWHEN \"transaction\".\"type\" in ('OPENING_BALANCE','SAVINGS','SAVINGS_CHEQUE') THEN 1 \n" +
                 "\t\t\t\t\tELSE 0 \n" +
                 "\t\t\tEND) * amount\n" +
                 "\t\t) AS total_balance \n" +
