@@ -214,7 +214,8 @@ class CuApplication {
                         String.format("%s 00:00", record[5]),
                         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
                     ),
-                    type = t.first()
+                    type = t.first(),
+                    comment = record[9],
                 )
 
 
