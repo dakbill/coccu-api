@@ -46,6 +46,7 @@ class ExchangeTokenRequestDto{
 }
 
 class UserRequestDto {
+    var memberId: Long? = null
     var image: String? = null
     var imageFile: MultipartFile? = null
     var name: String? = null

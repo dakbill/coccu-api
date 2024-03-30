@@ -2,7 +2,9 @@ package com.coc.cu.controllers
 
 import com.coc.cu.domain.AccountRequestDto
 import com.coc.cu.domain.AccountResponseDto
+import com.coc.cu.domain.AccountType
 import com.coc.cu.domain.models.ApiResponse
+import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.services.AccountService
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -14,7 +16,7 @@ import org.springframework.web.bind.annotation.*
 
 @RequestMapping("/api/v1/accounts")
 @RestController
-class AccountsController(var accountService: AccountService) {
+class AccountsController(var accountService: AccountService, var memberAccountRepository: MemberAccountRepository) {
 
 
     @PreAuthorize("isAuthenticated()")
@@ -33,6 +35,16 @@ class AccountsController(var accountService: AccountService) {
     @GetMapping("/{id}")
     fun detail(@PathVariable id: String): ApiResponse<AccountResponseDto> {
         return ApiResponse(accountService.single(id), "Success", HttpStatus.OK)
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/get-loan-account-count")
+    fun getLoanAccountCount(@RequestParam(name = "memberId") memberId: Long): ApiResponse<Long> {
+        var count = memberAccountRepository.countByMemberIdAndType(
+            memberId,
+            arrayOf(AccountType.LOAN.name)
+        )
+        return ApiResponse(count , "Success", HttpStatus.OK)
     }
 
 
