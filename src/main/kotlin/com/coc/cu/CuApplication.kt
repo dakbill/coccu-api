@@ -364,7 +364,8 @@ class CuApplication {
 
         em.transaction.commit();
 
-
+        membersRepository.updateTotalBalance(0)
+        membersRepository.resetMemberIdSequence()
     }
 
 }
