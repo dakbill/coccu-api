@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
+import java.util.Optional
 
 
 @RequestMapping("/api/v1/transactions")
@@ -30,8 +31,8 @@ class TransactionsController(val transactionsService: TransactionsService) {
     fun list(
         @RequestParam(name = "q", required = false) query: String?,
         @RequestParam(name = "transactionTypes", required = false) transactionTypes: Array<String>?,
-        @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(required = false) startDate: LocalDate,
-        @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(required = false) endDate: LocalDate,
+        @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(required = false) startDate: LocalDate?,
+        @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(required = false) endDate: LocalDate?,
         @RequestParam(name = "exportToExcel", defaultValue = "false") exportToExcel: Boolean,
         @RequestParam(name = "page", defaultValue = "0") page: Int,
         @RequestParam(name = "size", defaultValue = "10") size: Int,
@@ -69,8 +70,8 @@ class TransactionsController(val transactionsService: TransactionsService) {
                 memberId,
                 accountId,
                 transactionTypes,
-                startDate,
-                endDate,
+                startDate ?: LocalDate.now().withMonth(1).withDayOfMonth(1),
+                endDate ?: LocalDate.now(),
                 PageRequest.of(if (exportToExcel) 0 else page, if (exportToExcel) Int.MAX_VALUE else size, sort)
             )
 
@@ -81,6 +82,12 @@ class TransactionsController(val transactionsService: TransactionsService) {
     @GetMapping("/{id}")
     fun detail(@PathVariable id: Long): ApiResponse<TransactionResponseDto> {
         return ApiResponse(transactionsService.single(id), "Success", HttpStatus.OK)
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/{id}")
+    fun deleteTransaction(@PathVariable id: Long): ApiResponse<Boolean> {
+        return ApiResponse(transactionsService.purge(id), "Success", HttpStatus.OK)
     }
 
 

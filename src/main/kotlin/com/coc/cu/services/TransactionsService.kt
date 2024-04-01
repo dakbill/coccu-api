@@ -149,4 +149,16 @@ class TransactionsService(
     fun getTotalWithdrawals(memberId: Long): Double {
         return repository.getTotalWithdrawals(memberId)
     }
+
+    fun purge(id: Long): Boolean? {
+        var deleted = false
+        try {
+            repository.deleteById(id)
+            deleted = true
+        } catch (e: Exception) {
+            //ignored
+        }
+
+        return deleted
+    }
 }

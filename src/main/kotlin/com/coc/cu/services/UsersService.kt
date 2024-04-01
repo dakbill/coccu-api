@@ -82,7 +82,7 @@ class UsersService(
     fun create(model: UserRequestDto): MemberResponseDto? {
         val memberTypeRef = object : TypeReference<Member>() {}
         var member = objectMapper.convertValue(model, memberTypeRef)
-        if(model.memberId!! > 0){
+        if(model.memberId != null){
             member.id = model.memberId
         }
         member = repository.save(member)
