@@ -27,7 +27,7 @@ data class Account(
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Guarantor(
-    @Id @GeneratedValue(strategy = GenerationType.AUTO) var id: Long? = null,
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long? = null,
     @ManyToOne var member: Member?,
     var amount: Float? = null,
     var fundReleased: Boolean = false,
@@ -57,7 +57,7 @@ class Member(
     var createdDate: LocalDateTime? = null,
     var updatedDate: LocalDateTime? = null,
     @OneToMany var accounts: List<Account>? = arrayListOf(),
-    @Id @GeneratedValue(strategy = GenerationType.AUTO) var id: Long? = -1
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long? = -1
 )
 
 
@@ -78,6 +78,6 @@ data class Transaction(
 
     @ManyToOne var createdBy: Member? = null,
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO) var id: Long? = -1
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long? = -1
 )
 

@@ -209,4 +209,8 @@ class UsersService(
         )
     }
 
+    fun resetMemberIdSequence(): Long? {
+        return repository.resetMemberIdSequence()
+    }
+
 }

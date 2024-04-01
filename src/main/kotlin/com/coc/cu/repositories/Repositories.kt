@@ -152,8 +152,8 @@ interface MembersRepository : CrudRepository<Member, Long> {
                 "\t\t\tEND) * amount\n" +
                 "\t\t) AS total_balance \n" +
                 "\tFROM \"transaction\" \n" +
-                "\tWHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1)\n" +
-                ") WHERE id=?1 RETURNING TRUE\n" ,
+                "\tWHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=member.id)\n" +
+                ") WHERE (id=?1 OR 0=?1) RETURNING TRUE\n" ,
         nativeQuery = true
     )
     fun updateTotalBalance(id: Long?): Boolean
@@ -169,6 +169,12 @@ interface MembersRepository : CrudRepository<Member, Long> {
         nativeQuery = true
     )
     fun sumBalanceByGender(startDate: LocalDate, endDate: LocalDate, gender: String, transactionTypes: Array<String>): Long
+
+    @Query(
+        value = "SELECT setval('member_id_seq',(SELECT max(id) FROM member))",
+        nativeQuery = true
+    )
+    fun resetMemberIdSequence(): Long?
 }
 
 

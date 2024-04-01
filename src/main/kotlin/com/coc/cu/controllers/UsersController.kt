@@ -169,4 +169,10 @@ class UsersController(
     }
 
 
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/reset-member-id-sequence")
+    fun resetMemberIdSequence(): ApiResponse<Long> {
+        return ApiResponse(usersService.resetMemberIdSequence(), "Success", HttpStatus.OK)
+    }
+
 }
