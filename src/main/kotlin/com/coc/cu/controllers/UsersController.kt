@@ -175,4 +175,10 @@ class UsersController(
         return ApiResponse(usersService.resetMemberIdSequence(), "Success", HttpStatus.OK)
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/reset-member-balances")
+    fun resetMemberBalances(@RequestParam(name = "memberId", defaultValue = "0") memberId: Long): ApiResponse<Boolean> {
+        return ApiResponse(usersService.updateTotalBalance(memberId), "Success", HttpStatus.OK)
+    }
+
 }

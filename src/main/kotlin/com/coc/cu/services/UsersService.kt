@@ -213,4 +213,10 @@ class UsersService(
         return repository.resetMemberIdSequence()
     }
 
+    fun updateTotalBalance(memberId: Long): Boolean {
+        return repository.updateTotalBalance(memberId)
+    }
+
+
+
 }
