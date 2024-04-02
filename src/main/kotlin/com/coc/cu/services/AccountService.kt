@@ -236,7 +236,7 @@ class AccountService(
                 response.totalInCheque += record.amount
             } else if (record.type == TransactionType.INTEREST_ON_LOAN_CHEQUE.name) {
                 response.totalInterestRepaymentsCheque += record.amount
-                response.totalOutCheque += record.amount
+                response.totalInCheque += record.amount
             } else if (arrayOf(
                     TransactionType.INTEREST_ON_LOAN.name,
                 ).contains(
