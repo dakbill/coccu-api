@@ -226,10 +226,6 @@ class CuApplication {
                         .toFloat()
                 }
 
-                if (record[9].isNotEmpty()) {
-                    transaction.comment = record[9]
-                }
-
                 if (Strings.isNotEmpty(record[1])) {
                     val memberId = record[1].toLong()
                     var accountNumber = memberId.toString()

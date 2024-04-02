@@ -5380,10 +5380,10 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,,,,Notes
 ,549,David Kwaku Sablah,SAVINGS,GHS200.00,2024-03-31,,,,
 ,191,Grace Bright Mensah,SAVINGS,GHS40.00,2024-03-31,,,,
 ,131,Clement Baah,LOAN REPAYMENT,"GHS1,500.00",2024-03-31,,,,
-,223,Admin Expenses,STATIONERY,"GHS4,000.00",2024-03-31,,,,
+,223,Admin Expenses,STATIONERY,"GHS4,000.00",2024-03-31,,,,"Food, etc for dividend Sharing"
 ,025,Joyce Amoh,WITHDRAWAL,"GHS1,500.00",2024-03-31,,,,
 ,085,Mercy Nyanney,LOAN REPAYMENT CHEQUE,"GHS1,250.00",2024-03-31,,,,
 ,581,Douglas Nyanney,SAVINGS CHEQUE,GHS500.00,2024-03-31,,,,
-,085,Mercy Nyanney,INTEREST ON LOAN CHEQUE,GHS250.00,2024-03-31,,,,"Food, etc for dividend Sharing"
+,085,Mercy Nyanney,INTEREST ON LOAN CHEQUE,GHS250.00,2024-03-31,,,,
 ,585,Samuel Esin,CARD,GHS30.00,2024-03-31,,,,
 ,585,Samuel Esin,SAVINGS,GHS20.00,2024-03-31,,,,
