@@ -161,8 +161,13 @@ class TransactionsService(
     fun purge(id: Long): Boolean? {
         var deleted = false
         try {
+            val memberId = single(id)?.account?.member?.id
             repository.deleteById(id)
             deleted = true
+
+            if (memberId!=null){
+                membersRepository.updateTotalBalance(memberId)
+            }
         } catch (e: Exception) {
             //ignored
         }
