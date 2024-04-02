@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.*
 import java.util.stream.Collectors
 import kotlin.collections.ArrayList
@@ -80,7 +81,14 @@ class TransactionsService(
         val transactionTypeRef = object : TypeReference<Transaction>() {}
         var transaction = objectMapper.convertValue(model, transactionTypeRef)
 
-        transaction.createdDate = LocalDateTime.now()
+
+        if (model.date != null) {
+            transaction.createdDate = model.date!!.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+        } else {
+            transaction.createdDate = LocalDateTime.now()
+        }
+
+
         transaction.account = memberAccountRepository.findById(model.accountId!!).get()
 
         transaction = repository.save(transaction)
