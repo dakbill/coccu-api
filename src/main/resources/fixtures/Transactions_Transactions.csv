@@ -5384,6 +5384,6 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,,,,Notes
 ,025,Joyce Amoh,WITHDRAWAL,"GHS1,500.00",2024-03-31,,,,
 ,085,Mercy Nyanney,LOAN REPAYMENT CHEQUE,"GHS1,250.00",2024-03-31,,,,
 ,581,Douglas Nyanney,SAVINGS CHEQUE,GHS500.00,2024-03-31,,,,
-,085,Mercy Nyanney,INTEREST ON LOAN,GHS250.00,2024-03-31,,,,
+,085,Mercy Nyanney,INTEREST ON LOAN CHEQUE,GHS250.00,2024-03-31,,,,"Food, etc for dividend Sharing"
 ,585,Samuel Esin,CARD,GHS30.00,2024-03-31,,,,
 ,585,Samuel Esin,SAVINGS,GHS20.00,2024-03-31,,,,

@@ -177,6 +177,7 @@ class ClosingBooksResponseDto {
     var totalLoans: Double = 0.0
     var totalLoanRepaymentsCheque: Double = 0.0
     var totalLoanRepayments: Double = 0.0
+    var totalInterestRepaymentsCheque: Double = 0.0
     var totalInterestRepayments: Double = 0.0
     var totalInCheque: Double = 0.0
     var totalOutCheque: Double = 0.0
