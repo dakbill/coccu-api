@@ -118,6 +118,17 @@ class MemberResponseDto {
     var updatedDate: LocalDateTime? = null
 }
 
+
+interface MemberSummariesResponseDto {
+    fun getId(): Long?
+    fun getName(): String?
+    fun getPhone(): String? = null
+
+    fun getSavings(): Double? = 0.0
+
+    fun getWithdrawals(): Double? = 0.0
+}
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 class MemberMinimalResponseDto {
     var id: Long? = null

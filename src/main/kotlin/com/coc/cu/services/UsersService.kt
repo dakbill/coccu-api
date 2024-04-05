@@ -79,6 +79,25 @@ class UsersService(
         return PageImpl(users, pageRequest, members.totalElements)
     }
 
+    fun listSummaries(
+        query: String,
+        startDate: LocalDate?,
+        endDate: LocalDate?,
+        pageRequest: PageRequest
+    ): Page<MemberSummariesResponseDto> {
+        val accountsTypeRef = object : TypeReference<List<AccountResponseDto>>() {}
+
+        val members = repository.findSummariesByQuery(
+            query.lowercase(),
+            startDate ?: LocalDate.now(),
+            endDate ?: LocalDate.now(),
+            pageRequest
+        )
+
+
+        return PageImpl(members.content, pageRequest, members.totalElements)
+    }
+
     fun create(model: UserRequestDto): MemberResponseDto? {
         val memberTypeRef = object : TypeReference<Member>() {}
         var member = objectMapper.convertValue(model, memberTypeRef)

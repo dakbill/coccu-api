@@ -1,8 +1,7 @@
 package com.coc.cu.repositories
 
-import com.coc.cu.domain.GuarantorAccountResponseDto
+import com.coc.cu.domain.MemberSummariesResponseDto
 import com.coc.cu.domain.TransactionSumsDto
-import com.coc.cu.domain.TransactionType
 import com.coc.cu.entities.Account
 import com.coc.cu.entities.Guarantor
 import com.coc.cu.entities.Member
@@ -14,7 +13,6 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
-import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 @Repository
 interface AccountTransactionsRepository: JpaRepository<Transaction, Long> {
@@ -134,6 +132,45 @@ interface MembersRepository : CrudRepository<Member, Long> {
         nativeQuery = true
     )
     fun findByQuery(query: String?, pageRequest: Pageable): Page<Member>
+
+
+    @Query(
+        value = "" +
+                "SELECT " +
+                "DISTINCT member.* ," +
+                "(SUM( CASE WHEN transaction.type IN ('SAVINGS','SAVINGS_CHEQUE','OPENING_BALANCE') THEN transaction.amount ELSE 0 END)) AS savings," +
+                "(SUM( CASE WHEN transaction.type IN ('WITHDRAWAL','WITHDRAWAL_CHEQUE') THEN transaction.amount ELSE 0 END)) AS withdrawals " +
+                "FROM " +
+                "member LEFT JOIN account ON(account.member_id=member.id) " +
+                "LEFT JOIN transaction ON(transaction.account_id=account.id AND transaction.created_date BETWEEN CAST(?2 AS DATE) AND CAST(?3 AS DATE) ) " +
+                "WHERE " +
+                "( LENGTH(MEMBER.name) > 0 ) AND"+
+                "( " +
+                "   (( LOWER(?1) <> UPPER(?1) ) AND CAST(account.member_id AS CHAR) LIKE '%' || ?1 || '%') OR " +
+                "   (CAST(MEMBER.id AS CHAR) LIKE '%' || ?1 || '%' ) OR " +
+                "   (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' ) " +
+                ") GROUP BY member.id",
+
+        countQuery = "" +
+                "SELECT " +
+                "COUNT(DISTINCT member.id) " +
+                "FROM " +
+                "member LEFT JOIN account ON(account.member_id=member.id) " +
+                "WHERE " +
+                "( LENGTH(MEMBER.name) > 0 ) AND"+
+                "( " +
+                "   (( LOWER(?1) <> UPPER(?1) ) AND CAST(account.member_id AS CHAR) LIKE '%' || ?1 || '%') OR " +
+                "   (CAST(MEMBER.id AS CHAR) LIKE '%' || ?1 || '%' ) OR " +
+                "   (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' ) " +
+                ")",
+        nativeQuery = true
+    )
+    fun findSummariesByQuery(
+        query: String?,
+        startDate: LocalDate?,
+        endDate: LocalDate?,
+        pageRequest: Pageable
+    ): Page<MemberSummariesResponseDto>
 
     @Query(
         value = "UPDATE member SET transaction_count=(SELECT COUNT(id) FROM TRANSACTION WHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1)) WHERE id=?1 RETURNING TRUE",

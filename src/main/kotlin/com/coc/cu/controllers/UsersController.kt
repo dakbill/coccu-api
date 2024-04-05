@@ -15,11 +15,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.JpaSort
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.RestTemplate
 import java.math.BigInteger
+import java.time.LocalDate
 
 
 @RequestMapping("/api/v1/users")
@@ -107,6 +109,49 @@ class UsersController(
                 }
             }
         }
+
+        return ApiResponse(membersPage.content, "OK", HttpStatus.OK, page, size, membersPage.totalElements)
+    }
+
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/summaries")
+    fun summaries(
+        @RequestParam(name = "exportToExcel", defaultValue = "false") exportToExcel: Boolean,
+        @RequestParam(name = "page", defaultValue = "0") page: Int,
+        @RequestParam(name = "size", defaultValue = "10") size: Int,
+        @RequestParam(name = "q", defaultValue = "") query: String,
+        @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(required = false) startDate: LocalDate?,
+        @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(required = false) endDate: LocalDate?,
+        @RequestParam(name = "properties", required = false) properties: Array<String>?,
+        @RequestParam(name = "direction", required = false) direction: Array<String>?,
+
+        ): ApiResponse<List<MemberSummariesResponseDto>> {
+
+        var sort: Sort = JpaSort.unsafe(Sort.Direction.ASC, "(name)")
+        if (properties != null && properties.isNotEmpty()) {
+
+            sort = JpaSort.unsafe(Sort.Direction.valueOf(direction!![0].uppercase()), properties[0])
+            properties.forEachIndexed { index, property ->
+                run {
+                    if (index > 0) {
+                        sort.and(JpaSort.unsafe(Sort.Direction.valueOf(direction[index].uppercase()), property))
+                    }
+                }
+            }
+        }
+
+        val membersPage = usersService.listSummaries(
+            query,
+            startDate,
+            endDate,
+            PageRequest.of(
+                if (exportToExcel) 0 else page,
+                if (exportToExcel) Int.MAX_VALUE else size,
+                sort
+            )
+        )
+
 
         return ApiResponse(membersPage.content, "OK", HttpStatus.OK, page, size, membersPage.totalElements)
     }
