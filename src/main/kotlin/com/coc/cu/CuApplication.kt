@@ -204,7 +204,7 @@ class CuApplication {
 
             try {
 
-                var t = TransactionType.values().filter { t -> t.name == record[3].trim().replace(" ", "_") }
+                var t = TransactionType.values().filter { t -> t.name == record[3].trim().replace(" ", "_").replace("PERSONEL","PERSONNEL") }
                 if (t.isEmpty()) {
                     continue
                 }
