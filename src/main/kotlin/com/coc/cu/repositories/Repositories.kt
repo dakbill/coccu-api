@@ -140,8 +140,8 @@ interface MembersRepository : CrudRepository<Member, Long> {
                 "DISTINCT member.* ," +
                 "(SUM( CASE WHEN transaction.type IN ('SAVINGS','SAVINGS_CHEQUE','OPENING_BALANCE') THEN transaction.amount ELSE 0 END)) AS savings," +
                 "(SUM( CASE WHEN transaction.type IN ('WITHDRAWAL','WITHDRAWAL_CHEQUE') THEN transaction.amount ELSE 0 END)) AS withdrawals " +
-                "FROM " +
-                "member LEFT JOIN account ON(account.member_id=member.id) " +
+                "FROM member " +
+                "LEFT JOIN account ON(account.member_id=member.id) " +
                 "LEFT JOIN transaction ON(transaction.account_id=account.id AND transaction.created_date BETWEEN CAST(?2 AS DATE) AND CAST(?3 AS DATE) ) " +
                 "WHERE " +
                 "( LENGTH(MEMBER.name) > 0 ) AND"+
