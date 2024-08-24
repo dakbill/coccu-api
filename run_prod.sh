@@ -3,4 +3,4 @@
 #export $(cat .env | xargs)
 #./mvnw spring-boot:run -Dmaven.test.skip=true -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=dev" &
 
-./mvnw clean package && docker-compose -f ~/docker-compose.yml up -d coccu-api
+./mvnw clean package && docker-compose -f ~/docker-compose.yml up -d --force-recreate coccu-api
