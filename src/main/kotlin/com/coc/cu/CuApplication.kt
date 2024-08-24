@@ -69,6 +69,11 @@ class CuApplication {
         guarantorRepository: GuarantorRepository,
         emf: EntityManagerFactory
     ) = CommandLineRunner {
+        val em: EntityManager = emf.createEntityManager()
+        em.transaction.begin();
+        em.createNativeQuery("truncate transaction cascade").executeUpdate()
+        em.transaction.commit();
+
         registerMembers(membersRepository, memberAccountRepository)
         recordTransactions(
             accountTransactionsRepository,
