@@ -72,6 +72,8 @@ class CuApplication {
         val em: EntityManager = emf.createEntityManager()
         em.transaction.begin();
         em.createNativeQuery("truncate transaction cascade").executeUpdate()
+        em.createNativeQuery("truncate account cascade").executeUpdate()
+        em.createNativeQuery("truncate member cascade").executeUpdate()
         em.transaction.commit();
 
         registerMembers(membersRepository, memberAccountRepository)
