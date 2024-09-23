@@ -5723,6 +5723,9 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,,,,Notes
 ,594,Kwadwo Oware,SAVINGS,GHS450.00,2024-09-22,,,,
 ,575,Forgive Amelefo,SAVINGS,GHS50.00,2024-09-22,,,,
 ,019,Martin Asare,SAVINGS,"GHS2,600.00",2024-09-22,,,,
-,223,Admin Expenses,SAVINGS,GHS90.00,2024-09-22,,,,
+,223,Admin Expenses,OPENING BALANCE,GHS90.00,2024-09-22,,,,Overage from previous week (2024-09-15)
 ,485,Kojo Dadzie,WITHDRAWAL,GHS400.00,2024-09-22,,,,Transfer to Emmanuel Larkai
-,004,Emmanuel Larkai,SAVINGS,GHS400.00,2024-09-22,,,,Transfer from Kojo Dadzie
+,004,Emmanuel Larkai,LOAN REPAYMENT,GHS400.00,2024-09-22,,,,Transfer from Kojo Dadzie
+,004,Emmanuel Larkai,LOAN REPAYMENT,GHS200.00,2024-09-22,,,,
+,485,Kojo Dadzie,SAVINGS,"GHS1,200.00",2024-09-22,,,,
+,223,Admin Expenses,STATIONERY,GHS350.00,2024-09-22,,,,Food for meeting
