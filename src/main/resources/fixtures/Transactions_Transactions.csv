@@ -5850,7 +5850,7 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,,,,Notes
 ,485,Kojo Dadzie,WITHDRAWAL,GHS600.00,2024-11-10,,,,
 ,454,Vera Kwemley Neequaye,SAVINGS,GHS200.00,2024-11-10,,,,
 ,584,Charity Akyem,WITHDRAWAL,GHS120.00,2024-11-10,,,,
-,222,Opening Balance,OPENING BALANCE,GHS250.00,2024-11-10,,,,
+,222,Opening Balance,OPENING BALANCE,GHS250.00,2024-11-10,,,,Money From Kofi
 ,223,Admin Expenses,STATIONERY,GHS250.00,2024-11-10,,,,Toner (Deacon Amoh)
 ,469,Ebenezer Nkrumah Abban,WITHDRAWAL,"GHS2,000.00",2024-11-10,,,,
 ,019,Martin Asare,SAVINGS,"GHS1,000.00",2024-11-10,,,,
@@ -5866,3 +5866,19 @@ Timestamp,Account Number,Name,Transaction Type,Amount,Date,,,,Notes
 ,025,Joyce Amoh,WITHDRAWAL,"GHS1,900.00",2024-11-17,,,,
 ,576,Odorkor Zone 1,WITHDRAWAL,GHS600.00,2024-11-17,,,,Confirm number vs Forgive Amelefo
 ,223,Admin Expenses,STATIONERY,GHS250.00,2024-11-17,,,,Money for Toner (Kofi)
+,482,Sandra Botchwey,SAVINGS,GHS500.00,2024-11-24,,,,
+,471,Godwin Mankata,SAVINGS,GHS500.00,2024-11-24,,,,
+,179,Felicia Dadzie,SAVINGS,"GHS1,000.00",2024-11-24,,,,
+,574,Blessing Ahinful Sagoe,SAVINGS,GHS50.00,2024-11-24,,,,
+,421,Mr & Mrs Gyadu,LOAN REPAYMENT,GHS400.00,2024-11-24,,,,
+,169,Solomon Boateng,SAVINGS,"GHS2,000.00",2024-11-24,,,,
+,339,Beatrice Boateng,SAVINGS,GHS200.00,2024-11-24,,,,
+,585,Samuel Esin,SAVINGS,GHS100.00,2024-11-24,,,,
+,570,Grace Nyarko,SAVINGS,GHS100.00,2024-11-24,,,,
+,477,Odorkor Church Of Christ Deacons,WITHDRAWAL,GHS800.00,2024-11-24,,,,
+,398,Isaac Krampah,WITHDRAWAL,GHS100.00,2024-11-24,,,,
+,445,Ebenezer Quayson,SAVINGS,GHS100.00,2024-11-24,,,,
+,223,Admin Expenses,OPENING BALANCE,"GHS2,460.00",2024-11-24,,,,Balance From Last week
+,473,Kwesi Botchwey,LOAN,"GHS6,000.00",2024-11-24,,,,[Guarantors:(472:6000)]
+,032,Ellen Bruce-Ashiley,INTEREST ON LOAN,GHS500.00,2024-11-24,,,,
+,007,Ebenezer Ashley,SAVINGS,GHS100.00,2024-11-24,,,,
