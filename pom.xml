@@ -123,6 +123,28 @@
 			<artifactId>hibernate-commons-annotations</artifactId>
 			<version>6.0.4.Final</version>
 		</dependency>
+		<!-- Google Sheets API dependencies -->
+		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client</artifactId>
+			<version>2.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-sheets</artifactId>
+			<version>v4-rev20220927-2.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.auth</groupId>
+			<artifactId>google-auth-library-oauth2-http</artifactId>
+			<version>1.19.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlinx</groupId>
+			<artifactId>kotlinx-coroutines-core-jvm</artifactId>
+			<version>1.6.4</version>
+		</dependency>
+
 
 
 

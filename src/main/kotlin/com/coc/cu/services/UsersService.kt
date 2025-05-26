@@ -6,9 +6,14 @@ import com.coc.cu.entities.Member
 import com.coc.cu.repositories.AccountTransactionsRepository
 import com.coc.cu.repositories.MemberAccountRepository
 import com.coc.cu.repositories.MembersRepository
+import com.coc.cu.utils.GoogleSheetUtils
 import com.coc.cu.utils.JwtUtils
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.apache.commons.csv.CSVFormat
+import org.apache.commons.csv.CSVParser
+import org.apache.logging.log4j.util.Strings
+import org.springframework.core.io.ClassPathResource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -17,7 +22,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.stream.Collectors
 
 
@@ -236,6 +244,46 @@ class UsersService(
         return repository.updateTotalBalance(memberId)
     }
 
+
+
+    fun registerMembers() {
+        val reader = GoogleSheetUtils()
+
+        val spreadsheetId = "17fuYsDWkBkv4aLaVI3ZwXdNAc2Pam52-jFqcN6N6FjI"
+        val range = "Members!A2:M1000"
+        val credentialsPath = ClassPathResource("credentials.json").file.absolutePath
+
+        val data = reader.readSheet(credentialsPath, spreadsheetId, range)
+
+
+        for (record in data) {
+            if (record.isEmpty() || Strings.isEmpty(record[0].toString()) || record.size < 2) {
+                continue
+            }
+
+
+            val userId = record[0].toString().toLong()
+            var member = repository.findById(userId)
+                .orElse(
+                    Member(
+                        id = userId,
+                        name = record[1].toString(),
+                        createdDate = LocalDateTime.now(),
+                        totalBalance = 0.0,
+                        availableBalance = 0.0,
+                        gender = record[3].toString(),
+                        phone = record[2].toString()
+                    )
+                )
+            member = repository.save(member)
+
+            val accountNumber = member.id.toString()
+            val account = memberAccountRepository.findById(accountNumber)
+                .orElse(Account(member, AccountType.SAVINGS, accountNumber, createdDate = LocalDateTime.now()))
+            memberAccountRepository.save(account)
+        }
+
+    }
 
 
 }

@@ -17,8 +17,11 @@ class TransactionListener(@Lazy val membersRepository: MembersRepository) {
     @PostPersist
     fun postPersist(target: Transaction?) {
         thread(start = true) {
-            var isUpdated = membersRepository.updateTransactionCount(target!!.account!!.member!!.id)
-            isUpdated = membersRepository.updateTotalBalance(target!!.account!!.member!!.id)
+            if(target?.account != null){
+                membersRepository.updateTransactionCount(target.account!!.member!!.id)
+                membersRepository.updateTotalBalance(target.account!!.member!!.id)
+            }
+
         }
     }
 
