@@ -6,7 +6,6 @@ import com.google.api.services.sheets.v4.Sheets
 import com.google.api.services.sheets.v4.SheetsScopes
 import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.GoogleCredentials
-import java.io.FileInputStream
 
 class GoogleSheetUtils {
 
@@ -16,10 +15,8 @@ class GoogleSheetUtils {
     /**
      * Creates Sheets service object with credentials
      */
-    private fun getSheetsService(credentialsPath: String): Sheets {
-        val credentials = GoogleCredentials
-            .fromStream(FileInputStream(credentialsPath))
-            .createScoped(listOf(SheetsScopes.SPREADSHEETS_READONLY))
+    private fun getSheetsService(credentials: GoogleCredentials): Sheets {
+        val credentials = credentials.createScoped(listOf(SheetsScopes.SPREADSHEETS_READONLY))
 
         val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
 
@@ -36,12 +33,12 @@ class GoogleSheetUtils {
      * @return List of rows, each row is a list of values
      */
     fun readSheet(
-        credentialsPath: String,
+        credentials: GoogleCredentials,
         spreadsheetId: String,
         range: String
     ): List<List<Any>> {
         return try {
-            val service = getSheetsService(credentialsPath)
+            val service = getSheetsService(credentials)
 
             val response = service.spreadsheets().values()
                 .get(spreadsheetId, range)
@@ -58,22 +55,22 @@ class GoogleSheetUtils {
      * Reads entire sheet by sheet name
      */
     fun readEntireSheet(
-        credentialsPath: String,
+        credentials: GoogleCredentials,
         spreadsheetId: String,
         sheetName: String = "Sheet1"
     ): List<List<Any>> {
-        return readSheet(credentialsPath, spreadsheetId, "$sheetName!A:Z")
+        return readSheet(credentials, spreadsheetId, "$sheetName!A:Z")
     }
 
     /**
      * Reads sheet data and converts to map with headers
      */
     fun readSheetAsMap(
-        credentialsPath: String,
+        credentials: GoogleCredentials,
         spreadsheetId: String,
         range: String
     ): List<Map<String, Any>> {
-        val data = readSheet(credentialsPath, spreadsheetId, range)
+        val data = readSheet(credentials, spreadsheetId, range)
 
         if (data.isEmpty()) return emptyList()
 

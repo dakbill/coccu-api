@@ -10,10 +10,12 @@ import com.coc.cu.utils.GoogleSheetUtils
 import com.coc.cu.utils.JwtUtils
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.auth.oauth2.GoogleCredentials
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.logging.log4j.util.Strings
 import org.springframework.core.io.ClassPathResource
+import org.springframework.core.io.ResourceLoader
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -38,7 +40,8 @@ class UsersService(
     val restTemplate: RestTemplate,
     val storageService: StorageService,
     val authenticationManager: AuthenticationManager,
-    val jwtUtils: JwtUtils
+    val jwtUtils: JwtUtils,
+    val resourceLoader: ResourceLoader
 ) {
 
     fun single(id: Long): MemberResponseDto? {
@@ -251,9 +254,10 @@ class UsersService(
 
         val spreadsheetId = "17fuYsDWkBkv4aLaVI3ZwXdNAc2Pam52-jFqcN6N6FjI"
         val range = "Members!A2:M1000"
-        val credentialsPath = ClassPathResource("credentials.json").file.absolutePath
+        val resource = resourceLoader.getResource("classpath:credentials.json")
+        val serviceAccount = resource.inputStream
 
-        val data = reader.readSheet(credentialsPath, spreadsheetId, range)
+        val data = reader.readSheet(GoogleCredentials.fromStream(serviceAccount), spreadsheetId, range)
 
 
         for (record in data) {
