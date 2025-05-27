@@ -174,10 +174,10 @@ interface MembersRepository : CrudRepository<Member, Long> {
     @Modifying
     @Transactional
     @Query(
-        value = "UPDATE member SET transaction_count=(SELECT COUNT(id) FROM TRANSACTION WHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?1)) WHERE id=?1",
+        value = "UPDATE member SET transaction_count=(SELECT COUNT(id) FROM TRANSACTION WHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=member.id)) WHERE id=?1",
         nativeQuery = true
     )
-    fun updateTransactionCount(id: Long?): Int
+    fun updateTransactionCount(id: Long): Int
 
     @Modifying
     @Transactional
