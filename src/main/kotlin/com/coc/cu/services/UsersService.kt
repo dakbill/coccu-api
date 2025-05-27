@@ -267,13 +267,21 @@ class UsersService(
         em.createNativeQuery("truncate member cascade").executeUpdate()
         em.transaction.commit()
 
+        repository.resetMemberIdSequence()
+
 
         for (record in data) {
-            if (record.isEmpty() || record.size < 2) {
+            if (record.isEmpty()) {
+                return
+            }
+
+            if (record.size < 2) {
                 continue
             }
 
+
             val userId = record[0].toString().toLong()
+
             val member = repository.findById(userId).orElseGet {
                 Member(
                     id = userId,
@@ -284,7 +292,10 @@ class UsersService(
                     gender = if (record.size > 3) record[3].toString() else null,
                     phone = if (record.size > 2) record[2].toString() else null
                 )
-            }.let { repository.save(it) }
+            }.let {
+                repository.save(it)
+            }
+
 
             val accountNumber = member.id.toString()
             val account = memberAccountRepository.findById(accountNumber).orElseGet {

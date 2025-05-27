@@ -57,7 +57,7 @@ class Member(
     var createdDate: LocalDateTime? = null,
     var updatedDate: LocalDateTime? = null,
     @OneToMany var accounts: List<Account>? = arrayListOf(),
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long? = -1
+    @Id var id: Long? = null
 )
 
 
