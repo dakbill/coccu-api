@@ -162,7 +162,7 @@ class UsersController(
 
         var memberResponseDto = usersService.single(id)
         memberResponseDto!!.totalSavings = transactionsService.getTotalSavings(id)
-        memberResponseDto!!.totalWithdrawals = transactionsService.getTotalWithdrawals(id)
+        memberResponseDto.totalWithdrawals = transactionsService.getTotalWithdrawals(id)
 
         val accountTypeRef = object : TypeReference<MinimalAccountResponseDto>() {}
         val guarantorTypeRef = object : TypeReference<GuarantorResponseDto>() {}
