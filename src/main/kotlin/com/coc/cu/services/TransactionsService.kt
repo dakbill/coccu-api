@@ -73,8 +73,8 @@ class TransactionsService(
     ): Page<TransactionResponseDto> {
         val typeRef = object : TypeReference<List<TransactionResponseDto>>() {}
 
-
-        var transactionsPage: Page<Transaction> = repository.findAllByMemberId(
+        println(query)
+        val transactionsPage: Page<Transaction> = repository.findAllByMemberId(
             Optional.ofNullable(query).orElse(""),
             memberId,
             Optional.ofNullable(accountId).orElse(""),

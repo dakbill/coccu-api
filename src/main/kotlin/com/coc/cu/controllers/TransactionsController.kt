@@ -51,7 +51,7 @@ class TransactionsController(val transactionsService: TransactionsService) {
         )
 
         var sort: Sort = JpaSort.unsafe(Sort.Direction.ASC, sortMaps.getOrDefault("(name)","(name)"))
-        if (properties != null && properties.isNotEmpty()) {
+        if (!properties.isNullOrEmpty()) {
 
             sort = JpaSort.unsafe(Sort.Direction.valueOf(direction!![0].uppercase()), sortMaps.getOrDefault(properties[0],properties[0]))
             properties.forEachIndexed { index, property ->
