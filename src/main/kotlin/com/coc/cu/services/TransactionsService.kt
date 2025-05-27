@@ -73,9 +73,10 @@ class TransactionsService(
     ): Page<TransactionResponseDto> {
         val typeRef = object : TypeReference<List<TransactionResponseDto>>() {}
 
-        println(query)
+
+
         val transactionsPage: Page<Transaction> = repository.findAllByMemberId(
-            Optional.ofNullable(query).orElse(""),
+            if (query == "_") "" else (query ?: ""),
             memberId,
             Optional.ofNullable(accountId).orElse(""),
             transactionTypes ?: arrayOf("EMPTY"),

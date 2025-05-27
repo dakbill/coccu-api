@@ -106,31 +106,28 @@ interface AccountTransactionsRepository: JpaRepository<Transaction, Long> {
 interface MembersRepository : CrudRepository<Member, Long> {
 
     @Query(
-        value = "" +
-                "SELECT " +
-                    "DISTINCT member.* " +
-                "FROM " +
-                    "member LEFT JOIN account ON(account.member_id=member.id) " +
-                "WHERE " +
-                    "( LENGTH(MEMBER.name) > 0 ) AND"+
-                    "( " +
-                    "   (( LOWER(?1) <> UPPER(?1) ) AND CAST(account.member_id AS CHAR) LIKE '%' || ?1 || '%') OR " +
-                    "   (CAST(MEMBER.id AS CHAR) LIKE '%' || ?1 || '%' ) OR " +
-                    "   (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' ) " +
-                    ")",
-
-        countQuery = "" +
-                "SELECT " +
-                "COUNT(DISTINCT member.id) " +
-                "FROM " +
-                "member LEFT JOIN account ON(account.member_id=member.id) " +
-                "WHERE " +
-                "( LENGTH(MEMBER.name) > 0 ) AND"+
-                "( " +
-                "   (( LOWER(?1) <> UPPER(?1) ) AND CAST(account.member_id AS CHAR) LIKE '%' || ?1 || '%') OR " +
-                "   (CAST(MEMBER.id AS CHAR) LIKE '%' || ?1 || '%' ) OR " +
-                "   (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' ) " +
-                ")",
+        value = """
+        SELECT DISTINCT member.* 
+        FROM member 
+        LEFT JOIN account ON account.member_id = member.id 
+        WHERE LENGTH(member.name) > 0 
+          AND (
+              (LOWER(?1) <> UPPER(?1) AND CAST(account.member_id AS CHAR) LIKE '%' || ?1 || '%') OR 
+              (CAST(member.id AS CHAR) LIKE '%' || ?1 || '%') OR 
+              (LOWER(member.name) LIKE '%' || ?1 || '%')
+          )
+    """,
+        countQuery = """
+        SELECT COUNT(DISTINCT member.id) 
+        FROM member 
+        LEFT JOIN account ON account.member_id = member.id 
+        WHERE LENGTH(member.name) > 0 
+          AND (
+              (LOWER(?1) <> UPPER(?1) AND CAST(account.member_id AS CHAR) LIKE '%' || ?1 || '%') OR 
+              (CAST(member.id AS CHAR) LIKE '%' || ?1 || '%') OR 
+              (LOWER(member.name) LIKE '%' || ?1 || '%')
+          )
+    """,
         nativeQuery = true
     )
     fun findByQuery(query: String?, pageRequest: Pageable): Page<Member>
