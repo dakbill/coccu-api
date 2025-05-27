@@ -232,23 +232,22 @@ class TransactionsService(
 
 
                 val member = membersRepository.findById(memberId).orElseGet {
-                    membersRepository.save(Member(id = memberId, createdDate = transaction.createdDate))
-                }.apply {
-                    if (createdDate!!.isAfter(transaction.createdDate)) {
-                        createdDate = transaction.createdDate
-                        membersRepository.save(this)
+                    Member(id = memberId, createdDate = transaction.createdDate)
+                }.let { member ->
+                    if (member.createdDate!!.isAfter(transaction.createdDate)) {
+                        member.createdDate = transaction.createdDate
                     }
-
+                    membersRepository.save(member)
                 }
 
 
-                val account = memberAccountRepository.findById(accountNumber).orElse(
-                    memberAccountRepository.save(Account(member, accountType, accountNumber, createdDate = transaction.createdDate))
-                ).apply {
-                    if (createdDate!!.isAfter(transaction.createdDate)){
-                        createdDate = transaction.createdDate
-                        memberAccountRepository.save(this)
+                val account = memberAccountRepository.findById(accountNumber).orElseGet {
+                    Account(member, accountType, accountNumber, createdDate = transaction.createdDate)
+                }.let { account ->
+                    if (account.createdDate!!.isAfter(transaction.createdDate)) {
+                        account.createdDate = transaction.createdDate
                     }
+                    memberAccountRepository.save(account)
                 }
 
 

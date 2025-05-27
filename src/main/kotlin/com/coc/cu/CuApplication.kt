@@ -63,7 +63,7 @@ class CuApplication {
 
     @Bean
     fun objectMapper(): ObjectMapper {
-        var om = jacksonObjectMapper()
+        val om = jacksonObjectMapper()
         om.findAndRegisterModules()
 
         return om

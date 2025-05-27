@@ -120,7 +120,7 @@ class UsersService(
         }
         member = repository.save(member)
 
-        var savingsAccount =
+        val savingsAccount =
             Account(member, AccountType.SAVINGS, String.format("%s-%s", AccountType.SAVINGS, member.id))
         memberAccountRepository.save(savingsAccount)
 
