@@ -253,11 +253,6 @@ class UsersService(
 
 
     fun registerMembers() {
-        val em: EntityManager = emf.createEntityManager()
-        em.transaction.begin()
-        em.createNativeQuery("truncate member cascade").executeUpdate()
-        em.transaction.commit()
-
         val reader = GoogleSheetUtils()
 
         val spreadsheetId = "17fuYsDWkBkv4aLaVI3ZwXdNAc2Pam52-jFqcN6N6FjI"
@@ -266,6 +261,11 @@ class UsersService(
         val serviceAccount = resource.inputStream
 
         val data = reader.readSheet(GoogleCredentials.fromStream(serviceAccount), spreadsheetId, range)
+
+        val em: EntityManager = emf.createEntityManager()
+        em.transaction.begin()
+        em.createNativeQuery("truncate member cascade").executeUpdate()
+        em.transaction.commit()
 
 
         for (record in data) {

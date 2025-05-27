@@ -192,16 +192,17 @@ class TransactionsService(
 
 
     fun recordTransactions() {
-        val em: EntityManager = emf.createEntityManager()
-        em.transaction.begin()
-        em.createNativeQuery("truncate transaction cascade").executeUpdate()
-        em.transaction.commit()
 
         val reader = GoogleSheetUtils()
         val spreadsheetId = "17fuYsDWkBkv4aLaVI3ZwXdNAc2Pam52-jFqcN6N6FjI"
         val range = "Transactions!A2:J8000"
         val serviceAccount = resourceLoader.getResource("classpath:credentials.json").inputStream
         val data = reader.readSheet(GoogleCredentials.fromStream(serviceAccount), spreadsheetId, range)
+
+        val em: EntityManager = emf.createEntityManager()
+        em.transaction.begin()
+        em.createNativeQuery("truncate transaction cascade").executeUpdate()
+        em.transaction.commit()
 
         data.forEach { record ->
             try {
