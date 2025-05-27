@@ -9,9 +9,11 @@ import com.coc.cu.entities.Transaction
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @Repository
@@ -178,22 +180,28 @@ interface MembersRepository : CrudRepository<Member, Long> {
     )
     fun updateTransactionCount(id: Long?): Boolean
 
+    @Modifying
+    @Transactional
     @Query(
-        value = "UPDATE member SET total_balance=(\n" +
-                "\tSELECT\n" +
-                "\t\tSUM(\n" +
-                "\t\t\t(CASE \n" +
-                "\t\t\t\t\tWHEN \"transaction\".\"type\" in ('WITHDRAWAL','WITHDRAWAL_CHEQUE') THEN -1 \n" +
-                "\t\t\t\t\tWHEN \"transaction\".\"type\" in ('OPENING_BALANCE','SAVINGS','SAVINGS_CHEQUE') THEN 1 \n" +
-                "\t\t\t\t\tELSE 0 \n" +
-                "\t\t\tEND) * amount\n" +
-                "\t\t) AS total_balance \n" +
-                "\tFROM \"transaction\" \n" +
-                "\tWHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=member.id)\n" +
-                ") WHERE (id=?1 OR 0=?1) RETURNING TRUE\n" ,
+        value = """
+            UPDATE member 
+            SET total_balance = (
+                SELECT SUM(
+                    CASE 
+                        WHEN transaction.type IN ('WITHDRAWAL', 'WITHDRAWAL_CHEQUE') THEN -1 
+                        WHEN transaction.type IN ('OPENING_BALANCE', 'SAVINGS', 'SAVINGS_CHEQUE') THEN 1 
+                        ELSE 0 
+                    END * amount
+                ) 
+                FROM transaction 
+                WHERE account_id IN (SELECT id FROM account WHERE member_id = member.id)
+            ) 
+            WHERE (id = ?1 OR ?1 = 0) 
+        """,
         nativeQuery = true
     )
-    fun updateTotalBalance(id: Long?): Boolean
+    fun updateTotalBalance(id: Long): Int
+
 
     @Query(
         value = "SELECT COUNT(id) FROM member WHERE created_date BETWEEN ?1 AND ?2 AND gender=?3",

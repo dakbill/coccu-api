@@ -19,7 +19,7 @@ class TransactionListener(@Lazy val membersRepository: MembersRepository) {
         thread(start = true) {
             if(target?.account != null){
                 membersRepository.updateTransactionCount(target.account!!.member!!.id)
-                membersRepository.updateTotalBalance(target.account!!.member!!.id)
+                membersRepository.updateTotalBalance(target.account!!.member!!.id ?:0)
             }
 
         }

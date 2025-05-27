@@ -29,6 +29,8 @@ import java.io.InputStreamReader
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.stream.Collectors
+import javax.persistence.EntityManager
+import javax.persistence.EntityManagerFactory
 
 
 @Service
@@ -41,6 +43,7 @@ class UsersService(
     val storageService: StorageService,
     val authenticationManager: AuthenticationManager,
     val jwtUtils: JwtUtils,
+    var emf: EntityManagerFactory,
     val resourceLoader: ResourceLoader
 ) {
 
@@ -243,13 +246,18 @@ class UsersService(
         return repository.resetMemberIdSequence()
     }
 
-    fun updateTotalBalance(memberId: Long): Boolean {
-        return repository.updateTotalBalance(memberId)
+    fun updateTotalBalance(memberId: Long) {
+        repository.updateTotalBalance(memberId)
     }
 
 
 
     fun registerMembers() {
+        val em: EntityManager = emf.createEntityManager()
+        em.transaction.begin()
+        em.createNativeQuery("truncate member cascade").executeUpdate()
+        em.transaction.commit()
+
         val reader = GoogleSheetUtils()
 
         val spreadsheetId = "17fuYsDWkBkv4aLaVI3ZwXdNAc2Pam52-jFqcN6N6FjI"
