@@ -207,12 +207,11 @@ class TransactionsService(
             try {
                 if (record.isEmpty()) return
 
-
                 val transactionType = TransactionType.values().find {
                     it.name == record[3].toString().trim().replace(" ", "_").replace("PERSONEL", "PERSONNEL")
                 }
 
-                if  (transactionType == null) {
+                if (transactionType == null) {
                     println("Unknown transaction type: $record")
                     return@forEach
                 }
@@ -230,32 +229,24 @@ class TransactionsService(
                 val accountType = if (transaction.type!!.name.contains("LOAN")) AccountType.LOAN else AccountType.SAVINGS
                 val accountNumber = resolveAccountNumber(memberId, transaction.type!!)
 
-
                 val member = membersRepository.findById(memberId).orElseGet {
                     Member(id = memberId, createdDate = transaction.createdDate)
-                }.let { member ->
-                    if (member.createdDate!!.isAfter(transaction.createdDate)) {
-                        member.createdDate = transaction.createdDate
+                }.apply {
+                    if (createdDate!!.isAfter(transaction.createdDate)) {
+                        createdDate = transaction.createdDate
                     }
-                    membersRepository.save(member)
-                }
-
+                }.let { membersRepository.save(it) }
 
                 val account = memberAccountRepository.findById(accountNumber).orElseGet {
                     Account(member, accountType, accountNumber, createdDate = transaction.createdDate)
-                }.let { account ->
-                    if (account.createdDate!!.isAfter(transaction.createdDate)) {
-                        account.createdDate = transaction.createdDate
+                }.apply {
+                    if (createdDate!!.isAfter(transaction.createdDate)) {
+                        createdDate = transaction.createdDate
                     }
-                    memberAccountRepository.save(account)
-                }
-
-
+                }.let { memberAccountRepository.save(it) }
 
                 transaction.account = account
-                println(record)
                 repository.save(transaction)
-                println("after transaction save")
 
                 updateAccountBalance(account)
             } catch (ex: Exception) {
@@ -268,7 +259,6 @@ class TransactionsService(
 //        applyPostProcessing(em)
 //        em.transaction.commit()
         membersRepository.updateTotalBalance(0)
-        membersRepository.resetMemberIdSequence()
     }
 
     private fun resolveAccountNumber(memberId: Long, transactionType: TransactionType): String {

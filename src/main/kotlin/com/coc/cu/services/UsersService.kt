@@ -50,9 +50,9 @@ class UsersService(
     fun single(id: Long): MemberResponseDto? {
         val typeRef = object : TypeReference<MemberResponseDto>() {}
 
-        var res = repository.findById(id)
+        val res = repository.findById(id)
         if (res.isPresent) {
-            var userEntity = res.get()
+            val userEntity = res.get()
 
             val accountTypeRef = object : TypeReference<List<AccountResponseDto>>() {}
             val accounts =
@@ -269,33 +269,31 @@ class UsersService(
 
 
         for (record in data) {
-            if (record.isEmpty() || Strings.isEmpty(record[0].toString()) || record.size < 2) {
+            if (record.isEmpty() || record.size < 2) {
                 continue
             }
 
-
-
             val userId = record[0].toString().toLong()
-            var member = repository.findById(userId)
-                .orElse(
-                    Member(
-                        id = userId,
-                        name = record[1].toString(),
-                        createdDate = LocalDateTime.now(),
-                        totalBalance = 0.0,
-                        availableBalance = 0.0,
-                        gender = record[3].toString(),
-                        phone = record[2].toString()
-                    )
+            val member = repository.findById(userId).orElseGet {
+                Member(
+                    id = userId,
+                    name = record[1].toString(),
+                    createdDate = LocalDateTime.now(),
+                    totalBalance = 0.0,
+                    availableBalance = 0.0,
+                    gender = if (record.size > 3) record[3].toString() else null,
+                    phone = if (record.size > 2) record[2].toString() else null
                 )
-            member = repository.save(member)
+            }.let { repository.save(it) }
 
             val accountNumber = member.id.toString()
-            val account = memberAccountRepository.findById(accountNumber)
-                .orElse(Account(member, AccountType.SAVINGS, accountNumber, createdDate = LocalDateTime.now()))
+            val account = memberAccountRepository.findById(accountNumber).orElseGet {
+                Account(member, AccountType.SAVINGS, accountNumber, createdDate = LocalDateTime.now())
+            }
             memberAccountRepository.save(account)
         }
 
+        repository.resetMemberIdSequence()
     }
 
 

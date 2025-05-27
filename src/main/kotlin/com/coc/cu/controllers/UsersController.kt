@@ -160,7 +160,7 @@ class UsersController(
     @GetMapping("/{id}")
     fun detail(@PathVariable id: Long): ApiResponse<MemberResponseDto> {
 
-        var memberResponseDto = usersService.single(id)
+        val memberResponseDto = usersService.single(id)
         memberResponseDto!!.totalSavings = transactionsService.getTotalSavings(id)
         memberResponseDto.totalWithdrawals = transactionsService.getTotalWithdrawals(id)
 
