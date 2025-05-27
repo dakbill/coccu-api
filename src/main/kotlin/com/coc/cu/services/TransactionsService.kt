@@ -253,7 +253,9 @@ class TransactionsService(
 
 
                 transaction.account = account
+                println(record)
                 repository.save(transaction)
+                println("after transaction save")
 
                 updateAccountBalance(account)
             } catch (ex: Exception) {

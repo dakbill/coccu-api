@@ -90,11 +90,11 @@ class CuApplication {
                 .build()
         )
         manager.createUser(
-            users.username("eben.ashley@gmail.com").password(passwordEncoder!!.encode("0209980010"))
+            users.username("eben.ashley@gmail.com").password(passwordEncoder.encode("0209980010"))
                 .roles("USER", "ADMIN").build()
         )
         manager.createUser(
-            users.username("teller").password(passwordEncoder!!.encode("cuateller")).roles("USER", "TELLER").build()
+            users.username("teller").password(passwordEncoder.encode("cuateller")).roles("USER", "TELLER").build()
         )
         manager.createUser(
             users.username("bernardakuffo@hotmail.com").password(passwordEncoder!!.encode("0249853588"))

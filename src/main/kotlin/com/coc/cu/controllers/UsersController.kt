@@ -81,7 +81,7 @@ class UsersController(
         if (getGuarantorDebtorAccounts) {
             val accountTypeRef = object : TypeReference<MinimalAccountResponseDto>() {}
             val guarantorTypeRef = object : TypeReference<GuarantorResponseDto>() {}
-            membersPage.content!!.stream().forEach { m ->
+            membersPage.content.stream().forEach { m ->
                 run {
                     m.availableBalance = memberAccountRepository.getAvailableBalance(m.id)
                     m.guarantorDebtorAccounts =
