@@ -213,7 +213,8 @@ interface MembersRepository : CrudRepository<Member, Long> {
     fun sumBalanceByGender(startDate: LocalDate, endDate: LocalDate, gender: String, transactionTypes: Array<String>): Long
 
     @Query(
-        value = "SELECT setval('member_id_seq',(SELECT max(id) FROM member))",
+        value = "SELECT 1",
+//        value = "SELECT setval('member_id_seq',(SELECT max(id) FROM member))",
         nativeQuery = true
     )
     fun resetMemberIdSequence(): Long?
