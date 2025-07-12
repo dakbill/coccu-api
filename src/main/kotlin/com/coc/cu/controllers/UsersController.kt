@@ -191,6 +191,7 @@ class UsersController(
                 guarantorAccountResponseDto
 
             }
+        memberResponseDto.accounts = memberResponseDto.accounts!!.sortedBy { it.createdDate }
         return ApiResponse(memberResponseDto, "Success", HttpStatus.OK)
     }
 

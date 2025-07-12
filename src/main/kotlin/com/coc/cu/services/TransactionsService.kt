@@ -202,11 +202,14 @@ class TransactionsService(
         val em: EntityManager = emf.createEntityManager()
         em.transaction.begin()
         em.createNativeQuery("truncate transaction cascade").executeUpdate()
+        em.createNativeQuery("truncate account cascade").executeUpdate()
+        em.createNativeQuery("truncate guarantor cascade").executeUpdate()
         em.transaction.commit()
 
         data.forEach { record ->
             try {
                 if (record.isEmpty()) return
+
 
                 val transactionType = TransactionType.values().find {
                     it.name == record[3].toString().trim().replace(" ", "_").replace("PERSONEL", "PERSONNEL")
@@ -227,8 +230,15 @@ class TransactionsService(
                 )
 
                 val memberId = record[1].toString().toLongOrNull() ?: return@forEach
+
+//                if (memberId != 85L) return@forEach
+
+//                println(record)
+
                 val accountType = if (transaction.type!!.name.contains("LOAN")) AccountType.LOAN else AccountType.SAVINGS
+
                 val accountNumber = resolveAccountNumber(memberId, transaction.type!!)
+
 
                 val member = membersRepository.findById(memberId).orElseGet {
                     Member(id = memberId, createdDate = transaction.createdDate)
@@ -256,23 +266,52 @@ class TransactionsService(
             }
         }
 
-//        em.transaction.begin()
-//        applyPostProcessing(em)
-//        em.transaction.commit()
         membersRepository.updateTotalBalance(0)
     }
+
 
     private fun resolveAccountNumber(memberId: Long, transactionType: TransactionType): String {
         if (!transactionType.name.contains("LOAN")) return memberId.toString()
 
-        val loanAccountsCount = memberAccountRepository.countByMemberIdAndType(memberId, arrayOf(AccountType.LOAN.name))
+        var loanAccountsCount = memberAccountRepository.countByMemberIdAndType(memberId, arrayOf(AccountType.LOAN.name))
+        loanAccountsCount = if (loanAccountsCount == 0L) 1L else loanAccountsCount
         val lastLoanAccountNumber = "LOAN-$memberId-$loanAccountsCount"
         val lastTransaction = repository.lastByAccountId(lastLoanAccountNumber)
 
-        return if (lastTransaction == null || !arrayOf(TransactionType.LOAN, TransactionType.LOAN_CHEQUE).contains(lastTransaction.type)) {
-            "LOAN-$memberId-${loanAccountsCount + 1}"
-        } else {
+
+
+//        println(lastLoanAccountNumber + " - " + transactionType.name + " - " + lastTransaction?.account?.balance)
+        return if (
+            lastTransaction == null
+            || (lastTransaction.account?.balance == null)
+            || (arrayOf(
+                TransactionType.LOAN,
+                TransactionType.LOAN_CHEQUE,
+
+                ).contains(lastTransaction.type) && arrayOf(
+                TransactionType.LOAN,
+                TransactionType.LOAN_CHEQUE,
+            ).contains(transactionType))
+            || (
+                    lastTransaction.account?.balance != 0.0
+                            &&
+                            !arrayOf(
+                                TransactionType.LOAN.name,
+                                TransactionType.LOAN_CHEQUE.name
+                            ).contains(transactionType.name)
+                    )
+            || (
+                    lastTransaction.account?.balance == 0.0
+                            &&
+                            arrayOf(
+                                TransactionType.INTEREST_ON_LOAN.name,
+                                TransactionType.INTEREST_ON_LOAN_CHEQUE.name
+                            ).contains(transactionType.name)
+                    )
+        ) {
             lastLoanAccountNumber
+        } else {
+            "LOAN-$memberId-${loanAccountsCount + 1}"
         }
     }
 
@@ -285,9 +324,5 @@ class TransactionsService(
         memberAccountRepository.save(account)
     }
 
-    private fun applyPostProcessing(em: EntityManager) {
-        em.createNativeQuery("UPDATE \"transaction\" SET account_id='LOAN-200-1' WHERE account_id='LOAN-200-2' AND amount=100 AND CAST(created_date AS DATE)='2015-08-15' AND type='LOAN_REPAYMENT'").executeUpdate()
-        em.createNativeQuery("UPDATE \"transaction\" SET account_id='LOAN-546-1' WHERE account_id='LOAN-546-2' AND amount=1000 AND CAST(created_date AS DATE)='2022-11-20' AND type='LOAN_REPAYMENT'").executeUpdate()
-//        em.createNativeQuery("DELETE FROM \"account\" WHERE id='LOAN-406-2'").executeUpdate()
-    }
+
 }

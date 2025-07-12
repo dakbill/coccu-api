@@ -74,7 +74,7 @@ data class Transaction(
 
     var updatedDate: LocalDateTime? = null,
 
-    @ManyToOne var account: Account? = null,
+    @ManyToOne(fetch = FetchType.EAGER) var account: Account? = null,
 
     @ManyToOne var createdBy: Member? = null,
 
