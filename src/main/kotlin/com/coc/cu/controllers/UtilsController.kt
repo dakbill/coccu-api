@@ -4,10 +4,9 @@ package com.coc.cu.controllers
 import com.coc.cu.domain.models.ApiResponse
 import com.coc.cu.services.TransactionsService
 import com.coc.cu.services.UsersService
-import com.coc.cu.utils.JwtUtils
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -25,9 +24,10 @@ class UtilsController(
     val logger: Logger = LoggerFactory.getLogger(UtilsController::class.java)
 
 
+    @OptIn(DelicateCoroutinesApi::class)
     @GetMapping("/google-sheet-sync")
-    suspend fun googleSheetSync(): ApiResponse<Boolean> = withContext(Dispatchers.IO) {
-        val job = launch {
+    fun googleSheetSync(): ApiResponse<Boolean>  {
+        GlobalScope.launch {
             try {
                 logger.info("Starting Google Sheet sync")
                 usersService.registerMembers()
@@ -45,7 +45,7 @@ class UtilsController(
 
 
 
-        ApiResponse(true, "Sync process started", HttpStatus.ACCEPTED)
+        return  ApiResponse(true, "Sync process started", HttpStatus.ACCEPTED)
     }
 
 
