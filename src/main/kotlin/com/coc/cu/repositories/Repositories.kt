@@ -28,9 +28,10 @@ interface AccountTransactionsRepository: JpaRepository<Transaction, Long> {
                 " AND  ( ('EMPTY' IN (?4) ) OR ( type IN (?4) ) )   " +
                 " AND  ( created_date BETWEEN CAST(?5 AS DATE) AND CAST(?6 AS DATE) )   ",
         countQuery = "SELECT COUNT(TRANSACTION.id) FROM TRANSACTION WHERE " +
-                     " ( (?2=0) OR (account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?2)) )   " +
-                     " AND  ( (LENGTH(?3)=0) OR (?3 = account_id ) )   " +
-                     " AND  ( created_date BETWEEN CAST(?5 AS DATE) AND CAST(?6 AS DATE) )   ",
+                "  ( (LENGTH(?1)=0) OR ( SELECT LOWER(name) LIKE CONCAT('%', ?1, '%') FROM member WHERE id=(SELECT member_id FROM ACCOUNT WHERE id=TRANSACTION.account_id LIMIT 1) )   )   " +
+                " AND ( (?2=0) OR (account_id IN (SELECT id FROM ACCOUNT WHERE member_id=?2)) )   " +
+                " AND  ( (LENGTH(?3)=0) OR (?3 = account_id ) )   " +
+                " AND  ( created_date BETWEEN CAST(?5 AS DATE) AND CAST(?6 AS DATE) )   ",
         nativeQuery = true
     )
     fun findAllByMemberId(
