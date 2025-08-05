@@ -129,7 +129,7 @@ class UsersController(
         ): ApiResponse<List<MemberSummariesResponseDto>> {
 
         var sort: Sort = JpaSort.unsafe(Sort.Direction.ASC, "(name)")
-        if (properties != null && properties.isNotEmpty()) {
+        if (!properties.isNullOrEmpty()) {
 
             sort = JpaSort.unsafe(Sort.Direction.valueOf(direction!![0].uppercase()), properties[0])
             properties.forEachIndexed { index, property ->

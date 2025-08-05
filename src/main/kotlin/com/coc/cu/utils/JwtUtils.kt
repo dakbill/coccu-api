@@ -10,7 +10,7 @@ import java.util.*
 class JwtUtils {
     val logger = LoggerFactory.getLogger(JwtUtils::class.java)
 
-    private val jwtSecret: String? = "topSecret"
+    private val jwtSecret: String = "topSecret"
 
     private val jwtExpirationMs = 24 * 5 * 60 * 60 * 1000
 
