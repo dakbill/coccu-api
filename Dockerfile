@@ -1,9 +1,9 @@
-FROM openjdk:21-jdk-slim AS builder
+FROM eclipse-temurin:21-jre AS builder
 WORKDIR extracted
 ADD target/*.jar app.jar
 RUN java -Djarmode=layertools -jar app.jar extract
 
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jre
 WORKDIR application
 COPY --from=builder extracted/dependencies/ ./
 COPY --from=builder extracted/spring-boot-loader/ ./
