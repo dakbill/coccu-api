@@ -208,8 +208,8 @@ class TransactionsService(
 
         data.forEach { record ->
             try {
-                println(record)
-                if (record.isEmpty()) return@forEach
+                // println(record)
+                if (record.isEmpty()) return
 
 
                 val transactionType = TransactionType.values().find {
