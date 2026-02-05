@@ -208,6 +208,7 @@ class TransactionsService(
 
         data.forEach { record ->
             try {
+                println(record)
                 if (record.isEmpty()) return
 
 
