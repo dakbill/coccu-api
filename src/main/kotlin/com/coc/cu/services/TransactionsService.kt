@@ -195,7 +195,7 @@ class TransactionsService(
 
         val reader = GoogleSheetUtils()
         val spreadsheetId = "17fuYsDWkBkv4aLaVI3ZwXdNAc2Pam52-jFqcN6N6FjI"
-        val range = "Transactions!A2:J8000"
+        val range = "Transactions!A2:J10000"
         val serviceAccount = resourceLoader.getResource("classpath:credentials.json").inputStream
         val data = reader.readSheet(GoogleCredentials.fromStream(serviceAccount), spreadsheetId, range)
 
@@ -231,10 +231,6 @@ class TransactionsService(
                 )
 
                 val memberId = record[1].toString().toLongOrNull() ?: return@forEach
-
-//                if (memberId != 85L) return@forEach
-
-//                println(record)
 
                 val accountType = if (transaction.type!!.name.contains("LOAN")) AccountType.LOAN else AccountType.SAVINGS
 
