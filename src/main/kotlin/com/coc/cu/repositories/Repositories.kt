@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -141,13 +142,13 @@ interface MembersRepository : CrudRepository<Member, Long> {
                 "(SUM( CASE WHEN transaction.type IN ('WITHDRAWAL','WITHDRAWAL_CHEQUE') THEN transaction.amount ELSE 0 END)) AS withdrawals " +
                 "FROM member " +
                 "LEFT JOIN account ON(account.member_id=member.id) " +
-                "LEFT JOIN transaction ON(transaction.account_id=account.id AND transaction.created_date BETWEEN CAST(?2 AS DATE) AND CAST(?3 AS DATE) ) " +
+                "LEFT JOIN transaction ON(transaction.account_id=account.id AND transaction.created_date BETWEEN CAST(:startDate AS DATE) AND CAST(:endDate AS DATE) ) " +
                 "WHERE " +
                 "( LENGTH(MEMBER.name) > 0 ) AND"+
                 "( " +
-                "   (( LOWER(?1) <> UPPER(?1) ) AND CAST(account.member_id AS CHAR) LIKE '%' || ?1 || '%') OR " +
-                "   (CAST(MEMBER.id AS CHAR) LIKE '%' || ?1 || '%' ) OR " +
-                "   (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' ) " +
+                "   (( LOWER(:query) <> UPPER(:query) ) AND CAST(account.member_id AS CHAR) LIKE '%' || :query || '%') OR " +
+                "   (CAST(MEMBER.id AS CHAR) LIKE '%' || :query || '%' ) OR " +
+                "   (LOWER(MEMBER.name) LIKE '%' || :query || '%' ) " +
                 ") GROUP BY member.id",
 
         countQuery = "" +
@@ -158,16 +159,16 @@ interface MembersRepository : CrudRepository<Member, Long> {
                 "WHERE " +
                 "( LENGTH(MEMBER.name) > 0 ) AND"+
                 "( " +
-                "   (( LOWER(?1) <> UPPER(?1) ) AND CAST(account.member_id AS CHAR) LIKE '%' || ?1 || '%') OR " +
-                "   (CAST(MEMBER.id AS CHAR) LIKE '%' || ?1 || '%' ) OR " +
-                "   (LOWER(MEMBER.name) LIKE '%' || ?1 || '%' ) " +
+                "   (( LOWER(:query) <> UPPER(:query) ) AND CAST(account.member_id AS CHAR) LIKE '%' || :query || '%') OR " +
+                "   (CAST(MEMBER.id AS CHAR) LIKE '%' || :query || '%' ) OR " +
+                "   (LOWER(MEMBER.name) LIKE '%' || :query || '%' ) " +
                 ")",
         nativeQuery = true
     )
     fun findSummariesByQuery(
-        query: String?,
-        startDate: LocalDate?,
-        endDate: LocalDate?,
+        @Param("query") query: String?,
+        @Param("startDate") startDate: LocalDate?,
+        @Param("endDate") endDate: LocalDate?,
         pageRequest: Pageable
     ): Page<MemberSummariesResponseDto>
 
