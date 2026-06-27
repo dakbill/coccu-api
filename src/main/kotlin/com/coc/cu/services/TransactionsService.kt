@@ -32,6 +32,8 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 import javax.persistence.EntityManager
 import javax.persistence.EntityManagerFactory
+import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.support.TransactionTemplate
 
 
 @Service
@@ -44,6 +46,8 @@ class TransactionsService(
     var restTemplate: RestTemplate,
     var jwtUtils: JwtUtils,
     var emf: EntityManagerFactory,
+    var em: EntityManager,
+    var transactionManager: PlatformTransactionManager,
     var resourceLoader: ResourceLoader
 ) {
 
@@ -199,71 +203,69 @@ class TransactionsService(
         val serviceAccount = resourceLoader.getResource("classpath:credentials.json").inputStream
         val data = reader.readSheet(GoogleCredentials.fromStream(serviceAccount), spreadsheetId, range)
 
-        val em: EntityManager = emf.createEntityManager()
-        em.transaction.begin()
-        em.createNativeQuery("truncate transaction cascade").executeUpdate()
-        em.createNativeQuery("truncate account cascade").executeUpdate()
-        em.createNativeQuery("truncate guarantor cascade").executeUpdate()
-        em.transaction.commit()
+        val transactionTemplate = TransactionTemplate(transactionManager)
+        transactionTemplate.execute {
+            em.createNativeQuery("truncate transaction cascade").executeUpdate()
+            em.createNativeQuery("truncate account cascade").executeUpdate()
+            em.createNativeQuery("truncate guarantor cascade").executeUpdate()
 
-        data.forEach { record ->
-            try {
-                // println(record)
-                if (record.isEmpty()) return
+            for (record in data) {
+                try {
+                    // println(record)
+                    if (record.isEmpty()) break
 
-
-                val transactionType = TransactionType.values().find {
-                    it.name == record[3].toString().trim().replace(" ", "_").replace("PERSONEL", "PERSONNEL")
-                }
-
-                if (transactionType == null) {
-                    println("Unknown transaction type: $record")
-                    return@forEach
-                }
-
-                val transaction = Transaction(
-                    createdDate = LocalDateTime.parse(
-                        "${record[5]} 00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-                    ),
-                    type = transactionType,
-                    amount = record[4].toString().replace("GHS", "").replace(",", "").toFloatOrNull(),
-                    comment = record.getOrNull(9)?.toString()
-                )
-
-                val memberId = record[1].toString().toLongOrNull() ?: return@forEach
-
-                val accountType = if (transaction.type!!.name.contains("LOAN")) AccountType.LOAN else AccountType.SAVINGS
-
-                val accountNumber = resolveAccountNumber(memberId, transaction.type!!)
-
-
-                val member = membersRepository.findById(memberId).orElseGet {
-                    Member(id = memberId, createdDate = transaction.createdDate)
-                }.apply {
-                    if (createdDate!!.isAfter(transaction.createdDate)) {
-                        createdDate = transaction.createdDate
+                    val transactionType = TransactionType.values().find {
+                        it.name == record[3].toString().trim().replace(" ", "_").replace("PERSONEL", "PERSONNEL")
                     }
-                }.let { membersRepository.save(it) }
 
-                val account = memberAccountRepository.findById(accountNumber).orElseGet {
-                    Account(member, accountType, accountNumber, createdDate = transaction.createdDate)
-                }.apply {
-                    if (createdDate!!.isAfter(transaction.createdDate)) {
-                        createdDate = transaction.createdDate
+                    if (transactionType == null) {
+                        println("Unknown transaction type: $record")
+                        continue
                     }
-                }.let { memberAccountRepository.save(it) }
 
-                transaction.account = account
-                repository.save(transaction)
+                    val transaction = Transaction(
+                        createdDate = LocalDateTime.parse(
+                            "${record[5]} 00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                        ),
+                        type = transactionType,
+                        amount = record[4].toString().replace("GHS", "").replace(",", "").toFloatOrNull(),
+                        comment = record.getOrNull(9)?.toString()
+                    )
 
-                updateAccountBalance(account)
-            } catch (ex: Exception) {
-                println(record)
-                ex.printStackTrace()
+                    val memberId = record[1].toString().toLongOrNull() ?: continue
+
+                    val accountType = if (transaction.type!!.name.contains("LOAN")) AccountType.LOAN else AccountType.SAVINGS
+
+                    val accountNumber = resolveAccountNumber(memberId, transaction.type!!)
+
+                    val member = membersRepository.findById(memberId).orElseGet {
+                        Member(id = memberId, createdDate = transaction.createdDate)
+                    }.apply {
+                        if (createdDate!!.isAfter(transaction.createdDate)) {
+                            createdDate = transaction.createdDate
+                        }
+                    }.let { membersRepository.save(it) }
+
+                    val account = memberAccountRepository.findById(accountNumber).orElseGet {
+                        Account(member, accountType, accountNumber, createdDate = transaction.createdDate)
+                    }.apply {
+                        if (createdDate!!.isAfter(transaction.createdDate)) {
+                            createdDate = transaction.createdDate
+                        }
+                    }.let { memberAccountRepository.save(it) }
+
+                    transaction.account = account
+                    repository.save(transaction)
+
+                    updateAccountBalance(account)
+                } catch (ex: Exception) {
+                    println(record)
+                    ex.printStackTrace()
+                }
             }
-        }
 
-        membersRepository.updateTotalBalance(0)
+            membersRepository.updateTotalBalance(0)
+        }
     }
 
 
