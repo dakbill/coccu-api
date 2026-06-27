@@ -8,6 +8,7 @@ import com.coc.cu.entities.Account
 import com.coc.cu.entities.Guarantor
 import com.coc.cu.entities.Member
 import com.coc.cu.entities.Transaction
+import com.coc.cu.entities.TransactionListener
 import com.coc.cu.repositories.AccountTransactionsRepository
 import com.coc.cu.repositories.GuarantorRepository
 import com.coc.cu.repositories.MemberAccountRepository
@@ -203,80 +204,145 @@ class TransactionsService(
         val serviceAccount = resourceLoader.getResource("classpath:credentials.json").inputStream
         val data = reader.readSheet(GoogleCredentials.fromStream(serviceAccount), spreadsheetId, range)
 
-        val transactionTemplate = TransactionTemplate(transactionManager)
-        transactionTemplate.execute {
-            em.createNativeQuery("truncate transaction cascade").executeUpdate()
-            em.createNativeQuery("truncate account cascade").executeUpdate()
-            em.createNativeQuery("truncate guarantor cascade").executeUpdate()
+        // Disable entity listener temporarily for bulk sync to prevent thread spawning
+        TransactionListener.enabled = false
 
-            for (record in data) {
-                try {
-                    // println(record)
-                    if (record.isEmpty()) break
+        try {
+            val transactionTemplate = TransactionTemplate(transactionManager)
+            transactionTemplate.execute {
+                // Truncate existing transactions and accounts
+                em.createNativeQuery("truncate transaction cascade").executeUpdate()
+                em.createNativeQuery("truncate account cascade").executeUpdate()
+                em.createNativeQuery("truncate guarantor cascade").executeUpdate()
 
-                    val transactionType = TransactionType.values().find {
-                        it.name == record[3].toString().trim().replace(" ", "_").replace("PERSONEL", "PERSONNEL")
-                    }
+                // Load all existing members from the database
+                val membersMap = membersRepository.findAll().associateBy { it.id!! }.toMutableMap()
+                val accountsMap = mutableMapOf<String, Account>()
+                val lastTransactionMap = mutableMapOf<String, Transaction>()
+                val loanAccountsCountMap = mutableMapOf<Long, Long>()
 
-                    if (transactionType == null) {
-                        println("Unknown transaction type: $record")
-                        continue
-                    }
+                val transactionsToSave = mutableListOf<Transaction>()
+                val modifiedMembers = mutableSetOf<Member>()
 
-                    val transaction = Transaction(
-                        createdDate = LocalDateTime.parse(
-                            "${record[5]} 00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-                        ),
-                        type = transactionType,
-                        amount = record[4].toString().replace("GHS", "").replace(",", "").toFloatOrNull(),
-                        comment = record.getOrNull(9)?.toString()
-                    )
+                for (record in data) {
+                    try {
+                        if (record.isEmpty()) break
 
-                    val memberId = record[1].toString().toLongOrNull() ?: continue
-
-                    val accountType = if (transaction.type!!.name.contains("LOAN")) AccountType.LOAN else AccountType.SAVINGS
-
-                    val accountNumber = resolveAccountNumber(memberId, transaction.type!!)
-
-                    val member = membersRepository.findById(memberId).orElseGet {
-                        Member(id = memberId, createdDate = transaction.createdDate)
-                    }.apply {
-                        if (createdDate!!.isAfter(transaction.createdDate)) {
-                            createdDate = transaction.createdDate
+                        val transactionType = TransactionType.values().find {
+                            it.name == record[3].toString().trim().replace(" ", "_").replace("PERSONEL", "PERSONNEL")
                         }
-                    }.let { membersRepository.save(it) }
 
-                    val account = memberAccountRepository.findById(accountNumber).orElseGet {
-                        Account(member, accountType, accountNumber, createdDate = transaction.createdDate)
-                    }.apply {
-                        if (createdDate!!.isAfter(transaction.createdDate)) {
-                            createdDate = transaction.createdDate
+                        if (transactionType == null) {
+                            println("Unknown transaction type: $record")
+                            continue
                         }
-                    }.let { memberAccountRepository.save(it) }
 
-                    transaction.account = account
-                    repository.save(transaction)
+                        val transaction = Transaction(
+                            createdDate = LocalDateTime.parse(
+                                "${record[5]} 00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                            ),
+                            type = transactionType,
+                            amount = record[4].toString().replace("GHS", "").replace(",", "").toFloatOrNull(),
+                            comment = record.getOrNull(9)?.toString()
+                        )
 
-                    updateAccountBalance(account)
-                } catch (ex: Exception) {
-                    println(record)
-                    ex.printStackTrace()
+                        val memberId = record[1].toString().toLongOrNull() ?: continue
+
+                        val accountType = if (transaction.type!!.name.contains("LOAN")) AccountType.LOAN else AccountType.SAVINGS
+
+                        val accountNumber = resolveAccountNumber(memberId, transaction.type!!, loanAccountsCountMap, lastTransactionMap)
+
+                        val member = membersMap[memberId] ?: Member(id = memberId, createdDate = transaction.createdDate).apply {
+                            membersMap[memberId] = this
+                            modifiedMembers.add(this)
+                        }
+
+                        if (member.createdDate == null || member.createdDate!!.isAfter(transaction.createdDate)) {
+                            member.createdDate = transaction.createdDate
+                            modifiedMembers.add(member)
+                        }
+
+                        val account = accountsMap[accountNumber] ?: Account(member, accountType, accountNumber, createdDate = transaction.createdDate, balance = 0.0).apply {
+                            accountsMap[accountNumber] = this
+                        }
+
+                        if (account.createdDate == null || account.createdDate!!.isAfter(transaction.createdDate)) {
+                            account.createdDate = transaction.createdDate
+                        }
+
+                        // Calculate balance in memory
+                        val amount = transaction.amount ?: 0.0f
+                        val currentBalance = account.balance ?: 0.0
+                        account.balance = when (account.type) {
+                            AccountType.SAVINGS -> {
+                                if (arrayOf(TransactionType.OPENING_BALANCE, TransactionType.SAVINGS, TransactionType.SAVINGS_CHEQUE).contains(transaction.type)) {
+                                    currentBalance + amount
+                                } else if (arrayOf(TransactionType.WITHDRAWAL, TransactionType.WITHDRAWAL_CHEQUE).contains(transaction.type)) {
+                                    currentBalance - amount
+                                } else {
+                                    currentBalance
+                                }
+                            }
+                            AccountType.LOAN -> {
+                                if (arrayOf(TransactionType.OPENING_LOAN_BALANCE, TransactionType.LOAN, TransactionType.LOAN_CHEQUE).contains(transaction.type)) {
+                                    currentBalance + amount
+                                } else if (arrayOf(TransactionType.LOAN_REPAYMENT, TransactionType.LOAN_REPAYMENT_CHEQUE).contains(transaction.type)) {
+                                    currentBalance - amount
+                                } else {
+                                    currentBalance
+                                }
+                            }
+                            else -> { // admin/expenses
+                                if (arrayOf(TransactionType.STATIONERY, TransactionType.STATIONERY_CHEQUE, TransactionType.TRANSPORT, TransactionType.INCENTIVE_TO_PERSONNEL, TransactionType.INCENTIVE_TO_PERSONNEL_CHEQUE).contains(transaction.type)) {
+                                    currentBalance + amount
+                                } else if (transaction.type == TransactionType.WITHDRAWAL) {
+                                    currentBalance - amount
+                                } else {
+                                    currentBalance
+                                }
+                            }
+                        }
+
+                        transaction.account = account
+                        transactionsToSave.add(transaction)
+                        lastTransactionMap[accountNumber] = transaction
+
+                    } catch (ex: Exception) {
+                        println(record)
+                        ex.printStackTrace()
+                    }
                 }
-            }
 
-            membersRepository.updateTotalBalance(0)
+                // Bulk save all entities
+                membersRepository.saveAll(modifiedMembers)
+                memberAccountRepository.saveAll(accountsMap.values)
+                repository.saveAll(transactionsToSave)
+
+                // Bulk update total balances and transaction counts for all members
+                membersRepository.updateTotalBalance(0)
+                membersRepository.updateAllTransactionCounts()
+            }
+        } finally {
+            TransactionListener.enabled = true
         }
     }
 
 
-    private fun resolveAccountNumber(memberId: Long, transactionType: TransactionType): String {
+    private fun resolveAccountNumber(
+        memberId: Long,
+        transactionType: TransactionType,
+        loanAccountsCountMap: MutableMap<Long, Long>,
+        lastTransactionMap: Map<String, Transaction>
+    ): String {
         if (!transactionType.name.contains("LOAN")) return memberId.toString()
 
-        var loanAccountsCount = memberAccountRepository.countByMemberIdAndType(memberId, arrayOf(AccountType.LOAN.name))
-        loanAccountsCount = if (loanAccountsCount == 0L) 1L else loanAccountsCount
+        var loanAccountsCount = loanAccountsCountMap[memberId] ?: 0L
+        if (loanAccountsCount == 0L) {
+            loanAccountsCount = 1L
+            loanAccountsCountMap[memberId] = 1L
+        }
         val lastLoanAccountNumber = "LOAN-$memberId-$loanAccountsCount"
-        val lastTransaction = repository.lastByAccountId(lastLoanAccountNumber)
-
+        val lastTransaction = lastTransactionMap[lastLoanAccountNumber]
 
 
 //        println(lastLoanAccountNumber + " - " + transactionType.name + " - " + lastTransaction?.account?.balance)
@@ -310,7 +376,9 @@ class TransactionsService(
         ) {
             lastLoanAccountNumber
         } else {
-            "LOAN-$memberId-${loanAccountsCount + 1}"
+            val nextCount = loanAccountsCount + 1
+            loanAccountsCountMap[memberId] = nextCount
+            "LOAN-$memberId-$nextCount"
         }
     }
 

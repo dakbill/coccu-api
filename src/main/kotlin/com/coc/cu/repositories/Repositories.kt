@@ -182,6 +182,14 @@ interface MembersRepository : CrudRepository<Member, Long> {
     @Modifying
     @Transactional
     @Query(
+        value = "UPDATE member SET transaction_count=(SELECT COUNT(id) FROM TRANSACTION WHERE account_id IN (SELECT id FROM ACCOUNT WHERE member_id=member.id))",
+        nativeQuery = true
+    )
+    fun updateAllTransactionCounts(): Int
+
+    @Modifying
+    @Transactional
+    @Query(
         value = """
             UPDATE member 
             SET total_balance = (
